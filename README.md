@@ -2,17 +2,6 @@
 
 How to find groups and other structure in unlabeled, possibly high dimensional data. Dimension reduction for visualization and data analysis. Clustering and model fitting via the EM algorithm.
 
-
-## Teaching Team
-
-| Position | Name  | Slack Handle | GHE Handle | Office Hours |
-| :------: | :---: | :----------: | :--------: | :-----------: |
-| Lecturer & Lab Instructor | Rodolfo Lourenzutti | `@lourenzutti` | `@lourenzu` | Fridays - 2:00pm ~ 3:00pm (ESB 1045)|
-| Teaching Assistant | Aaron Berk |  `@Aaron Berk`  | `@aberk` | Thursday - 15:30pm ~ 16:30pm (PCOH 1001) |
-| Teaching Assistant | Flora (Qiuyan) Liu | `@Flora Liu ` | `@floraliu` | Mondays - 4:00pm ~ 5:00pm (ESB 1045) |
-| Teaching Assistant | Elijah Willie |  |  | Tuesdays - 2:00pm ~ 3:00pm (ESB 1045)  |
-
-
 ## Lectures
 
 
