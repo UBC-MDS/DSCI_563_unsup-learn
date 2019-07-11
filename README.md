@@ -16,22 +16,6 @@ How to find groups and other structure in unlabeled, possibly high dimensional d
 | 7 | 2019-01-24   | Thur | More on Recommender Systems and Multidimensional Scaling ([Mike's class](https://www.youtube.com/watch?v=rR9kLt8hxq0&index=27&list=PLWmXHcz_53Q02ZLeAxigki1JZFfCO6M-b))  |   |
 | 8 | 2019-01-29   | Tue  | GAP statistic, FCM, t-SNE, Isomap, eigenfaces  |   |
  
-## Labs
-
-|   | Lab topic   |  Due Date |
-|------|-----------|-----------|
-| [1](labs/lab1.md) | Lecture 1     | 2019-01-05|
-| [2](labs/lab2.md) | Lectures 2 & 3  | 2019-01-12 |
-| [3](labs/lab3.md) | Lectures 4 & 5  | 2019-01-19 |
-| [4](labs/lab4.md) | Lectures 6 & 7 | 2019-01-26 |
-
-## Quizzes
-|     | Time | Date | Location |
-|-----|------|------|----------|
-| 1 | 13:30 - 14:00 | 2019-01-17 | In your lab section |
-| 2 | 11:00 - 11:30 | 2019-01-31 | DPM 301 |
-
-
 
 ## Reference Material and other Resources
 * **[JWHT13]**: James, G., Witten, D., Hastie, T. and Tibshirani, R.
