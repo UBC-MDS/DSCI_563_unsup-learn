@@ -1,0 +1,12 @@
+*.csv
+*.xlsx
+*.sh
+*.pl
+*.user
+*.item
+*.base
+*.test
+*.data
+*.genre
+*.info
+*.occupation
