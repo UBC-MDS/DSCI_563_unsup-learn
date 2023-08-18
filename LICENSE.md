@@ -18,7 +18,7 @@ The licensor cannot revoke these freedoms as long as you follow the license term
 
 Under the following terms:
 
-- **Attribution** -- You must give appropriate credit (mentioning that your work is derived from work that is Copyright © Varada Kolhatkar, Rodolfo Lourenzutti, and Mike  Gelbart), provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
+- **Attribution** -- You must give appropriate credit (mentioning that your work is derived from work that is Copyright © Varada Kolhatkar and Mike  Gelbart), provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
 
 - **No additional restrictions** -- You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
 
@@ -34,7 +34,7 @@ Except where otherwise noted, the example programs and other software provided i
 
 MIT License
 
-Copyright (c) 2021 Varada Kolhatkar, Rodolfo Lourenzutti, and Mike Gelbart 
+Copyright (c) 2023 Varada Kolhatkar, Rodolfo Lourenzutti, and Mike Gelbart
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
