@@ -3,13 +3,7 @@
 
 ## Important links 
 
-- [Course Jupyter book](https://pages.github.ubc.ca/mds-2022-23/DSCI_563_unsup-learn_students/README.html)
-- [Course GitHub page](https://github.ubc.ca/MDS-2022-23/DSCI_563_unsup-learn_students)
-- [Slack Channel](https://ubc-mds.slack.com/messages/563_unsup-learn)
-- [Canvas](https://canvas.ubc.ca/courses/106525)
-- [Gradescope](https://www.gradescope.ca/courses/9525)
 - [YouTube videos](https://www.youtube.com/playlist?list=PLHofvQE1VlGtZoAULxcHb7lOsMved0CuM)
-- [Panopto videos](https://ubc.ca.panopto.com/Panopto/Pages/Sessions/List.aspx#folderID=%22c88c9005-dab6-4c23-b135-af85000b71e1%22)
 - [Class + office hours calendar](https://ubc-mds.github.io/calendar/)
 
 ## Course learning outcomes    
