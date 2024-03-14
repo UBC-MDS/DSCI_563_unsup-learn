@@ -3,9 +3,13 @@
 
 ## Important links 
 
+- [Course Jupyter book](https://pages.github.ubc.ca/mds-2023-24/DSCI_563_unsup-learn_students/README.html)
+- [Course GitHub page](https://github.ubc.ca/MDS-2023-24/DSCI_563_unsup-learn_students)
+- [Slack Channel](https://ubc-mds.slack.com/messages/563_unsup-learn)
+- [Canvas](https://canvas.ubc.ca/courses/130310)
+- [Gradescope](https://www.gradescope.ca/courses/12077)
 - [YouTube videos](https://www.youtube.com/playlist?list=PLHofvQE1VlGtZoAULxcHb7lOsMved0CuM)
 - [Class + office hours calendar](https://ubc-mds.github.io/calendar/)
-
 ## Course learning outcomes    
 This course is about identifying underlying structure in data. We will talk about clustering, data representation (e.g., dimensionality reduction and word embeddings), and recommendation systems. 
 
@@ -34,14 +38,15 @@ By the end of the course, students are expected to be able to
     
 The following deliverables will determine your course grade:
 
-| Assessment       | Weight  | Where to submit|
-| :---:            | :---:   |:---:  | 
-| Lab Assignment 1 | 15%     | [Gradescope](https://www.gradescope.ca/courses/9525) |
-| Lab Assignment 2 | 15%     | [Gradescope](https://www.gradescope.ca/courses/9525) |
-| Lab Assignment 3 | 15%     | [Gradescope](https://www.gradescope.ca/courses/9525) |
-| Lab Assignment 4 | 15%     | [Gradescope](https://www.gradescope.ca/courses/9525) |
-| Quiz 1           | 20%     | [Canvas](https://canvas.ubc.ca/courses/106525)     |
-| Quiz 2           | 20%     | [Canvas](https://canvas.ubc.ca/courses/106525)     |
+| Assessment           | Weight  | Where to submit|
+| :---:                | :---:   |:---:  | 
+| Lab Assignment 1     | 12%     | [Gradescope](https://www.gradescope.ca/courses/12077) |
+| Lab Assignment 2     | 12%     | [Gradescope](https://www.gradescope.ca/courses/12077) 
+| Lab Assignment 3     | 12%     | [Gradescope](https://www.gradescope.ca/courses/12077) |
+| Lab Assignment 4     | 12%     | [Gradescope](https://www.gradescope.ca/courses/12077) |
+| Class participation  |  2%     | [iClicker Cloud]() |
+| Quiz 1               | 25%     | [Canvas](https://canvas.ubc.ca/courses/106525)     |
+| Quiz 2               | 25%     | [Canvas](https://canvas.ubc.ca/courses/106525)     |
 
 See [Calendar](https://ubc-mds.github.io/calendar/) for the due dates. 
 </details>
@@ -54,11 +59,10 @@ See [Calendar](https://ubc-mds.github.io/calendar/) for the due dates.
 | :------: | :---: |
 | Lecture instructor | Varada Kolhatkar |
 | Lab instructor | Varada Kolhatkar |
-| Teaching assistant | Daniel Ramandi |
-| Teaching assistant | Farnoosh Hashemi |
-| Teaching assistant | Glenn Chang|
-| Teaching assistant | Harsh Sharma |
-| Teaching assistant | Shan Lu |
+| Teaching assistant | Ngoc Bui|
+| Teaching assistant | Mohit Pandey |
+| Teaching assistant | Negar Sadrzadeh |
+| Teaching assistant | Jordan Yu |
     
 </details>  
 
@@ -113,10 +117,12 @@ We are providing you with a `conda` environment file which is available [here](e
 conda env create -f env-dsci-563.yml
 conda activate 563
 ```
-In order to use this environment in `Jupyter`, you will have to install `nb_conda_kernels` in the environment where you have installed `Jupyter` (typically the `base` environment). You will then be able to select this new environment in `Jupyter`. For more details on this, refer to "Making environments work well with JupyterLab section" in your [521 lecture 6](https://pages.github.ubc.ca/fdandrea/521_lecture6/slides.html#51).
 
-I've only tried installing this environment file on a couple of machines, and it's possible that you will encounter problems with some of the packages from the `yml` file when you run the commands above. This is not unusual. It often means that the package with the given version is not available for your operating system via `conda` yet. There are a couple of options for you when this happens:
-1. Get rid of the line with that package from the `yml` file.
+In order to use this environment in `Jupyter`, you will have to install `nb_conda_kernels` in the environment where you have installed `Jupyter` (typically the `base` environment). You will then be able to select this new environment in `Jupyter`. If you're unable to see the environment in Jupyter, you might have to install the kernel manually. See the documentation [here](https://ipython.readthedocs.io/en/stable/install/kernel_install.html). For more details on this, refer to your [521 lecture 7](https://pages.github.ubc.ca/MDS-2023-24/DSCI_521_platforms-dsci_students/lectures/7-virtual-environments.html#).
+
+I've only attempted to install this environment file on a few machines, and you may encounter issues with certain packages from the `yaml` file when executing the commands above. This is not uncommon and may suggest that the specified package version is not yet available for your operating system via `conda`. When this occurs, you have a couple of options:
+
+1. Modify the local version of the `yaml` file to remove the line containing that package.
 2. Create the environment without that package. 
 3. Activate the environment and install the package manually either with `conda install` or `pip install` in the environment.   
 
@@ -131,7 +137,7 @@ We all are here to help you learn and succeed in the course and the program. Her
 
 ### Clarifications on the lecture notes or lab questions
 
-If there is any clarification on the lecture material or lab questions, I'll open an issue in the [course repository](https://github.ubc.ca/MDS-2022-23/DSCI_563_unsup-learn_students) and tag you. **It is your responsibility to read the messages whenever you are tagged.** (I know that there are too many things for you to keep track of. You do not have to read all the messages but please make sure to carefully read the messages whenever you are tagged.) 
+If there is any clarification on the lecture material or lab questions, I'll post a message on our course channel and tag you. **It is your responsibility to read the messages whenever you are tagged.** (I know that there are too many things for you to keep track of. You do not have to read all the messages but please make sure to carefully read the messages whenever you are tagged.) 
 
 ### Questions on lecture material or labs
 
@@ -156,38 +162,6 @@ I am open for a conversation with you. If you want to talk about anything sensit
 
 </details>
 
-## Working during the COVID-19 global pandemic
-<details>
-  <summary>Click to expand!</summary>
-    
-We are working together on this course during this transition period between hybrid to in-person teaching and learning. Everyone is struggling to some extent. If you tell me you are having trouble, I am not going to judge you or think less of you. I hope you will extend me the same grace! Let's try to be open with each other and help each other. 
-
-Here are some ground rules:
-
-- If you are unable to submit a deliverable on time, please reach out **before** the deliverable is due.
-- If you need extra support, the teaching team is here to work with you. Our goal is to help each of you succeed in the course.
-- If you are struggling with the material, getting back to in-person teaching and learning, or anything else, please reach out. I will try to find time and listen to you empathetically.
-- If I am unable to help you, I might know someone who can. UBC has some [great student support resources](https://students.ubc.ca/support).
-
-### [Covid Safety at UBC](https://srs.ubc.ca/covid-19/ubc-campus-rules-guidance-documents/#COVID-19%20Campus%20Rules)
-
-Please read [Covid Campus Rules](https://srs.ubc.ca/covid-19/ubc-campus-rules-guidance-documents/#COVID-19%20Campus%20Rules).  
-
-**Masks:** This class is going to be in person. UBC no longer requires students, faculty and staff to wear non-medical masks, but continues to recommend that masks be worn in indoor public spaces. 
-
-**Your personal health:**
-If you are ill or believe you have COVID-19 symptoms or been exposed to SARS-CoV-2 use the [Thrive Health](https://bc.thrive.health/covid19/en) self-assessment tool for guidance, or download the [BC COVID-19 Support App](https://welcome.thrive.health/bc-covid19-app) for iOS or Android device and follow the instructions provided. Follow the advice from [Public Health](https://www2.gov.bc.ca/gov/content/covid-19/info/restrictions).
-
-Stay home if you have recently tested positive for COVID-19 or are required to quarantine. You can check [this website](http://www.bccdc.ca/health-info/diseases-conditions/covid-19/self-isolation#Who) to find out if you should self-isolate or self-monitor. If you are unable to submit a deliverable on time or unable to appear for an in-person quiz, check out [MDS policies](https://ubc-mds.github.io/policies/) on academic concession and remote quiz requests. 
-
-Your precautions will help reduce risk and keep everyone safer. In this class, the marking scheme is intended to provide flexibility so that you can prioritize your health and still be able to succeed: 
-- All course notes will be provided online. 
-- All homework assignments can be done and handed in online. 
-- All exams will be held online.  
-- Most of the class activity will be video recorded and will be made available to you. 
-- Before each class, I'll also try to post some [videos on YouTube](https://www.youtube.com/watch?v=-1hTcS5ZE4w&list=PLHofvQE1VlGtZoAULxcHb7lOsMved0CuM) to facilitate hybrid learning. 
-- There will be at least a few office hours which will be held online. 
-</details>
 
 ## Reference Material
 <details>
