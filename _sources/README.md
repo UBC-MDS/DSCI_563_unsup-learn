@@ -3,7 +3,7 @@
 
 ## Important links 
 
-- [Course Jupyter book](https://pages.github.ubc.ca/mds-2023-24/DSCI_563_unsup-learn_students/README.html)
+- [Course Jupyter book](https://ubc-mds.github.io/DSCI_563_unsup-learn)
 - [Course GitHub page](https://github.ubc.ca/MDS-2023-24/DSCI_563_unsup-learn_students)
 - [Slack Channel](https://ubc-mds.slack.com/messages/563_unsup-learn)
 - [Canvas](https://canvas.ubc.ca/courses/130310)
