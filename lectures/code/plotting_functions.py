@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap, colorConverter, LinearSegmentedColormap
 from scipy.spatial import distance
 from sklearn.metrics import euclidean_distances
-from sklearn.neighbors import DistanceMetric
 from sklearn.manifold import MDS
 from scipy.spatial import distance
 from sklearn.datasets import make_blobs
@@ -53,7 +52,7 @@ colors = ['xkcd:azure', 'yellowgreen', 'tomato', 'teal', 'indigo', 'aqua', 'oran
 
 def discrete_scatter(x1, x2, y=None, markers=None, s=8, ax=None,
                      labels=None, padding=.2, alpha=1, c=None, markeredgewidth=0.6, 
-                     label_points=False, x1_annot=-0.1, x2_annot=0.1):
+                     label_points=False, x1_annot=-0.1, x2_annot=0.2):
     """Adaption of matplotlib.pyplot.scatter to plot classes or clusters.
     Parameters
     ----------
@@ -123,8 +122,8 @@ def discrete_scatter(x1, x2, y=None, markers=None, s=8, ax=None,
     if label_points: 
         labs = [str(label) for label in list(range(0,len(x1)))]
         for i, txt in enumerate(labs):
-            font_size=10
-            ax.annotate(txt, (x1[i], x2[i]), xytext= (x1[i]+x1_annot, x2[i]+x2_annot), c='k', size = font_size)
+            font_size=9
+            ax.annotate(txt, (x1[i]+0.2, x2[i]+0.2), xytext= (x1[i]+x1_annot, x2[i]+x2_annot), c='k', size = font_size)
 
     return lines    
 
@@ -277,12 +276,14 @@ def plot_pca_model_search(X, fig, alpha, w=10, h=8):
 
     err = np.round(reconstruction_error(X, Z).sum(), 4)    
     #mglearn.discrete_scatter(X[:, 0], X[:, 1], s=8)
-    discrete_scatter(X[:, 0], X[:, 1], s=12, label_points=True)
+    discrete_scatter(X[:, 0], X[:, 1], s=8, label_points=True)
     #plt.scatter(X[:, 0], X[:, 1], c=X[:, 0], cmap="viridis", s=60, linewidths=3)    
     plt.plot(W[0, 0] * 3.5 * np.array([-1, 1]), W[0, 1] * 3.5 * np.array([-1, 1]), "k")
     plt.xlim([-2, 2])
     plt.ylim([-2, 2])
-    discrete_scatter(Z[:, 0], Z[:, 1], s=12, c=[0])
+    plt.xlabel('feature0', fontsize=8)
+    plt.ylabel('feature1', fontsize=8)
+    discrete_scatter(Z[:, 0], Z[:, 1], s=8, c=[0])
     #plt.scatter(Z[:, 0], Z[:, 1], c="r", s=60)
     for i in range(len(X)):
         plt.plot(
@@ -296,7 +297,7 @@ def plot_pca_model_search(X, fig, alpha, w=10, h=8):
 
     n = X.shape[0]
     w = W.T @ W
-    plt.title(f"Which line?\nReconstruction error: {err}", fontsize=14)
+    plt.title(f"Which line?\nReconstruction error: {err}", fontsize=12)
     plt.close()
     return fig
 
@@ -944,7 +945,7 @@ def update_centers(X, Z, old_centers, k):
 
 
 
-def plot_example_dist(data, centroids, fig, fontsize = 16, point_ind=None, ax=None):
+def plot_example_dist(data, centroids, fig, fontsize = 10, point_ind=None, ax=None):
     """
     Plot the distance of a point to the centroids.
 
@@ -972,8 +973,8 @@ def plot_example_dist(data, centroids, fig, fontsize = 16, point_ind=None, ax=No
     point = data[point_ind, 0:2]
     centroids = centroids[:, 0:2]
 
-    discrete_scatter(data[:, 0], data[:, 1], s=14, label_points=True, ax=ax)
-    discrete_scatter(centroids[:, 0], centroids[:, 1], y=[0,1,2], s=18,
+    discrete_scatter(data[:, 0], data[:, 1], s=8, label_points=True, ax=ax, x1_annot=-0.1, x2_annot=0.3)
+    discrete_scatter(centroids[:, 0], centroids[:, 1], y=[0,1,2], s=12,
                 markers='*', ax=ax)
     # ax.set_xlabel(data.columns[0], fontdict={'fontsize': fontsize})
     # ax.set_ylabel(data.columns[1], fontdict={'fontsize': fontsize})
@@ -985,7 +986,7 @@ def plot_example_dist(data, centroids, fig, fontsize = 16, point_ind=None, ax=No
         dist[i] = np.sum((point-centroids[i, :])**2)**0.5                 
         ax.plot(l[:, 0], l[:, 1], c=colors[i], linewidth=2.0, linestyle='-.')
         if (l[0, 1] <= l[1, 1]):
-            ax.text(l[1, 0]+.20, l[1, 1]+.2,
+            ax.text(l[1, 0]+.22, l[1, 1]+.22,
                      f"d = {np.round(dist[i], 2)}", color=colors[i],
                      fontdict={'fontsize': fontsize})
         else:
@@ -1012,12 +1013,12 @@ def plot_km_initialization(X, centers):
     ax[1].set_title("Initial centers");    
     
     
-def plot_km_iteration(X, Z, centers, new_centers, iteration, fig, ax, fontsize=18):
-    discrete_scatter(X[:,0], X[:,1], y=Z.tolist(), markers='o', s=12, ax = ax[0])
-    discrete_scatter(centers[:,0], centers[:,1], y=np.arange(len(centers)), markers='*',s=18, ax = ax[0])
+def plot_km_iteration(X, Z, centers, new_centers, iteration, fig, ax, fontsize=10):
+    discrete_scatter(X[:,0], X[:,1], y=Z.tolist(), markers='o', s=8, label_points=True, ax = ax[0], x1_annot = -0.3, x2_annot=0.4)
+    discrete_scatter(centers[:,0], centers[:,1], y=np.arange(len(centers)), markers='*',s=10, ax = ax[0])
     ax[0].set_title(f'Iteration: {iteration}: Update Z', fontdict={'fontsize': fontsize})    
-    discrete_scatter(X[:,0], X[:,1], y=Z.tolist(), markers='o', s=12, label_points=True, ax = ax[1])
-    discrete_scatter(new_centers[:,0], new_centers[:,1], y=np.arange(len(centers)), markers='*',s=18, ax = ax[1])    
+    discrete_scatter(X[:,0], X[:,1], y=Z.tolist(), markers='o', s=8, label_points=True, ax = ax[1], x1_annot = -0.3, x2_annot=0.4)
+    discrete_scatter(new_centers[:,0], new_centers[:,1], y=np.arange(len(centers)), markers='*',s=10, ax = ax[1])    
     aux = new_centers-(centers+(new_centers-centers)*0.9)
     aux = np.linalg.norm(aux, axis=1)    
     for i in range(0, 3):
@@ -1134,8 +1135,8 @@ def Gaussian_mixture_1d(ϕ1, ϕ2, fig, μ1=0.0, μ2=5.0, Σ1=1, Σ2=3):
     plt.plot('x', 'mixture', data=data, linewidth=4, label='Mixture')
     plt.plot('x', 'f1(x|mu1,Sigma1)', linestyle='--', linewidth=3, alpha = .50, data=data, color='green', label=f'$f_1(x|\mu_1={μ1},\Sigma_1={Σ1})$')
     plt.plot('x', 'f2(x|mu2,Sigma2)', linestyle='--', linewidth=3, alpha = .50, data=data, color='red', label=f'$f_2(x|\mu_2={μ2},\Sigma_2={Σ2})$')
-    plt.legend(fontsize=16)
-    plt.title(f'Gaussian Mixture: $\Phi_1$ = {ϕ1} and $\Phi_2$ = {ϕ2}', fontdict={'fontsize':18})
+    plt.legend(fontsize=10)
+    plt.title(f'Gaussian Mixture: $\pi_1$ = {ϕ1} and $\pi_2$ = {ϕ2}', fontdict={'fontsize':12})
     plt.close()    
     return fig
 
@@ -1212,29 +1213,41 @@ def plot_gmm_cov_types(estimators, X_train):
         plt.title(name)
 
     plt.legend(scatterpoints=1, loc="upper right", prop=dict(size=12))
-
     
+
 def get_cluster_images(model, Z, inputs, cluster=0, n_img=5):
     fig, axes = plt.subplots(1, n_img + 1, subplot_kw={'xticks': (), 'yticks': ()},
                              figsize=(10, 10), gridspec_kw={"hspace": .3})
-    img_shape = [3,200,200]
+    img_shape = [3,224,224]
     transpose_axes = (1,2,0)      
     
     if type(model).__name__ == 'KMeans': 
         center = model.cluster_centers_[cluster]
-        mask = model.labels_ == cluster
-        dists = np.sum((Z - center) ** 2, axis=1)
-        dists[~mask] = np.inf
-        inds = np.argsort(dists)[:n_img]        
+        dists = np.linalg.norm(Z - center, axis=1)
+        # mask = model.labels_ == cluster
+        # dists = np.sum((Z - center) ** 2, axis=1)
+        #dists[~mask] = np.inf        
+        closest_index = np.argmin(dists)
+        inds = np.argsort(dists)[:n_img]
+        print(closest_index)
         if Z.shape[1] == 1024: 
-            axes[0].imshow(center.reshape((32,32)))
+            axes[0].imshow(np.transpose(inputs[closest_index].reshape(img_shape) / 2 + 0.5, transpose_axes))
+            #axes[0].imshow(center.reshape((32,32)))
         else:
             axes[0].imshow(np.transpose(center.reshape(img_shape) / 2 + 0.5, transpose_axes))
         axes[0].set_title('Cluster center %d'%(cluster))       
-    if type(model).__name__ == 'GaussianMixture':         
-        cluster_probs = model.predict_proba(Z)[:,cluster]
-        inds = np.argsort(cluster_probs)[-n_img:]        
-        axes[0].imshow(np.transpose(inputs[inds[0]].reshape(img_shape) / 2 + 0.5, transpose_axes))
+    if type(model).__name__ == 'GaussianMixture':
+        center = model.means_[cluster]        
+        cluster_probs = model.predict_proba(Z)[:,cluster]        
+        inds = np.argsort(cluster_probs)[-n_img:]
+        dists = np.linalg.norm(Z - center, axis=1)
+        # Find the index of the closest feature vector to the mean
+        closest_index = np.argmin(dists)
+        if Z.shape[1] == 1024: 
+            axes[0].imshow(np.transpose(inputs[closest_index].reshape(img_shape) / 2 + 0.5, transpose_axes))
+        else:
+            axes[0].imshow(np.transpose(center.reshape(img_shape) / 2 + 0.5, transpose_axes))
+        #axes[0].imshow(np.transpose(inputs[inds[0]].reshape(img_shape) / 2 + 0.5, transpose_axes))
         axes[0].set_title('Cluster %d'%(cluster))   
         
     i = 1
@@ -1242,7 +1255,7 @@ def get_cluster_images(model, Z, inputs, cluster=0, n_img=5):
     for image in inputs[inds]:
         axes[i].imshow(np.transpose(image/2 + 0.5 , transpose_axes))
         i+=1
-    plt.show()    
+    plt.show()
     
 def plot_original_clustered(X, model, labels):
     k = np.unique(labels).shape[0]
@@ -1394,12 +1407,12 @@ def plot_dbscan():
     
 
 def plot_X_dendrogram(X, linkage_array, font_size=14, label_n_clusters=False, title='Dendrogram'): 
-    fig, axes = plt.subplots(1, 2, figsize=(12, 4))
+    fig, axes = plt.subplots(1, 2, figsize=(12, 4))    
     discrete_scatter(X[:, 0], X[:, 1], markeredgewidth=1.0, ax = axes[0]); 
     axes[0].set_title('Original data')
     labels = [str(label) for label in list(range(0,len(X)))]
     for i, txt in enumerate(labels):
-        axes[0].annotate(txt, X[i], xytext=X[i] + 0.2, size = font_size)
+        axes[0].annotate(txt, X[i], xytext=X[i] + 0.1, size = font_size)
         
     # Credit: Based on the code in Introduction to Machine Learning with Python        
     dendrogram(linkage_array, ax=axes[1])
@@ -1479,13 +1492,13 @@ def print_hierarchical_clusters(inputs, Z, cluster_labels, unique_cluster_labels
         for i in range(cluster_size, 15):
             axes[i].set_visible(False)
 
-def plot_dendrogram_clusters(X, linkage_array, hier_labels, linkage_type='single', title=None): 
+def plot_dendrogram_clusters(X, linkage_array, hier_labels, linkage_type='single', title=None, color_threshold=3): 
     fig, ax = plt.subplots(1, 2, figsize=(12, 4)) 
-    dendrogram(linkage_array, ax=ax[0])
+    dendrogram(linkage_array, ax=ax[0], color_threshold=color_threshold)
     ax[0].set_xlabel("Sample index")
     ax[0].set_ylabel("Cluster distance");
     ax[0].set_title(f"{linkage_type} linkage")
-    discrete_scatter(X[:, 0], X[:,1], hier_labels, markers='o', label_points=True, ax=ax[1]);
+    discrete_scatter(X[:, 0], X[:,1], hier_labels, markers='o', label_points=True, ax=ax[1], x1_annot=-0.1, x2_annot=0.05);
     ax[1].set_title(title)            
             
 def plot_linkage_criteria(X, n_clusters):

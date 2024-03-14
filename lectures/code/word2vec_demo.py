@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim
 import numpy as np
 import pandas as pd
@@ -20,89 +19,74 @@ from preprocessing import MyPreprocessor
 
 from sklearn.metrics.pairwise import cosine_similarity
 
-class skipgramModel(torch.nn.Module):
-    def __init__(self, vocab_size, embedding_dim=10, context_size=2):
-        super(skipgramModel, self).__init__()
-        self.context_size = context_size
-        self.embedding = nn.Embedding(vocab_size, embedding_dim)
-        nn.init.uniform_(self.embedding.weight)        
-        self.linear = nn.Linear(embedding_dim, vocab_size)
-        nn.init.uniform_(self.linear.weight)
-        # self.linear2 = nn.Linear(128, vocab_size)
+class SkipgramModel(nn.Module):
+    def __init__(self, vocab_size, embedding_dim):
+        super(SkipgramModel, self).__init__()
+        self.embeddings = nn.Embedding(vocab_size, embedding_dim)
+        self.out = nn.Linear(embedding_dim, vocab_size)
     
-    def forward(self, x):
-        embeds = self.embedding(x).view((1, -1))
-        out = self.linear(embeds)
-        log_probs = F.log_softmax(out, dim=1)
+    def forward(self, inputs):
+        embeds = self.embeddings(inputs)
+        scores = self.out(embeds)
+        log_probs = torch.log_softmax(scores, dim=1)
         return log_probs
     
 def create_input_pairs(pp_corpus, word2idx, context_size=2):
-    idx_pairs = [] 
-    for sentence in pp_corpus:
-        indices = [word2idx[word] for word in sentence]
-        for center_word_pos in range(len(indices)):
-            for w in range(-context_size, context_size + 1):
-                context_word_pos = center_word_pos + w
-                if (
-                    context_word_pos < 0
-                    or context_word_pos >= len(indices)
-                    or center_word_pos == context_word_pos
-                ):
-                    continue
-                context_word_idx = indices[context_word_pos]
-                idx_pairs.append((indices[center_word_pos], context_word_idx))
-
-    idx_pairs = np.array(idx_pairs
-    )  # it will be useful to have this as numpy array
-    return idx_pairs
+    """
+    Generate training pairs of word indices for the SkipGram model.
+    
+    Args:
+        pp_corpus (list of list of str): Preprocessed corpus where each sub-list represents a tokenized sentence.
+        word2idx (dict): A dictionary mapping words to their respective indices in the vocabulary.
+        context_size (int): The size of the context window around the target word.
+        
+    Returns:
+        np.array: An array of tuples, each containing a pair of indices (target_word_index, context_word_index).
+    """    
+    idx_pairs = [(word2idx[sentence[i]], word2idx[sentence[j]])
+                 for sentence in pp_corpus
+                 for i in range(len(sentence))
+                 for j in range(max(i - context_size, 0), min(i + context_size + 1, len(sentence)))
+                 if i != j]
+    return np.array(idx_pairs)
 
 def get_vocab(tokenized_corpus):
-    vocab = []
-    for sent in tokenized_corpus:
-        for token in sent:
-            if token not in vocab:
-                vocab.append(token)
-
-    return vocab     
+    """
+    Create a vocabulary list from a tokenized corpus.
+    
+    Args:
+        tokenized_corpus (list of list of str): The corpus where each sub-list represents a tokenized sentence.
         
-def train_model(model, idx_pairs, n_epochs=10):
+    Returns:
+        list: A list of unique tokens found in the corpus, representing the vocabulary.
+    """    
+    return list(set(token for sentence in tokenized_corpus for token in sentence))    
+        
+def train_skipgram(model, pairs, epochs=10, learning_rate=0.01, verbose=False):
     loss_function = nn.NLLLoss()
-    optimizer = optim.SGD(model.parameters(), lr=0.001)
-    losses = []
-    for epoch in range(n_epochs):
+    optimizer = optim.SGD(model.parameters(), lr=learning_rate)
+    
+    for epoch in range(epochs):
         total_loss = 0
-        for inp, target in idx_pairs:
-            # Step 1. Prepare the inputs to be passed to the model (i.e, turn the words
-            # into integer indices and wrap them in tensors)
-            word_idx = torch.tensor(inp, dtype=torch.long)
-            # Step 2. Recall that torch *accumulates* gradients. Before passing in a
-            # new instance, you need to zero out the gradients from the old
-            # instance
-            model.zero_grad()
-
-            # Step 3. Run the forward pass, getting log probabilities over next
-            # words
-            log_probs = model(word_idx)
-
-            # Step 4. Compute your loss function. (Again, Torch wants the target
-            # word wrapped in a tensor)
+        for context, target in pairs:
+            context_var = torch.tensor([context], dtype=torch.long)
+            log_probs = model(context_var)
             loss = loss_function(log_probs, torch.tensor([target], dtype=torch.long))
-
-            # Step 5. Do the backward pass and update the gradient
+            
+            optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-
-            # Get the Python number from a 1-element Tensor by calling tensor.item()
+            
             total_loss += loss.item()
-        losses.append(total_loss)
-    # print(losses)  # The loss decreased every iteration over the training data!    
-    
+        if verbose: 
+            print(f"Epoch {epoch}: Total Loss: {total_loss}")
+
     
 def plot_word2_vec_pca(
     data,
     words,
     show_labels=False,
-    size=100,
+    size=40,
     title="PCA visualization",
 ):
     """
@@ -130,7 +114,7 @@ def plot_word2_vec_pca(
     principal_comp = pca.fit_transform(data)
     pca_df = pd.DataFrame(data=principal_comp, columns=["pca1", "pca2"])
 
-    plt.figure(figsize=(10, 7))
+    plt.figure(figsize=(6, 4))
     plt.title(title)
     ax = sns.scatterplot(
         x="pca1", y="pca2", data=pca_df, palette="tab10", s=size
@@ -140,7 +124,7 @@ def plot_word2_vec_pca(
     y = pca_df["pca2"].tolist()
     if show_labels:
         for i, txt in enumerate(words):
-            plt.annotate(txt, (x[i]+0.05, y[i]+0.05), size=15)
+            plt.annotate(txt, (x[i]+0.05, y[i]+0.05), size=10)
 
     plt.show()   
     
@@ -172,9 +156,9 @@ def plot_word2_vec_pca(
 #     fig.show()
 
 def plot_embeddings(fig, n_epochs, model, idx_pairs, vocab, word2idx, show_labels=True, word1="hockey", word2="football", word3="mango"):
-    train_model(model, idx_pairs, n_epochs)
-    emb_mat = model.embedding.weight.detach().numpy()
-    context_mat = model.linear.weight.detach().numpy()
+    train_skipgram(model, idx_pairs, n_epochs)
+    emb_mat = model.embeddings.weight.detach().numpy()
+    context_mat = model.out.weight.detach().numpy()
 #     fig.add_trace(go.Heatmap(z=emb_mat, y=vocab, colorscale="Viridis"), row=1, col=1)
 
 #     fig.add_trace(go.Heatmap(z=context_mat, y=vocab, colorscale="Viridis"), row=1, col=2)
@@ -200,7 +184,7 @@ def plot_embeddings(fig, n_epochs, model, idx_pairs, vocab, word2idx, show_label
     vec3 = emb_mat[word2idx[word3]].reshape(1, -1)    
     sim1 = np.round(cosine_similarity(vec1, vec2)[0][0], 2)
     sim2 = np.round(cosine_similarity(vec1, vec3)[0][0], 2)    
-    plt.title(f"\nNumber of epochs {n_epochs}\n Similarity({word1}, {word2}) = {sim1}\n Similarity({word1},{word3}) = {sim2}", fontsize=14)    
+    plt.title(f"\nNumber of epochs {n_epochs}\n Similarity({word1}, {word2}) = {sim1}\n Similarity({word1},{word3}) = {sim2}", fontsize=9)    
     # print(f"Similarity between {word1} and {word2} is {sim1}")    
     # print(f"Similarity between {word1} and {word3} is {sim2}")            
     plt.close()    
@@ -232,12 +216,13 @@ if __name__=="__main__":
     EMBEDDING_DIM = 10
     CONTEXT_SIZE = 2
     toy_pp_corpus = MyPreprocessor(toy_corpus)    
-    vocab = get_vocab(toy_pp_corpus)    
+    vocab = get_vocab(toy_pp_corpus)  
+    
     word2idx = {w: idx for (idx, w) in enumerate(vocab)}
     idx2word = {idx: w for (idx, w) in enumerate(vocab)}
     print(vocab)
 
     idx_pairs = create_input_pairs(toy_pp_corpus, word2idx)    
-    model = skipgramModel(len(vocab), EMBEDDING_DIM, CONTEXT_SIZE)
+    model = SkipgramModel(len(vocab), EMBEDDING_DIM)
     print('The number of input pairs: ', len(idx_pairs))
-    train_model(model, idx_pairs, n_epochs=10)
+    train_skipgram(model, idx_pairs, epochs=10, verbose=True)
