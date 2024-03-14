@@ -1,0 +1,2876 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Lecture 07: Collaborative filtering class demo &#8212; DSCI 563 Unsupervised Learning</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'lectures/class_demos/07_class-demo';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Attributions" href="../../attribution.html" />
+    <link rel="prev" title="Lecture 03: PCA applications class demo" href="03_class-demo.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../../README.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/mds-hex-sticker.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../../_static/mds-hex-sticker.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Lectures</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../00_course-information.html">Course Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../01_K-Means.html">Lecture 1: K-Means Clustering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../02_DBSCAN-hierarchical.html">Lecture 2: DBSCAN and Hierarchical Clustering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../03_PCA-intro.html">Lecture 3: Introduction to Principal Component Analysis (PCA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../04_More-PCA-LSA-NMF.html">Lecture 4: More PCA, LSA, and NMF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../05_word-embeddings.html">Lecture 5: Word Embeddings, word2vec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../06_more-word2vec-tsne.html">Lecture 6: Using word embeddings, manifold learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../07_recommender-systems1.html">Lecture 7: Recommender Systems Part I</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../08_recommender-systems2.html">Lecture 8: Recommender Systems Part 2</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Appendices</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../AppendixA.html">Appendix A: K-Means customer segmentation case study</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Class demos</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="01_class-demo.html">Lecture 01: Clustering class demo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_class-demo.html">Lecture 02: Clustering class demo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_class-demo.html">Lecture 03: PCA applications class demo</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Lecture 07: Collaborative filtering class demo</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Attribution</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../attribution.html">Attributions</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.ubc.ca/MDS-2022-23/DSCI_563_unsup-learn" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/lectures/class_demos/07_class-demo.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Lecture 07: Collaborative filtering class demo</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-dataset-jester-1-7m-jokes-ratings-dataset">Example dataset: Jester 1.7M jokes ratings dataset</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dataset-stats">Dataset stats</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#utility-matrix-for-jester-jokes-ratings-data">Utility matrix for Jester jokes ratings data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-splitting-and-evaluation">Data splitting and evaluation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#data-splitting">Data splitting</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#baseline-approaches">Baseline approaches</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#global-average-baseline">Global average baseline</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#k-nearest-neighbours-imputation"><span class="math notranslate nohighlight">\(k\)</span>-nearest neighbours imputation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-finding-nearest-neighbors">(Optional) Finding nearest neighbors</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-k-nearest-neighbours-on-a-query-joke">(Optional) <span class="math notranslate nohighlight">\(k\)</span>-nearest neighbours on a query joke</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#collaborative-filtering-using-the-surprise-package">Collaborative filtering using the <code class="docutils literal notranslate"><span class="pre">surprise</span></code> package</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-pytorch-implementation">(Optional) PyTorch implementation</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="lecture-07-collaborative-filtering-class-demo">
+<h1>Lecture 07: Collaborative filtering class demo<a class="headerlink" href="#lecture-07-collaborative-filtering-class-demo" title="Permalink to this heading">#</a></h1>
+<p><img alt="" src="../../_images/eva-fun-times.png" /></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">&quot;..&quot;</span><span class="p">),</span> <span class="s2">&quot;code&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="example-dataset-jester-1-7m-jokes-ratings-dataset">
+<h2>Example dataset: <a class="reference external" href="https://www.kaggle.com/vikashrajluhaniwal/jester-17m-jokes-ratings-dataset?select=jester_ratings.csv">Jester 1.7M jokes ratings dataset</a><a class="headerlink" href="#example-dataset-jester-1-7m-jokes-ratings-dataset" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p>We’ll use a sample of <a class="reference external" href="https://www.kaggle.com/vikashrajluhaniwal/jester-17m-jokes-ratings-dataset">Jester 1.7M jokes ratings dataset</a> to demonstrate different recommendation systems.</p></li>
+</ul>
+<p>The dataset comes with two CSVs</p>
+<ul class="simple">
+<li><p>A CSV containing ratings (-10.0 to +10.0) of 150 jokes from 59,132 users.</p></li>
+<li><p>A CSV containing joke IDs and the actual text of jokes.</p></li>
+</ul>
+<blockquote>
+<div><p>Some jokes might be offensive. Please do not look too much into the actual text data if you are sensitive to such language.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>Recommendation systems are most effective when you have a large amount of data.</p></li>
+<li><p>But we are only taking a sample here for speed.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;../data/jester_ratings.csv&quot;</span>
+<span class="n">ratings_full</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+<span class="n">ratings</span> <span class="o">=</span> <span class="n">ratings_full</span><span class="p">[</span><span class="n">ratings_full</span><span class="p">[</span><span class="s2">&quot;userId&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">4000</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ratings</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>userId</th>
+      <th>jokeId</th>
+      <th>rating</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>5</td>
+      <td>0.219</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>7</td>
+      <td>-9.281</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1</td>
+      <td>8</td>
+      <td>-9.281</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1</td>
+      <td>13</td>
+      <td>-6.781</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1</td>
+      <td>15</td>
+      <td>0.875</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">user_key</span> <span class="o">=</span> <span class="s2">&quot;userId&quot;</span>
+<span class="n">item_key</span> <span class="o">=</span> <span class="s2">&quot;jokeId&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="dataset-stats">
+<h2>Dataset stats<a class="headerlink" href="#dataset-stats" title="Permalink to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ratings</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;
+Index: 141362 entries, 0 to 141361
+Data columns (total 3 columns):
+ #   Column  Non-Null Count   Dtype  
+---  ------  --------------   -----  
+ 0   userId  141362 non-null  int64  
+ 1   jokeId  141362 non-null  int64  
+ 2   rating  141362 non-null  float64
+dtypes: float64(1), int64(2)
+memory usage: 4.3 MB
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_stats</span><span class="p">(</span><span class="n">ratings</span><span class="p">,</span> <span class="n">item_key</span><span class="o">=</span><span class="s2">&quot;jokeId&quot;</span><span class="p">,</span> <span class="n">user_key</span><span class="o">=</span><span class="s2">&quot;userId&quot;</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of ratings:&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ratings</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Average rating:  </span><span class="si">%0.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">ratings</span><span class="p">[</span><span class="s2">&quot;rating&quot;</span><span class="p">])))</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">ratings</span><span class="p">[</span><span class="n">user_key</span><span class="p">]))</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">ratings</span><span class="p">[</span><span class="n">item_key</span><span class="p">]))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of users (N): </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">N</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of items (M): </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">M</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Fraction non-nan ratings: </span><span class="si">%0.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ratings</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">N</span> <span class="o">*</span> <span class="n">M</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">N</span><span class="p">,</span> <span class="n">M</span>
+
+
+<span class="n">N</span><span class="p">,</span> <span class="n">M</span> <span class="o">=</span> <span class="n">get_stats</span><span class="p">(</span><span class="n">ratings</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of ratings: 141362
+Average rating:  1.200
+Number of users (N): 3635
+Number of items (M): 140
+Fraction non-nan ratings: 0.278
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>Let’s construct utility matrix with <code class="docutils literal notranslate"><span class="pre">number</span> <span class="pre">of</span> <span class="pre">users</span></code> rows and <code class="docutils literal notranslate"><span class="pre">number</span> <span class="pre">of</span> <span class="pre">items</span></code> columns from the ratings data.</p></li>
+</ul>
+<blockquote>
+<div><p>Note we are constructing a non-sparse matrix for demonstration purpose here. In real life it’s recommended that you work with sparse matrices.</p>
+</div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">user_mapper</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">ratings</span><span class="p">[</span><span class="n">user_key</span><span class="p">]),</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">))))</span>
+<span class="n">item_mapper</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">ratings</span><span class="p">[</span><span class="n">item_key</span><span class="p">]),</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">))))</span>
+<span class="n">user_inverse_mapper</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">ratings</span><span class="p">[</span><span class="n">user_key</span><span class="p">])))</span>
+<span class="n">item_inverse_mapper</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">ratings</span><span class="p">[</span><span class="n">item_key</span><span class="p">])))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">create_Y_from_ratings</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">user_mapper</span><span class="p">,</span> <span class="n">item_mapper</span><span class="p">,</span> <span class="n">user_key</span><span class="o">=</span><span class="s2">&quot;userId&quot;</span><span class="p">,</span> <span class="n">item_key</span><span class="o">=</span><span class="s2">&quot;jokeId&quot;</span>
+<span class="p">):</span>  <span class="c1"># Function to create a dense utility matrix</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">))</span>
+    <span class="n">Y</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">user_mapper</span><span class="p">[</span><span class="n">val</span><span class="p">[</span><span class="n">user_key</span><span class="p">]]</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">item_mapper</span><span class="p">[</span><span class="n">val</span><span class="p">[</span><span class="n">item_key</span><span class="p">]]</span>
+        <span class="n">Y</span><span class="p">[</span><span class="n">n</span><span class="p">,</span> <span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="s2">&quot;rating&quot;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">Y</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="utility-matrix-for-jester-jokes-ratings-data">
+<h2>Utility matrix for Jester jokes ratings data<a class="headerlink" href="#utility-matrix-for-jester-jokes-ratings-data" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Rows represent users.</p></li>
+<li><p>Columns represent items (jokes in our case).</p></li>
+<li><p>Each cell gives the rating given by the user to the corresponding joke.</p></li>
+<li><p>Users are features for jokes and jokes are features for users.</p></li>
+<li><p>We want to predict the missing entries.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Y_mat</span> <span class="o">=</span> <span class="n">create_Y_from_ratings</span><span class="p">(</span><span class="n">ratings</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">user_mapper</span><span class="p">,</span> <span class="n">item_mapper</span><span class="p">)</span>
+<span class="n">Y_mat</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(3635, 140)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">Y_mat</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>0</th>
+      <th>1</th>
+      <th>2</th>
+      <th>3</th>
+      <th>4</th>
+      <th>5</th>
+      <th>6</th>
+      <th>7</th>
+      <th>8</th>
+      <th>9</th>
+      <th>...</th>
+      <th>130</th>
+      <th>131</th>
+      <th>132</th>
+      <th>133</th>
+      <th>134</th>
+      <th>135</th>
+      <th>136</th>
+      <th>137</th>
+      <th>138</th>
+      <th>139</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.219</td>
+      <td>-9.281</td>
+      <td>-9.281</td>
+      <td>-6.781</td>
+      <td>0.875</td>
+      <td>-9.656</td>
+      <td>-9.031</td>
+      <td>-7.469</td>
+      <td>-8.719</td>
+      <td>-9.156</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-9.688</td>
+      <td>9.938</td>
+      <td>9.531</td>
+      <td>9.938</td>
+      <td>0.406</td>
+      <td>3.719</td>
+      <td>9.656</td>
+      <td>-2.688</td>
+      <td>-9.562</td>
+      <td>-9.125</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>-9.844</td>
+      <td>-9.844</td>
+      <td>-7.219</td>
+      <td>-2.031</td>
+      <td>-9.938</td>
+      <td>-9.969</td>
+      <td>-9.875</td>
+      <td>-9.812</td>
+      <td>-9.781</td>
+      <td>-6.844</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>-5.812</td>
+      <td>-4.500</td>
+      <td>-4.906</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>6.906</td>
+      <td>4.750</td>
+      <td>-5.906</td>
+      <td>-0.406</td>
+      <td>-4.031</td>
+      <td>3.875</td>
+      <td>6.219</td>
+      <td>5.656</td>
+      <td>6.094</td>
+      <td>5.406</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>3630</th>
+      <td>NaN</td>
+      <td>-9.812</td>
+      <td>-0.062</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3631</th>
+      <td>NaN</td>
+      <td>-9.844</td>
+      <td>7.531</td>
+      <td>-9.719</td>
+      <td>-9.344</td>
+      <td>3.875</td>
+      <td>9.812</td>
+      <td>8.938</td>
+      <td>8.375</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3632</th>
+      <td>NaN</td>
+      <td>-1.906</td>
+      <td>3.969</td>
+      <td>-2.312</td>
+      <td>-0.344</td>
+      <td>-8.844</td>
+      <td>4.188</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3633</th>
+      <td>NaN</td>
+      <td>-8.875</td>
+      <td>-9.156</td>
+      <td>-9.156</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3634</th>
+      <td>NaN</td>
+      <td>-6.312</td>
+      <td>1.281</td>
+      <td>-3.531</td>
+      <td>2.125</td>
+      <td>-5.812</td>
+      <td>5.562</td>
+      <td>-6.062</td>
+      <td>0.125</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>4.188</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+<p>3635 rows × 140 columns</p>
+</div></div></div>
+</div>
+<p><br><br></p>
+</section>
+<section id="data-splitting-and-evaluation">
+<h2>Data splitting and evaluation<a class="headerlink" href="#data-splitting-and-evaluation" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Recall that our goal is to predict missing entries in the utility matrix.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">Y_mat</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>0</th>
+      <th>1</th>
+      <th>2</th>
+      <th>3</th>
+      <th>4</th>
+      <th>5</th>
+      <th>6</th>
+      <th>7</th>
+      <th>8</th>
+      <th>9</th>
+      <th>...</th>
+      <th>130</th>
+      <th>131</th>
+      <th>132</th>
+      <th>133</th>
+      <th>134</th>
+      <th>135</th>
+      <th>136</th>
+      <th>137</th>
+      <th>138</th>
+      <th>139</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.219</td>
+      <td>-9.281</td>
+      <td>-9.281</td>
+      <td>-6.781</td>
+      <td>0.875</td>
+      <td>-9.656</td>
+      <td>-9.031</td>
+      <td>-7.469</td>
+      <td>-8.719</td>
+      <td>-9.156</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-9.688</td>
+      <td>9.938</td>
+      <td>9.531</td>
+      <td>9.938</td>
+      <td>0.406</td>
+      <td>3.719</td>
+      <td>9.656</td>
+      <td>-2.688</td>
+      <td>-9.562</td>
+      <td>-9.125</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>-9.844</td>
+      <td>-9.844</td>
+      <td>-7.219</td>
+      <td>-2.031</td>
+      <td>-9.938</td>
+      <td>-9.969</td>
+      <td>-9.875</td>
+      <td>-9.812</td>
+      <td>-9.781</td>
+      <td>-6.844</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>-5.812</td>
+      <td>-4.500</td>
+      <td>-4.906</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>6.906</td>
+      <td>4.750</td>
+      <td>-5.906</td>
+      <td>-0.406</td>
+      <td>-4.031</td>
+      <td>3.875</td>
+      <td>6.219</td>
+      <td>5.656</td>
+      <td>6.094</td>
+      <td>5.406</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>3630</th>
+      <td>NaN</td>
+      <td>-9.812</td>
+      <td>-0.062</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3631</th>
+      <td>NaN</td>
+      <td>-9.844</td>
+      <td>7.531</td>
+      <td>-9.719</td>
+      <td>-9.344</td>
+      <td>3.875</td>
+      <td>9.812</td>
+      <td>8.938</td>
+      <td>8.375</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3632</th>
+      <td>NaN</td>
+      <td>-1.906</td>
+      <td>3.969</td>
+      <td>-2.312</td>
+      <td>-0.344</td>
+      <td>-8.844</td>
+      <td>4.188</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3633</th>
+      <td>NaN</td>
+      <td>-8.875</td>
+      <td>-9.156</td>
+      <td>-9.156</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3634</th>
+      <td>NaN</td>
+      <td>-6.312</td>
+      <td>1.281</td>
+      <td>-3.531</td>
+      <td>2.125</td>
+      <td>-5.812</td>
+      <td>5.562</td>
+      <td>-6.062</td>
+      <td>0.125</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>4.188</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+<p>3635 rows × 140 columns</p>
+</div></div></div>
+</div>
+<section id="data-splitting">
+<h3>Data splitting<a class="headerlink" href="#data-splitting" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>We split the ratings into train and validation sets.</p></li>
+<li><p>It’s easier to split the ratings data instead of splitting the utility matrix.</p></li>
+<li><p>Don’t worry about <code class="docutils literal notranslate"><span class="pre">y</span></code>; we’re not really going to use it.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">ratings</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">ratings</span><span class="p">[</span><span class="n">user_key</span><span class="p">]</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_valid</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_valid</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span>
+<span class="p">)</span>
+
+<span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">X_valid</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>((113089, 3), (28273, 3))
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now we will create utility matrices for train and validation splits.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">train_mat</span> <span class="o">=</span> <span class="n">create_Y_from_ratings</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">user_mapper</span><span class="p">,</span> <span class="n">item_mapper</span><span class="p">)</span>
+<span class="n">valid_mat</span> <span class="o">=</span> <span class="n">create_Y_from_ratings</span><span class="p">(</span><span class="n">X_valid</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">user_mapper</span><span class="p">,</span> <span class="n">item_mapper</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">train_mat</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">valid_mat</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>((3635, 140), (3635, 140))
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">N</span> <span class="o">*</span> <span class="n">M</span><span class="p">))</span> <span class="c1"># Fraction of non-nan entries in the train set</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.22222244055806642
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X_valid</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">N</span> <span class="o">*</span> <span class="n">M</span><span class="p">))</span> <span class="c1"># Fraction of non-nan entries in the valid set</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.055557083906464924
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">train_mat</span></code> has only ratings from the train set and <code class="docutils literal notranslate"><span class="pre">valid_mat</span></code> has only ratings from the valid set.</p></li>
+<li><p>During training we assume that we do not have access to some of the available ratings. We predict these ratings and evaluate them against ratings in the validation set.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="n">X1</span><span class="p">,</span> <span class="n">X2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the root mean squared error.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">((</span><span class="n">X1</span> <span class="o">-</span> <span class="n">X2</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="n">pred_X</span><span class="p">,</span> <span class="n">train_X</span><span class="p">,</span> <span class="n">valid_X</span><span class="p">,</span> <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;Global average&quot;</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> train RMSE: </span><span class="si">%0.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">error</span><span class="p">(</span><span class="n">pred_X</span><span class="p">,</span> <span class="n">train_X</span><span class="p">)))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> valid RMSE: </span><span class="si">%0.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">error</span><span class="p">(</span><span class="n">pred_X</span><span class="p">,</span> <span class="n">valid_X</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><br><br></p>
+</section>
+</section>
+<section id="baseline-approaches">
+<h2>Baseline approaches<a class="headerlink" href="#baseline-approaches" title="Permalink to this heading">#</a></h2>
+<p>Let’s first try some simple approaches to predict missing entries.</p>
+<ol class="arabic simple">
+<li><p>Global average baseline</p></li>
+<li><p>Per-user average baseline</p></li>
+<li><p>Per-item average baseline</p></li>
+<li><p>Average of 2 and 3</p>
+<ul class="simple">
+<li><p>Take an average of per-user and per-item averages.</p></li>
+</ul>
+</li>
+<li><p><a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.impute.KNNImputer.html"><span class="math notranslate nohighlight">\(k\)</span>-Nearest Neighbours imputation</a></p></li>
+</ol>
+<p>I’ll show you 1. and 5. You’ll explore 2., 3., and 4. in the lab.</p>
+<section id="global-average-baseline">
+<h3>Global average baseline<a class="headerlink" href="#global-average-baseline" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Let’s examine RMSE of the global average baseline.</p></li>
+<li><p>In this baseline we predict everything as the global average rating.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">avg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">train_mat</span><span class="p">)</span>
+<span class="n">pred_g</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">train_mat</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">+</span> <span class="n">avg</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">pred_g</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>0</th>
+      <th>1</th>
+      <th>2</th>
+      <th>3</th>
+      <th>4</th>
+      <th>5</th>
+      <th>6</th>
+      <th>7</th>
+      <th>8</th>
+      <th>9</th>
+      <th>...</th>
+      <th>130</th>
+      <th>131</th>
+      <th>132</th>
+      <th>133</th>
+      <th>134</th>
+      <th>135</th>
+      <th>136</th>
+      <th>137</th>
+      <th>138</th>
+      <th>139</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>...</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>...</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>...</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>...</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>...</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+      <td>1.20741</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 140 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">evaluate</span><span class="p">(</span><span class="n">pred_g</span><span class="p">,</span> <span class="n">train_mat</span><span class="p">,</span> <span class="n">valid_mat</span><span class="p">,</span> <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;Global average&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Global average train RMSE: 5.75
+Global average valid RMSE: 5.77
+</pre></div>
+</div>
+</div>
+</div>
+<p><br><br></p>
+</section>
+<section id="k-nearest-neighbours-imputation">
+<h3><a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.impute.KNNImputer.html"><span class="math notranslate nohighlight">\(k\)</span>-nearest neighbours imputation</a><a class="headerlink" href="#k-nearest-neighbours-imputation" title="Permalink to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.impute</span> <span class="kn">import</span> <span class="n">KNNImputer</span>
+
+<span class="n">imputer</span> <span class="o">=</span> <span class="n">KNNImputer</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">keep_empty_features</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">train_mat_imp</span> <span class="o">=</span> <span class="n">imputer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">train_mat</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">train_mat_imp</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>0</th>
+      <th>1</th>
+      <th>2</th>
+      <th>3</th>
+      <th>4</th>
+      <th>5</th>
+      <th>6</th>
+      <th>7</th>
+      <th>8</th>
+      <th>9</th>
+      <th>...</th>
+      <th>130</th>
+      <th>131</th>
+      <th>132</th>
+      <th>133</th>
+      <th>134</th>
+      <th>135</th>
+      <th>136</th>
+      <th>137</th>
+      <th>138</th>
+      <th>139</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>-5.9406</td>
+      <td>-9.2810</td>
+      <td>-9.2810</td>
+      <td>-6.7810</td>
+      <td>0.8750</td>
+      <td>-9.6560</td>
+      <td>-9.0310</td>
+      <td>-7.4690</td>
+      <td>-8.7190</td>
+      <td>-9.1560</td>
+      <td>...</td>
+      <td>-4.5311</td>
+      <td>1.8968</td>
+      <td>0.6905</td>
+      <td>-3.1218</td>
+      <td>1.2843</td>
+      <td>-2.6063</td>
+      <td>-0.1812</td>
+      <td>-1.3937</td>
+      <td>1.7625</td>
+      <td>-0.4092</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2.3405</td>
+      <td>9.9380</td>
+      <td>9.5310</td>
+      <td>9.9380</td>
+      <td>0.4060</td>
+      <td>3.7190</td>
+      <td>9.6560</td>
+      <td>-2.6880</td>
+      <td>4.3438</td>
+      <td>-9.1250</td>
+      <td>...</td>
+      <td>2.2437</td>
+      <td>3.1719</td>
+      <td>5.0251</td>
+      <td>5.1812</td>
+      <td>8.2407</td>
+      <td>5.9311</td>
+      <td>5.8375</td>
+      <td>6.3812</td>
+      <td>1.1687</td>
+      <td>6.2532</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>-9.8440</td>
+      <td>-3.5750</td>
+      <td>-7.2190</td>
+      <td>-2.0310</td>
+      <td>-9.9380</td>
+      <td>-9.9690</td>
+      <td>-9.8750</td>
+      <td>-9.8120</td>
+      <td>-9.7810</td>
+      <td>-6.8440</td>
+      <td>...</td>
+      <td>-4.4186</td>
+      <td>-3.1156</td>
+      <td>-1.5655</td>
+      <td>-5.6250</td>
+      <td>0.3720</td>
+      <td>-4.0439</td>
+      <td>-6.0500</td>
+      <td>-5.5563</td>
+      <td>-5.4125</td>
+      <td>-5.5874</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>-5.8120</td>
+      <td>-2.4624</td>
+      <td>-4.9060</td>
+      <td>-2.7781</td>
+      <td>-0.0532</td>
+      <td>-3.8594</td>
+      <td>1.7031</td>
+      <td>-0.3687</td>
+      <td>1.8469</td>
+      <td>0.0593</td>
+      <td>...</td>
+      <td>-2.0344</td>
+      <td>2.1469</td>
+      <td>2.8875</td>
+      <td>1.6845</td>
+      <td>1.2437</td>
+      <td>-0.0156</td>
+      <td>1.2595</td>
+      <td>3.8219</td>
+      <td>3.1971</td>
+      <td>5.0249</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.3157</td>
+      <td>4.7500</td>
+      <td>1.8658</td>
+      <td>-0.4060</td>
+      <td>1.7937</td>
+      <td>3.8750</td>
+      <td>6.2190</td>
+      <td>1.9220</td>
+      <td>6.0940</td>
+      <td>5.4060</td>
+      <td>...</td>
+      <td>-0.2844</td>
+      <td>1.1313</td>
+      <td>4.0157</td>
+      <td>3.0344</td>
+      <td>4.0406</td>
+      <td>0.5218</td>
+      <td>4.3594</td>
+      <td>4.0968</td>
+      <td>3.9250</td>
+      <td>3.9657</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>3630</th>
+      <td>-0.7750</td>
+      <td>-9.8120</td>
+      <td>-0.0620</td>
+      <td>-2.8218</td>
+      <td>-4.1470</td>
+      <td>-4.8281</td>
+      <td>2.2718</td>
+      <td>-2.8782</td>
+      <td>-1.0125</td>
+      <td>0.0688</td>
+      <td>...</td>
+      <td>-6.6844</td>
+      <td>3.0531</td>
+      <td>2.8687</td>
+      <td>1.5281</td>
+      <td>4.5002</td>
+      <td>-0.1878</td>
+      <td>2.0031</td>
+      <td>4.0908</td>
+      <td>2.3563</td>
+      <td>5.0406</td>
+    </tr>
+    <tr>
+      <th>3631</th>
+      <td>2.5188</td>
+      <td>-5.0625</td>
+      <td>-0.4001</td>
+      <td>-9.7190</td>
+      <td>-9.3440</td>
+      <td>-1.6408</td>
+      <td>-4.1187</td>
+      <td>8.9380</td>
+      <td>8.3750</td>
+      <td>-0.9314</td>
+      <td>...</td>
+      <td>-4.0344</td>
+      <td>7.9155</td>
+      <td>3.4282</td>
+      <td>4.2968</td>
+      <td>6.7968</td>
+      <td>7.3999</td>
+      <td>1.8500</td>
+      <td>5.8219</td>
+      <td>5.1812</td>
+      <td>2.8437</td>
+    </tr>
+    <tr>
+      <th>3632</th>
+      <td>0.1749</td>
+      <td>-1.9060</td>
+      <td>3.9690</td>
+      <td>-1.3844</td>
+      <td>-0.3440</td>
+      <td>-8.8440</td>
+      <td>4.1880</td>
+      <td>-1.5564</td>
+      <td>5.0593</td>
+      <td>0.3343</td>
+      <td>...</td>
+      <td>-4.0126</td>
+      <td>2.8344</td>
+      <td>2.4499</td>
+      <td>2.9312</td>
+      <td>2.3750</td>
+      <td>-0.4062</td>
+      <td>1.4375</td>
+      <td>3.9750</td>
+      <td>-1.2220</td>
+      <td>2.8375</td>
+    </tr>
+    <tr>
+      <th>3633</th>
+      <td>-4.5937</td>
+      <td>-6.4376</td>
+      <td>-5.9563</td>
+      <td>-9.1560</td>
+      <td>-7.1437</td>
+      <td>-5.5844</td>
+      <td>2.2531</td>
+      <td>-0.9688</td>
+      <td>-2.8530</td>
+      <td>-0.6406</td>
+      <td>...</td>
+      <td>-4.6938</td>
+      <td>3.4186</td>
+      <td>5.1656</td>
+      <td>-0.1626</td>
+      <td>2.5594</td>
+      <td>-0.7750</td>
+      <td>4.6781</td>
+      <td>1.2658</td>
+      <td>-1.1718</td>
+      <td>-0.7157</td>
+    </tr>
+    <tr>
+      <th>3634</th>
+      <td>-0.0812</td>
+      <td>-6.3120</td>
+      <td>1.2810</td>
+      <td>-3.5310</td>
+      <td>2.1250</td>
+      <td>-5.8120</td>
+      <td>5.5620</td>
+      <td>0.2218</td>
+      <td>0.1250</td>
+      <td>-1.1874</td>
+      <td>...</td>
+      <td>-3.8156</td>
+      <td>4.1812</td>
+      <td>4.1880</td>
+      <td>3.7280</td>
+      <td>3.0750</td>
+      <td>2.1033</td>
+      <td>2.8156</td>
+      <td>5.5312</td>
+      <td>3.8283</td>
+      <td>4.1219</td>
+    </tr>
+  </tbody>
+</table>
+<p>3635 rows × 140 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">evaluate</span><span class="p">(</span><span class="n">train_mat_imp</span><span class="p">,</span> <span class="n">train_mat</span><span class="p">,</span> <span class="n">valid_mat</span><span class="p">,</span> <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;KNN imputer&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>KNN imputer train RMSE: 0.00
+KNN imputer valid RMSE: 4.79
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="optional-finding-nearest-neighbors">
+<h3>(Optional) Finding <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.NearestNeighbors.html">nearest neighbors</a><a class="headerlink" href="#optional-finding-nearest-neighbors" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>We can look at nearest neighbours of a query item.</p></li>
+<li><p>Here our columns are jokes, and users are features for jokes, and we’ll have to find nearest neighbours of columns vectors.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">train_mat_imp</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>0</th>
+      <th>1</th>
+      <th>2</th>
+      <th>3</th>
+      <th>4</th>
+      <th>5</th>
+      <th>6</th>
+      <th>7</th>
+      <th>8</th>
+      <th>9</th>
+      <th>...</th>
+      <th>130</th>
+      <th>131</th>
+      <th>132</th>
+      <th>133</th>
+      <th>134</th>
+      <th>135</th>
+      <th>136</th>
+      <th>137</th>
+      <th>138</th>
+      <th>139</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>-5.9406</td>
+      <td>-9.2810</td>
+      <td>-9.2810</td>
+      <td>-6.7810</td>
+      <td>0.8750</td>
+      <td>-9.6560</td>
+      <td>-9.0310</td>
+      <td>-7.4690</td>
+      <td>-8.7190</td>
+      <td>-9.1560</td>
+      <td>...</td>
+      <td>-4.5311</td>
+      <td>1.8968</td>
+      <td>0.6905</td>
+      <td>-3.1218</td>
+      <td>1.2843</td>
+      <td>-2.6063</td>
+      <td>-0.1812</td>
+      <td>-1.3937</td>
+      <td>1.7625</td>
+      <td>-0.4092</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2.3405</td>
+      <td>9.9380</td>
+      <td>9.5310</td>
+      <td>9.9380</td>
+      <td>0.4060</td>
+      <td>3.7190</td>
+      <td>9.6560</td>
+      <td>-2.6880</td>
+      <td>4.3438</td>
+      <td>-9.1250</td>
+      <td>...</td>
+      <td>2.2437</td>
+      <td>3.1719</td>
+      <td>5.0251</td>
+      <td>5.1812</td>
+      <td>8.2407</td>
+      <td>5.9311</td>
+      <td>5.8375</td>
+      <td>6.3812</td>
+      <td>1.1687</td>
+      <td>6.2532</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>-9.8440</td>
+      <td>-3.5750</td>
+      <td>-7.2190</td>
+      <td>-2.0310</td>
+      <td>-9.9380</td>
+      <td>-9.9690</td>
+      <td>-9.8750</td>
+      <td>-9.8120</td>
+      <td>-9.7810</td>
+      <td>-6.8440</td>
+      <td>...</td>
+      <td>-4.4186</td>
+      <td>-3.1156</td>
+      <td>-1.5655</td>
+      <td>-5.6250</td>
+      <td>0.3720</td>
+      <td>-4.0439</td>
+      <td>-6.0500</td>
+      <td>-5.5563</td>
+      <td>-5.4125</td>
+      <td>-5.5874</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>-5.8120</td>
+      <td>-2.4624</td>
+      <td>-4.9060</td>
+      <td>-2.7781</td>
+      <td>-0.0532</td>
+      <td>-3.8594</td>
+      <td>1.7031</td>
+      <td>-0.3687</td>
+      <td>1.8469</td>
+      <td>0.0593</td>
+      <td>...</td>
+      <td>-2.0344</td>
+      <td>2.1469</td>
+      <td>2.8875</td>
+      <td>1.6845</td>
+      <td>1.2437</td>
+      <td>-0.0156</td>
+      <td>1.2595</td>
+      <td>3.8219</td>
+      <td>3.1971</td>
+      <td>5.0249</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.3157</td>
+      <td>4.7500</td>
+      <td>1.8658</td>
+      <td>-0.4060</td>
+      <td>1.7937</td>
+      <td>3.8750</td>
+      <td>6.2190</td>
+      <td>1.9220</td>
+      <td>6.0940</td>
+      <td>5.4060</td>
+      <td>...</td>
+      <td>-0.2844</td>
+      <td>1.1313</td>
+      <td>4.0157</td>
+      <td>3.0344</td>
+      <td>4.0406</td>
+      <td>0.5218</td>
+      <td>4.3594</td>
+      <td>4.0968</td>
+      <td>3.9250</td>
+      <td>3.9657</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 140 columns</p>
+</div></div></div>
+</div>
+</section>
+<section id="optional-k-nearest-neighbours-on-a-query-joke">
+<h3>(Optional) <span class="math notranslate nohighlight">\(k\)</span>-nearest neighbours on a query joke<a class="headerlink" href="#optional-k-nearest-neighbours-on-a-query-joke" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Let’s transpose the matrix.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">item_user_mat</span> <span class="o">=</span> <span class="n">train_mat_imp</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">jokes_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;../data/jester_items.csv&quot;</span><span class="p">)</span>
+<span class="n">jokes_df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">jester_items_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;../data/jester_items.csv&quot;</span><span class="p">)</span>
+<span class="n">jester_items_df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">id_joke_map</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">jokes_df</span><span class="o">.</span><span class="n">jokeId</span><span class="p">,</span> <span class="n">jokes_df</span><span class="o">.</span><span class="n">jokeText</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">NearestNeighbors</span>
+
+
+<span class="k">def</span> <span class="nf">get_topk_recommendations</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">query_ind</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;cosine&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+    <span class="n">query_idx</span> <span class="o">=</span> <span class="n">item_inverse_mapper</span><span class="p">[</span><span class="n">query_ind</span><span class="p">]</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">NearestNeighbors</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;cosine&quot;</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">neigh_ind</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">kneighbors</span><span class="p">([</span><span class="n">X</span><span class="p">[</span><span class="n">query_ind</span><span class="p">]],</span> <span class="n">k</span><span class="p">,</span> <span class="n">return_distance</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="n">neigh_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">neigh_ind</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">query_ind</span> <span class="o">==</span> <span class="n">query_ind</span><span class="p">))</span>
+    <span class="n">recs</span> <span class="o">=</span> <span class="p">[</span><span class="n">id_joke_map</span><span class="p">[</span><span class="n">item_inverse_mapper</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">neigh_ind</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Query joke: &quot;</span><span class="p">,</span> <span class="n">id_joke_map</span><span class="p">[</span><span class="n">query_idx</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">recs</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;top recommendations&quot;</span><span class="p">])</span>
+
+
+<span class="n">get_topk_recommendations</span><span class="p">(</span><span class="n">item_user_mat</span><span class="p">,</span> <span class="n">query_ind</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;cosine&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="collaborative-filtering-using-the-surprise-package">
+<h2>Collaborative filtering using the <code class="docutils literal notranslate"><span class="pre">surprise</span></code> package<a class="headerlink" href="#collaborative-filtering-using-the-surprise-package" title="Permalink to this heading">#</a></h2>
+<p>Although matrix factorization is a prominent approach to complete the utility matrix, <code class="docutils literal notranslate"><span class="pre">TruncatedSVD</span></code> is not appropriate in this context because of a large number of NaN values in this matrix.</p>
+<ul class="simple">
+<li><p>We consider only observed ratings and add regularization to avoid overfitting.</p></li>
+<li><p>Here is the loss function</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[f(Z, W) = \sum_{(i,j) \in R} ((w_j^Tz_i) - y_{ij})^2 + \frac{\lambda_1}{2}\lVert Z \lVert_2^2 + \frac{\lambda_2}{2}\lVert W \lVert_2^2\]</div>
+<p>Let’s try it out on our Jester dataset utility matrix.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">surprise</span>
+<span class="kn">from</span> <span class="nn">surprise</span> <span class="kn">import</span> <span class="n">SVD</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">Reader</span><span class="p">,</span> <span class="n">accuracy</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">reader</span> <span class="o">=</span> <span class="n">Reader</span><span class="p">()</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">load_from_df</span><span class="p">(</span><span class="n">ratings</span><span class="p">,</span> <span class="n">reader</span><span class="p">)</span>  <span class="c1"># Load the data</span>
+
+<span class="c1"># I&#39;m being sloppy here. Probably there is a way to create validset from our already split data.</span>
+<span class="n">trainset</span><span class="p">,</span> <span class="n">validset</span> <span class="o">=</span> <span class="n">surprise</span><span class="o">.</span><span class="n">model_selection</span><span class="o">.</span><span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span>
+<span class="p">)</span>  <span class="c1"># Split the data</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Regularized SVD</strong></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">k</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">algo</span> <span class="o">=</span> <span class="n">SVD</span><span class="p">(</span><span class="n">n_factors</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">algo</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">trainset</span><span class="p">)</span>
+<span class="n">svd_preds</span> <span class="o">=</span> <span class="n">algo</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">validset</span><span class="p">)</span>
+<span class="n">accuracy</span><span class="o">.</span><span class="n">rmse</span><span class="p">(</span><span class="n">svd_preds</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>RMSE: 5.2893
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>5.28926338380112
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>No big improvement over the global baseline (RMSE=5.77).</p></li>
+<li><p>Probably because we are only considering a sample.</p></li>
+</ul>
+<p><strong>Cross-validation for recommender systems</strong></p>
+<ul class="simple">
+<li><p>We can also carry out cross-validation and grid search with this package.</p></li>
+<li><p>Let’s look at an example of cross-validation.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">surprise.model_selection</span> <span class="kn">import</span> <span class="n">cross_validate</span>
+
+<span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cross_validate</span><span class="p">(</span><span class="n">algo</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">measures</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;RMSE&quot;</span><span class="p">,</span> <span class="s2">&quot;MAE&quot;</span><span class="p">],</span> <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Evaluating RMSE, MAE of algorithm SVD on 5 split(s).
+
+                  Fold 1  Fold 2  Fold 3  Fold 4  Fold 5  Mean    Std     
+RMSE (testset)    5.3022  5.2667  5.2661  5.2970  5.3140  5.2892  0.0194  
+MAE (testset)     4.2272  4.1867  4.1792  4.2200  4.2142  4.2055  0.0190  
+Fit time          0.21    0.22    0.22    0.22    0.22    0.22    0.00    
+Test time         0.07    0.07    0.12    0.07    0.12    0.09    0.03    
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>test_rmse</th>
+      <th>test_mae</th>
+      <th>fit_time</th>
+      <th>test_time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>5.302232</td>
+      <td>4.227237</td>
+      <td>0.212285</td>
+      <td>0.068680</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>5.266715</td>
+      <td>4.186704</td>
+      <td>0.222506</td>
+      <td>0.066116</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>5.266053</td>
+      <td>4.179180</td>
+      <td>0.218399</td>
+      <td>0.119088</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>5.296970</td>
+      <td>4.219969</td>
+      <td>0.217175</td>
+      <td>0.068268</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>5.313987</td>
+      <td>4.214229</td>
+      <td>0.217195</td>
+      <td>0.118838</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<ul class="simple">
+<li><p>Jester dataset is available as one of the built-in datasets in this package and you can load it as follows and run cross-validation as follows.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">load_builtin</span><span class="p">(</span><span class="s2">&quot;jester&quot;</span><span class="p">)</span>
+
+<span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cross_validate</span><span class="p">(</span><span class="n">algo</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">measures</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;RMSE&quot;</span><span class="p">,</span> <span class="s2">&quot;MAE&quot;</span><span class="p">],</span> <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><br><br></p>
+<section id="optional-pytorch-implementation">
+<h3>(Optional) PyTorch implementation<a class="headerlink" href="#optional-pytorch-implementation" title="Permalink to this heading">#</a></h3>
+<p>We can also implement the loss function above using <code class="docutils literal notranslate"><span class="pre">PyTorch</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="c1"># Load the dataset</span>
+<span class="n">ratings</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../data/jester_ratings.csv&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ratings</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>   userId  jokeId  rating
+0       1       5   0.219
+1       1       7  -9.281
+2       1       8  -9.281
+3       1      13  -6.781
+4       1      15   0.875
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ratings_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../data/jester_ratings.csv&#39;</span><span class="p">)</span>
+<span class="n">ratings</span> <span class="o">=</span> <span class="n">ratings_df</span><span class="p">[</span><span class="n">ratings_df</span><span class="p">[</span><span class="s2">&quot;userId&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">4000</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="c1"># ratings = ratings_full[ratings_full[&quot;userId&quot;] &lt;= 4000]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ratings</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>userId</th>
+      <th>jokeId</th>
+      <th>rating</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>5</td>
+      <td>0.219</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>7</td>
+      <td>-9.281</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1</td>
+      <td>8</td>
+      <td>-9.281</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1</td>
+      <td>13</td>
+      <td>-6.781</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1</td>
+      <td>15</td>
+      <td>0.875</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>141357</th>
+      <td>4000</td>
+      <td>18</td>
+      <td>-6.062</td>
+    </tr>
+    <tr>
+      <th>141358</th>
+      <td>4000</td>
+      <td>19</td>
+      <td>0.125</td>
+    </tr>
+    <tr>
+      <th>141359</th>
+      <td>4000</td>
+      <td>76</td>
+      <td>5.719</td>
+    </tr>
+    <tr>
+      <th>141360</th>
+      <td>4000</td>
+      <td>53</td>
+      <td>5.344</td>
+    </tr>
+    <tr>
+      <th>141361</th>
+      <td>4000</td>
+      <td>143</td>
+      <td>4.188</td>
+    </tr>
+  </tbody>
+</table>
+<p>141362 rows × 3 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">LabelEncoder</span>
+
+<span class="n">user_encoder</span> <span class="o">=</span> <span class="n">LabelEncoder</span><span class="p">()</span>
+<span class="n">ratings</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">user_encoder</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ratings</span><span class="o">.</span><span class="n">userId</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+<span class="n">item_encoder</span> <span class="o">=</span> <span class="n">LabelEncoder</span><span class="p">()</span>
+<span class="n">ratings</span><span class="p">[</span><span class="s1">&#39;item&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">item_encoder</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ratings</span><span class="o">.</span><span class="n">jokeId</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+<span class="n">num_users</span> <span class="o">=</span> <span class="n">ratings</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span>
+<span class="n">num_items</span> <span class="o">=</span> <span class="n">ratings</span><span class="p">[</span><span class="s1">&#39;item&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ratings</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>userId</th>
+      <th>jokeId</th>
+      <th>rating</th>
+      <th>user</th>
+      <th>item</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>5</td>
+      <td>0.219</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>7</td>
+      <td>-9.281</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1</td>
+      <td>8</td>
+      <td>-9.281</td>
+      <td>0</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1</td>
+      <td>13</td>
+      <td>-6.781</td>
+      <td>0</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1</td>
+      <td>15</td>
+      <td>0.875</td>
+      <td>0</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>141357</th>
+      <td>4000</td>
+      <td>18</td>
+      <td>-6.062</td>
+      <td>3634</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>141358</th>
+      <td>4000</td>
+      <td>19</td>
+      <td>0.125</td>
+      <td>3634</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>141359</th>
+      <td>4000</td>
+      <td>76</td>
+      <td>5.719</td>
+      <td>3634</td>
+      <td>65</td>
+    </tr>
+    <tr>
+      <th>141360</th>
+      <td>4000</td>
+      <td>53</td>
+      <td>5.344</td>
+      <td>3634</td>
+      <td>42</td>
+    </tr>
+    <tr>
+      <th>141361</th>
+      <td>4000</td>
+      <td>143</td>
+      <td>4.188</td>
+      <td>3634</td>
+      <td>132</td>
+    </tr>
+  </tbody>
+</table>
+<p>141362 rows × 5 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">ratings</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">ratings</span><span class="p">[</span><span class="n">user_key</span><span class="p">]</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_valid</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_valid</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span>
+<span class="p">)</span>
+
+<span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">X_valid</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>((113089, 5), (28273, 5))
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s create a custom <code class="docutils literal notranslate"><span class="pre">ItemsRatingsDataset</span></code> class for the ratings data, so that we can use of PyTorch’s DataLoader for batch processing and data shuffling during training.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DataLoader</span>
+
+<span class="k">class</span> <span class="nc">ItemsRatingsDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">users</span><span class="p">,</span> <span class="n">items</span><span class="p">,</span> <span class="n">ratings</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">users</span> <span class="o">=</span> <span class="n">users</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">items</span> <span class="o">=</span> <span class="n">items</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ratings</span> <span class="o">=</span> <span class="n">ratings</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ratings</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;user&#39;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">users</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">),</span>
+            <span class="s1">&#39;item&#39;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">),</span>
+            <span class="s1">&#39;rating&#39;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ratings</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+        <span class="p">}</span>
+
+<span class="n">train_dataset</span> <span class="o">=</span> <span class="n">ItemsRatingsDataset</span><span class="p">(</span><span class="n">X_train</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">X_train</span><span class="p">[</span><span class="s1">&#39;item&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">X_train</span><span class="p">[</span><span class="s1">&#39;rating&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+<span class="n">train_dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">valid_dataset</span> <span class="o">=</span> <span class="n">ItemsRatingsDataset</span><span class="p">(</span><span class="n">X_valid</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">X_valid</span><span class="p">[</span><span class="s1">&#39;item&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">X_valid</span><span class="p">[</span><span class="s1">&#39;rating&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+<span class="n">valid_dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">valid_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">CFModel</span></code> class below defines the architecture and the forward method of collaborative filtering. We are using the <code class="docutils literal notranslate"><span class="pre">embedding</span></code> layer of <code class="docutils literal notranslate"><span class="pre">torch.nn</span></code> which simply creates a lookup table that stores embeddings of a fixed dictionary and size.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+
+<span class="k">class</span> <span class="nc">CFModel</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_users</span><span class="p">,</span> <span class="n">num_items</span><span class="p">,</span> <span class="n">emb_size</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CFModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="c1"># Embeddings for users</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_emb</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">num_users</span><span class="p">,</span> <span class="n">emb_size</span><span class="p">)</span>
+
+        <span class="c1"># Embeddings for items</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item_emb</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">num_items</span><span class="p">,</span> <span class="n">emb_size</span><span class="p">)</span>
+
+        <span class="c1"># Initialize the embeddings </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_emb</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">uniform_</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item_emb</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">uniform_</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">movie</span><span class="p">):</span>
+        <span class="n">user_embedding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_emb</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+        <span class="n">item_embedding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">item_emb</span><span class="p">(</span><span class="n">movie</span><span class="p">)</span>
+        <span class="c1"># calculate predicted ratings as dot products</span>
+        <span class="c1"># of corresponding user and item embeddings</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">user_embedding</span> <span class="o">*</span> <span class="n">item_embedding</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">CFModel</span><span class="p">(</span><span class="n">num_users</span><span class="p">,</span> <span class="n">num_items</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
+
+<span class="c1"># Loss function</span>
+<span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">()</span>
+
+<span class="c1"># Regularization coefficient</span>
+<span class="n">lambda_reg</span> <span class="o">=</span> <span class="mf">0.001</span>
+
+<span class="c1"># Optimizer (without weight decay) </span>
+<span class="c1"># We manually add regularization in the loss below</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
+
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
+
+<span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_dataloader</span><span class="p">,</span> <span class="n">valid_dataloader</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span> 
+        <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>  <span class="c1"># Set model to training mode</span>
+        <span class="n">total_train_loss</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">train_dataloader</span><span class="p">:</span>
+            <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+            
+            <span class="c1"># Forward pass</span>
+            <span class="n">predictions</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">],</span> <span class="n">batch</span><span class="p">[</span><span class="s1">&#39;item&#39;</span><span class="p">])</span>
+            
+            <span class="c1"># Compute the base loss (MSE)</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">batch</span><span class="p">[</span><span class="s1">&#39;rating&#39;</span><span class="p">])</span>
+            
+            <span class="c1"># Compute regularization terms (L2 norm of user and movie embeddings)</span>
+            <span class="n">user_reg</span> <span class="o">=</span> <span class="n">lambda_reg</span> <span class="o">*</span> <span class="n">model</span><span class="o">.</span><span class="n">user_emb</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">item_reg</span> <span class="o">=</span> <span class="n">lambda_reg</span> <span class="o">*</span> <span class="n">model</span><span class="o">.</span><span class="n">item_emb</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+            
+            <span class="c1"># Total loss is the sum of base loss and regularization terms</span>
+            <span class="n">train_loss</span> <span class="o">=</span> <span class="n">loss</span> <span class="o">+</span> <span class="n">user_reg</span> <span class="o">+</span> <span class="n">item_reg</span>
+            
+            <span class="c1"># Backpropagation</span>
+            <span class="n">train_loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+            <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+    
+            <span class="n">total_train_loss</span> <span class="o">+=</span> <span class="n">train_loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+                    
+        <span class="n">avg_train_loss</span> <span class="o">=</span> <span class="n">total_train_loss</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_dataloader</span><span class="p">)</span>
+    
+        <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>  <span class="c1"># Set model to evaluation mode</span>
+        <span class="n">total_valid_loss</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">all_predictions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">all_ratings</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">valid_dataloader</span><span class="p">:</span>
+                <span class="n">predictions</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">],</span> <span class="n">batch</span><span class="p">[</span><span class="s1">&#39;item&#39;</span><span class="p">])</span>
+                <span class="n">valid_loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">batch</span><span class="p">[</span><span class="s1">&#39;rating&#39;</span><span class="p">])</span>
+                <span class="n">total_valid_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+                <span class="n">all_predictions</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">predictions</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+                <span class="n">all_ratings</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s1">&#39;rating&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+        <span class="n">avg_valid_loss</span> <span class="o">=</span> <span class="n">total_valid_loss</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">valid_dataloader</span><span class="p">)</span>
+        <span class="n">rmse</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">all_predictions</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">all_ratings</span><span class="p">))</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">, Train Loss: </span><span class="si">{</span><span class="n">avg_train_loss</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">, Valid Loss: </span><span class="si">{</span><span class="n">avg_valid_loss</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">, Valid RMSE: </span><span class="si">{</span><span class="n">rmse</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">train</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_dataloader</span><span class="p">,</span> <span class="n">valid_dataloader</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">epochs</span> <span class="o">=</span> <span class="mi">20</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 1, Train Loss: 31.8835, Valid Loss: 26.9124, Valid RMSE: 5.2919
+Epoch 2, Train Loss: 25.1327, Valid Loss: 23.5237, Valid RMSE: 4.9331
+Epoch 3, Train Loss: 23.2564, Valid Loss: 23.8726, Valid RMSE: 4.8777
+Epoch 4, Train Loss: 22.7042, Valid Loss: 20.4802, Valid RMSE: 4.8478
+Epoch 5, Train Loss: 22.2066, Valid Loss: 25.0819, Valid RMSE: 4.8148
+Epoch 6, Train Loss: 21.5153, Valid Loss: 21.0060, Valid RMSE: 4.7681
+Epoch 7, Train Loss: 20.6530, Valid Loss: 21.4653, Valid RMSE: 4.7184
+Epoch 8, Train Loss: 19.8259, Valid Loss: 18.8280, Valid RMSE: 4.6790
+Epoch 9, Train Loss: 19.1407, Valid Loss: 17.8768, Valid RMSE: 4.6501
+Epoch 10, Train Loss: 18.5690, Valid Loss: 18.0142, Valid RMSE: 4.6269
+Epoch 11, Train Loss: 18.0456, Valid Loss: 17.7909, Valid RMSE: 4.6082
+Epoch 12, Train Loss: 17.5188, Valid Loss: 17.0157, Valid RMSE: 4.5913
+Epoch 13, Train Loss: 16.9827, Valid Loss: 15.0803, Valid RMSE: 4.5783
+Epoch 14, Train Loss: 16.4400, Valid Loss: 18.2713, Valid RMSE: 4.5671
+Epoch 15, Train Loss: 15.8830, Valid Loss: 19.4104, Valid RMSE: 4.5590
+Epoch 16, Train Loss: 15.3265, Valid Loss: 15.5913, Valid RMSE: 4.5510
+Epoch 17, Train Loss: 14.7745, Valid Loss: 14.3047, Valid RMSE: 4.5445
+Epoch 18, Train Loss: 14.2318, Valid Loss: 14.5296, Valid RMSE: 4.5399
+Epoch 19, Train Loss: 13.7009, Valid Loss: 13.7255, Valid RMSE: 4.5345
+Epoch 20, Train Loss: 13.1774, Valid Loss: 11.8074, Valid RMSE: 4.5313
+</pre></div>
+</div>
+</div>
+</div>
+<p>This is great! With this, we have the flexibility to tailor the loss function in the training loop as needed. For instance, we can integrate both user and item biases into the model and include regularization terms for these biases  (challenging lab exercise).</p>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "conda-env-563-py"
+        },
+        kernelOptions: {
+            name: "conda-env-563-py",
+            path: "./lectures/class_demos"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'conda-env-563-py'</script>
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="03_class-demo.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Lecture 03: PCA applications class demo</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../../attribution.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Attributions</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-dataset-jester-1-7m-jokes-ratings-dataset">Example dataset: Jester 1.7M jokes ratings dataset</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dataset-stats">Dataset stats</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#utility-matrix-for-jester-jokes-ratings-data">Utility matrix for Jester jokes ratings data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-splitting-and-evaluation">Data splitting and evaluation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#data-splitting">Data splitting</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#baseline-approaches">Baseline approaches</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#global-average-baseline">Global average baseline</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#k-nearest-neighbours-imputation"><span class="math notranslate nohighlight">\(k\)</span>-nearest neighbours imputation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-finding-nearest-neighbors">(Optional) Finding nearest neighbors</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-k-nearest-neighbours-on-a-query-joke">(Optional) <span class="math notranslate nohighlight">\(k\)</span>-nearest neighbours on a query joke</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#collaborative-filtering-using-the-surprise-package">Collaborative filtering using the <code class="docutils literal notranslate"><span class="pre">surprise</span></code> package</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-pytorch-implementation">(Optional) PyTorch implementation</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Varada Kolhatkar
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2022.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

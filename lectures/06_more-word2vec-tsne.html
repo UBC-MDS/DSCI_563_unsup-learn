@@ -1,0 +1,1902 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Lecture 6: Using word embeddings, manifold learning &#8212; DSCI 563 Unsupervised Learning</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'lectures/06_more-word2vec-tsne';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Lecture 7: Recommender Systems Part I" href="07_recommender-systems1.html" />
+    <link rel="prev" title="Lecture 5: Word Embeddings, word2vec" href="05_word-embeddings.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../README.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/mds-hex-sticker.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../_static/mds-hex-sticker.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Lectures</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="00_course-information.html">Course Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01_K-Means.html">Lecture 1: K-Means Clustering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_DBSCAN-hierarchical.html">Lecture 2: DBSCAN and Hierarchical Clustering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_PCA-intro.html">Lecture 3: Introduction to Principal Component Analysis (PCA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_More-PCA-LSA-NMF.html">Lecture 4: More PCA, LSA, and NMF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_word-embeddings.html">Lecture 5: Word Embeddings, word2vec</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Lecture 6: Using word embeddings, manifold learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_recommender-systems1.html">Lecture 7: Recommender Systems Part I</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_recommender-systems2.html">Lecture 8: Recommender Systems Part 2</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Appendices</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="AppendixA.html">Appendix A: K-Means customer segmentation case study</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Class demos</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="class_demos/01_class-demo.html">Lecture 01: Clustering class demo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="class_demos/02_class-demo.html">Lecture 02: Clustering class demo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="class_demos/03_class-demo.html">Lecture 03: PCA applications class demo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="class_demos/07_class-demo.html">Lecture 07: Collaborative filtering class demo</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Attribution</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../attribution.html">Attributions</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.ubc.ca/MDS-2022-23/DSCI_563_unsup-learn" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/lectures/06_more-word2vec-tsne.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Lecture 6: Using word embeddings, manifold learning</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lecture-plan-imports-and-los">Lecture plan, imports, and LOs</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lecture-plan">Lecture plan</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#imports">Imports</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#learning-outcomes">Learning outcomes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#context-and-motivation">1. Context and motivation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-word-embeddings-in-document-similarity-and-text-classification">2. Using word embeddings in document similarity and text classification</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#averaging-embeddings">2.1 Averaging embeddings</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#concatenating-embeddings">2.2 Concatenating embeddings</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#airline-sentiment-analysis-using-average-embedding-representation">2.3 Airline sentiment analysis using average embedding representation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#extensions-and-more-advanced-models">2.3 Extensions and more advanced models</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#questions-for-you">❓❓ Questions for you</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-1-select-all-of-the-following-statements-which-are-true-iclicker">Exercise 6.1 Select all of the following statements which are <strong>True</strong> (iClicker)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#word2vec-for-product-recommendation">3. word2vec for product recommendation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#purchase-history-example">3.1 Purchase history example</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#manifold-learning">4. Manifold learning</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#definition-and-motivation">4.1 Definition and motivation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#t-distributed-stochastic-neighbour-embedding-t-sne">4.2 t-distributed Stochastic Neighbour Embedding (t-SNE)</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pca-on-t-sne-the-digits-dataset">4.2.1 PCA on t-SNE the digits dataset</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-does-it-work-high-level">4.2.2 How does it work? (high-level)</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-4-2-2-loss-function-of-t-sne">(Optional) 4.2.2 Loss function of t-SNE</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#important-hyperparameter-perplexity">4.2.3 Important hyperparameter: <code class="docutils literal notranslate"><span class="pre">perplexity</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">❓❓ Questions for you</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-2-select-all-of-the-following-statements-which-are-true-iclicker">Exercise 6.2 Select all of the following statements which are <strong>True</strong> (iClicker)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#final-comments-summary-reflection">5. Final comments, summary, reflection</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#resources">Resources</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <p><img alt="" src="../_images/563_banner.png" /></p>
+<section class="tex2jax_ignore mathjax_ignore" id="lecture-6-using-word-embeddings-manifold-learning">
+<h1>Lecture 6: Using word embeddings, manifold learning<a class="headerlink" href="#lecture-6-using-word-embeddings-manifold-learning" title="Permalink to this heading">#</a></h1>
+<p>UBC Master of Data Science program, 2023-24</p>
+<p>Instructor: Varada Kolhatkar</p>
+<section id="lecture-plan-imports-and-los">
+<h2>Lecture plan, imports, and LOs<a class="headerlink" href="#lecture-plan-imports-and-los" title="Permalink to this heading">#</a></h2>
+<section id="lecture-plan">
+<h3>Lecture plan<a class="headerlink" href="#lecture-plan" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Context and motivation (~5 mins)</p></li>
+<li><p>Using word embeddings in text classification (~20 mins)</p></li>
+<li><p>Q&amp;A (~5 mins)</p></li>
+<li><p>Break (~5 mins)</p></li>
+<li><p>Product similarity using word2vec (~15 mins)</p></li>
+<li><p>t-SNE (~15 mins)</p></li>
+<li><p>Final remarks, summary, reflection (~5 mins)</p></li>
+</ul>
+</section>
+<section id="imports">
+<h3>Imports<a class="headerlink" href="#imports" title="Permalink to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;code/.&quot;</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">string</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">manifold</span>
+<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+<span class="kn">from</span> <span class="nn">plotting_functions</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="kn">import</span> <span class="n">CountVectorizer</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">make_pipeline</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;font.size&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">14</span>
+<span class="kn">import</span> <span class="nn">matplotlib.cm</span> <span class="k">as</span> <span class="nn">cm</span>
+
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s2">&quot;display.max_colwidth&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/51b410bcba00cc38c730c35d2883356fe8b0641e9112bc654a35a49ecbefb5f9.png" src="../_images/51b410bcba00cc38c730c35d2883356fe8b0641e9112bc654a35a49ecbefb5f9.png" />
+</div>
+</div>
+<p><br><br></p>
+</section>
+<section id="learning-outcomes">
+<h3>Learning outcomes<a class="headerlink" href="#learning-outcomes" title="Permalink to this heading">#</a></h3>
+<p>From this lecture, students are expected to be able to:</p>
+<ul class="simple">
+<li><p>Explain how could we evaluate quality of word embeddings.</p></li>
+<li><p>Explain how can one represent sentences and text with word representations.</p></li>
+<li><p>Use word embeddings in text classification and document clustering using spaCy.</p></li>
+<li><p>Explain limitations associated with the approaches used to create sentence embeddings from word embeddings.</p></li>
+<li><p>Use word2vec algorithm to build a product recommendation system using customer purchase history.</p></li>
+<li><p>Broadly explain the idea of manifold learning and t-SNE.</p></li>
+<li><p>Visualize data using t-SNE.</p></li>
+</ul>
+<p><br><br><br><br></p>
+</section>
+</section>
+<section id="context-and-motivation">
+<h2>1. Context and motivation<a class="headerlink" href="#context-and-motivation" title="Permalink to this heading">#</a></h2>
+<p>Two main topics for today</p>
+<ul class="simple">
+<li><p>Using word embeddings in ML applications</p>
+<ul>
+<li><p>In the last lecture we talked about word2vec.</p></li>
+<li><p>We used word embeddings to find similarity between words and phrases and to find analogies.</p></li>
+<li><p>How do we actually use them in machine learning applications?</p></li>
+</ul>
+</li>
+<li><p>Manifold learning</p></li>
+</ul>
+<p><strong>Evaluating quality of word vectors</strong></p>
+<ul class="simple">
+<li><p>Before using word embeddings in your applications, it’s a good idea to examine their quality.</p></li>
+<li><p>How do we evaluate the quality of embeddings?</p>
+<ul>
+<li><p>Examine a number of word pairs for similarity scores.</p></li>
+<li><p>Examine different analogies for stereotypes and biases they encode.</p></li>
+<li><p>Visualize embeddings in two dimensions.</p></li>
+</ul>
+</li>
+</ul>
+<p><strong>Example evaluation with TOEFL multiple-choice vocabulary tests</strong></p>
+<ul class="simple">
+<li><p>Compare it to human judgment on the similarity between words.</p></li>
+<li><p>Taking TOEFL multiple-choice vocabulary tests.</p>
+<ul>
+<li><p><strong>Levied</strong>  is closest in meaning to:
+<em>imposed, believed, requested, correlated</em></p></li>
+</ul>
+</li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">gensim.downloader</span> <span class="k">as</span> <span class="nn">api</span>
+
+<span class="n">google_news_vectors</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;word2vec-google-news-300&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">google_news_vectors</span><span class="o">.</span><span class="n">most_similar</span><span class="p">(</span><span class="s2">&quot;levied&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[(&#39;levying&#39;, 0.7044811844825745),
+ (&#39;Dedicating_fines&#39;, 0.5996160507202148),
+ (&#39;levies&#39;, 0.5890565514564514),
+ (&#39;imposed&#39;, 0.5830394625663757),
+ (&#39;fines_levied&#39;, 0.5777179598808289),
+ (&#39;Levying&#39;, 0.5654435753822327),
+ (&#39;Osteens_paid&#39;, 0.5609163641929626),
+ (&#39;levy&#39;, 0.5559998750686646),
+ (&#39;fines&#39;, 0.5462918281555176),
+ (&#39;Longe_Velazquez&#39;, 0.5221693515777588)]
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Visualization of embeddings</strong></p>
+<ul class="simple">
+<li><p>Let’s visualize word vectors for specific words from Google News pre-trained embeddings.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">words</span> <span class="o">=</span> <span class="n">google_news_vectors</span><span class="o">.</span><span class="n">index_to_key</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">google_news_vectors</span><span class="p">[</span><span class="s2">&quot;peace&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(300,)
+</pre></div>
+</div>
+</div>
+</div>
+<p>The vectors are 300 dimensional. How do we visualize them?</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">positive</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;amazing&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;admirable&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;awesome&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;outstanding&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;extraordinary&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;exceptional&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;fantastic&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="n">negative</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;rotten&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;stinky&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dirty&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;annoying&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;disgusting&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;fake&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;hideous&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bad&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;waste&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;awful&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">neutral</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;apathetic&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;urgent&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;detached&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;indifferent&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;wikipedia&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;PCA visualization&quot;</span><span class="p">)</span>
+
+<span class="n">X</span> <span class="o">=</span> <span class="n">google_news_vectors</span><span class="p">[</span><span class="n">positive</span> <span class="o">+</span> <span class="n">negative</span> <span class="o">+</span> <span class="n">neutral</span><span class="p">]</span>
+<span class="n">pca</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="c1"># # create a scatter plot of the projection</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">Z</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">Z</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">words</span> <span class="o">=</span> <span class="n">positive</span> <span class="o">+</span> <span class="n">negative</span> <span class="o">+</span> <span class="n">neutral</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">word</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">words</span><span class="p">):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.02</span><span class="p">,</span> <span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.02</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Z0&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Z1&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/ce6dc94f50575684cdd676398ff673a24fb295d7658c6483c9469ce5fd34a131.png" src="../_images/ce6dc94f50575684cdd676398ff673a24fb295d7658c6483c9469ce5fd34a131.png" />
+</div>
+</div>
+<ul class="simple">
+<li><p>Even in two dimensional projects we see three distinct clusters for positive, negative, and neutral words!</p></li>
+<li><p>Not sure why the word <em>wikipedia</em> is placed among negative words.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">google_news_vectors</span><span class="o">.</span><span class="n">most_similar</span><span class="p">(</span><span class="s2">&quot;wikipedia&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[(&#39;en.wikipedia.org_wiki&#39;, 0.4892520010471344),
+ (&#39;Wikepedia&#39;, 0.471505731344223),
+ (&#39;google&#39;, 0.45259714126586914),
+ (&#39;faqs&#39;, 0.444589763879776),
+ (&#39;htm&#39;, 0.4418445825576782),
+ (&#39;cgi_bin&#39;, 0.4352087378501892),
+ (&#39;Wikipedia&#39;, 0.4266732633113861),
+ (&#39;##.html&#39;, 0.42112863063812256),
+ (&#39;answers.com&#39;, 0.4172719120979309),
+ (&#39;Wikpedia&#39;, 0.41681769490242004)]
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>PCA is good first approach to transform data so that we can plot it in two dimensions.</p></li>
+<li><p>There is a class of algorithms for visualization called <strong>manifold learning algorithms</strong> which allow for much more complex mappings and better visualizations.</p></li>
+<li><p>A particularly useful one is the t-SNE algorithm which we’ll talk about in the second part of the lecture.</p></li>
+</ul>
+<p><br><br><br><br></p>
+</section>
+<section id="using-word-embeddings-in-document-similarity-and-text-classification">
+<h2>2. Using word embeddings in document similarity and text classification<a class="headerlink" href="#using-word-embeddings-in-document-similarity-and-text-classification" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Assuming that we have reasonable representations of words.</p></li>
+<li><p>How do we represent meaning of paragraphs or documents?</p></li>
+<li><p>Two simple approaches</p>
+<ul>
+<li><p>Averaging embeddings</p></li>
+<li><p>Concatenating embeddings</p></li>
+</ul>
+</li>
+</ul>
+<section id="averaging-embeddings">
+<h3>2.1 Averaging embeddings<a class="headerlink" href="#averaging-embeddings" title="Permalink to this heading">#</a></h3>
+<blockquote>
+All empty promises
+</blockquote>
+<p><span class="math notranslate nohighlight">\((embedding(all) + embedding(empty) + embedding(promise))/3\)</span></p>
+<ul class="simple">
+<li><p>We can do this conveniently with <a class="reference external" href="https://spacy.io/usage/linguistic-features#vectors-similarity">spaCy</a>.</p></li>
+<li><p>We need <code class="docutils literal notranslate"><span class="pre">en_core_web_md</span></code> or bigger model to access word vectors.</p></li>
+<li><p>You can download the model by going to command line and in your course <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment and download <code class="docutils literal notranslate"><span class="pre">en_core_web_md</span></code> as follows.</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">activate</span> <span class="mi">563</span>
+<span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">spacy</span> <span class="n">download</span> <span class="n">en_core_web_md</span>
+</pre></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">spacy</span>
+
+<span class="n">nlp</span> <span class="o">=</span> <span class="n">spacy</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;en_core_web_md&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can access word vectors for individual words in <code class="docutils literal notranslate"><span class="pre">spaCy</span></code> as follows.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nlp</span><span class="p">(</span><span class="s2">&quot;empty&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">vector</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([ 0.010289,  4.9203  , -0.48081 ,  3.5738  , -2.2516  ,  2.1697  ,
+       -1.0116  ,  2.4216  , -3.7343  ,  3.3025  ], dtype=float32)
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can get average embeddings for a sentence or a document in <code class="docutils literal notranslate"><span class="pre">spaCy</span></code> as follows:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;All empty promises&quot;</span>
+<span class="n">doc</span> <span class="o">=</span> <span class="n">nlp</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="n">avg_sent_emb</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">vector</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">avg_sent_emb</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;vector for: </span><span class="si">{}</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">((</span><span class="n">s</span><span class="p">),</span> <span class="p">(</span><span class="n">avg_sent_emb</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">])))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(300,)
+vector for: All empty promises
+[-0.459937    1.9785299   1.0319      1.5123      1.4806334   2.73183
+  1.204       1.1724668  -3.5227966  -0.05656664]
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>Now that we have representation for sentences we can get similarity between documents as follows.</p></li>
+<li><p>Note that this is based on average embeddings of each sentence.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">doc1</span> <span class="o">=</span> <span class="n">nlp</span><span class="p">(</span><span class="s2">&quot;Deep learning is very popular these days.&quot;</span><span class="p">)</span>
+<span class="n">doc2</span> <span class="o">=</span> <span class="n">nlp</span><span class="p">(</span><span class="s2">&quot;Data Science is dominated by neural networks.&quot;</span><span class="p">)</span>
+<span class="n">doc3</span> <span class="o">=</span> <span class="n">nlp</span><span class="p">(</span><span class="s2">&quot;Today I ate home-made fresh bread.&quot;</span><span class="p">)</span>
+
+<span class="c1"># Similarity of two documents</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">doc1</span><span class="p">,</span> <span class="s2">&quot;&lt;-&gt;&quot;</span><span class="p">,</span> <span class="n">doc2</span><span class="p">,</span> <span class="n">doc1</span><span class="o">.</span><span class="n">similarity</span><span class="p">(</span><span class="n">doc2</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">doc2</span><span class="p">,</span> <span class="s2">&quot;&lt;-&gt;&quot;</span><span class="p">,</span> <span class="n">doc3</span><span class="p">,</span> <span class="n">doc2</span><span class="o">.</span><span class="n">similarity</span><span class="p">(</span><span class="n">doc3</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Deep learning is very popular these days. &lt;-&gt; Data Science is dominated by neural networks. 0.62099759440504
+Data Science is dominated by neural networks. &lt;-&gt; Today I ate home-made fresh bread. 0.1728727999792462
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>Do these scores make sense?</p>
+<ul>
+<li><p>Kind of.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="concatenating-embeddings">
+<h3>2.2 Concatenating embeddings<a class="headerlink" href="#concatenating-embeddings" title="Permalink to this heading">#</a></h3>
+<blockquote>
+All empty promises
+</blockquote>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(embedding(all)\)</span> <span class="math notranslate nohighlight">\(embedding(empty)\)</span> <span class="math notranslate nohighlight">\(embedding(promise)\)</span></p></li>
+<li><p>Might have to chop some text in order to make fixed-sized vectors to feed into ML algorithms.</p></li>
+</ul>
+<p><strong>You’ll see real benefit of word embeddings when we talk about deep learning for text data in DSCI 575!</strong></p>
+</section>
+<section id="airline-sentiment-analysis-using-average-embedding-representation">
+<h3>2.3 Airline sentiment analysis using average embedding representation<a class="headerlink" href="#airline-sentiment-analysis-using-average-embedding-representation" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Let’s try average embedding representation for airline sentiment analysis.</p></li>
+<li><p>You can download the dataset from <a class="reference external" href="https://www.kaggle.com/jaskarancr/airline-sentiment-dataset">here</a>.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;data/Airline-Sentiment-2-w-AA.csv&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;ISO-8859-1&quot;</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>_unit_id</th>
+      <th>_golden</th>
+      <th>_unit_state</th>
+      <th>_trusted_judgments</th>
+      <th>_last_judgment_at</th>
+      <th>airline_sentiment</th>
+      <th>airline_sentiment:confidence</th>
+      <th>negativereason</th>
+      <th>negativereason:confidence</th>
+      <th>airline</th>
+      <th>airline_sentiment_gold</th>
+      <th>name</th>
+      <th>negativereason_gold</th>
+      <th>retweet_count</th>
+      <th>text</th>
+      <th>tweet_coord</th>
+      <th>tweet_created</th>
+      <th>tweet_id</th>
+      <th>tweet_location</th>
+      <th>user_timezone</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>681448150</td>
+      <td>False</td>
+      <td>finalized</td>
+      <td>3</td>
+      <td>2/25/15 5:24</td>
+      <td>neutral</td>
+      <td>1.0000</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>Virgin America</td>
+      <td>NaN</td>
+      <td>cairdin</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>@VirginAmerica What @dhepburn said.</td>
+      <td>NaN</td>
+      <td>2/24/15 11:35</td>
+      <td>5.703060e+17</td>
+      <td>NaN</td>
+      <td>Eastern Time (US &amp; Canada)</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>681448153</td>
+      <td>False</td>
+      <td>finalized</td>
+      <td>3</td>
+      <td>2/25/15 1:53</td>
+      <td>positive</td>
+      <td>0.3486</td>
+      <td>NaN</td>
+      <td>0.0000</td>
+      <td>Virgin America</td>
+      <td>NaN</td>
+      <td>jnardino</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>@VirginAmerica plus you've added commercials to the experience... tacky.</td>
+      <td>NaN</td>
+      <td>2/24/15 11:15</td>
+      <td>5.703010e+17</td>
+      <td>NaN</td>
+      <td>Pacific Time (US &amp; Canada)</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>681448156</td>
+      <td>False</td>
+      <td>finalized</td>
+      <td>3</td>
+      <td>2/25/15 10:01</td>
+      <td>neutral</td>
+      <td>0.6837</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>Virgin America</td>
+      <td>NaN</td>
+      <td>yvonnalynn</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>@VirginAmerica I didn't today... Must mean I need to take another trip!</td>
+      <td>NaN</td>
+      <td>2/24/15 11:15</td>
+      <td>5.703010e+17</td>
+      <td>Lets Play</td>
+      <td>Central Time (US &amp; Canada)</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>681448158</td>
+      <td>False</td>
+      <td>finalized</td>
+      <td>3</td>
+      <td>2/25/15 3:05</td>
+      <td>negative</td>
+      <td>1.0000</td>
+      <td>Bad Flight</td>
+      <td>0.7033</td>
+      <td>Virgin America</td>
+      <td>NaN</td>
+      <td>jnardino</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>@VirginAmerica it's really aggressive to blast obnoxious "entertainment" in your guests' faces &amp;amp; they have little recourse</td>
+      <td>NaN</td>
+      <td>2/24/15 11:15</td>
+      <td>5.703010e+17</td>
+      <td>NaN</td>
+      <td>Pacific Time (US &amp; Canada)</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>681448159</td>
+      <td>False</td>
+      <td>finalized</td>
+      <td>3</td>
+      <td>2/25/15 5:50</td>
+      <td>negative</td>
+      <td>1.0000</td>
+      <td>Can't Tell</td>
+      <td>1.0000</td>
+      <td>Virgin America</td>
+      <td>NaN</td>
+      <td>jnardino</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>@VirginAmerica and it's a really big bad thing about it</td>
+      <td>NaN</td>
+      <td>2/24/15 11:14</td>
+      <td>5.703010e+17</td>
+      <td>NaN</td>
+      <td>Pacific Time (US &amp; Canada)</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>What are we trying to do?</p>
+<ul class="simple">
+<li><p>Try sentiment analysis with bag-of-words representation</p></li>
+<li><p>Try sentiment analysis with embedding representation</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">cross_validate</span><span class="p">,</span> <span class="n">train_test_split</span>
+
+<span class="n">train_df</span><span class="p">,</span> <span class="n">test_df</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">123</span><span class="p">)</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span> <span class="o">=</span> <span class="n">train_df</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">],</span> <span class="n">train_df</span><span class="p">[</span><span class="s2">&quot;airline_sentiment&quot;</span><span class="p">]</span>
+<span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">test_df</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">],</span> <span class="n">test_df</span><span class="p">[</span><span class="s2">&quot;airline_sentiment&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Bag-of-words representation for sentiment analysis</strong></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pipe</span> <span class="o">=</span> <span class="n">make_pipeline</span><span class="p">(</span>
+    <span class="n">CountVectorizer</span><span class="p">(</span><span class="n">stop_words</span><span class="o">=</span><span class="s2">&quot;english&quot;</span><span class="p">),</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">pipe</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s2">&quot;countvectorizer&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+<span class="n">X_train_transformed</span> <span class="o">=</span> <span class="n">pipe</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s2">&quot;countvectorizer&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Data matrix shape:&quot;</span><span class="p">,</span> <span class="n">X_train_transformed</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">pipe</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Data matrix shape: (4392, 7290)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Train accuracy </span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pipe</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Test accuracy </span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pipe</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Train accuracy 0.96
+Test accuracy 0.76
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>Large gap between train and test scores. Overfitting.</p></li>
+<li><p>Test score is kind of low.</p></li>
+</ul>
+<p><strong>Sentiment analysis with average embedding representation</strong></p>
+<ul class="simple">
+<li><p>Let’s try average embedding representation using <code class="docutils literal notranslate"><span class="pre">spaCy</span></code>.</p></li>
+<li><p>How can we create average embedding representation for each example using <code class="docutils literal notranslate"><span class="pre">spaCy</span></code>?</p></li>
+<li><p>When you want to process large volumes of text, pre-trained models from <code class="docutils literal notranslate"><span class="pre">spaCy</span></code> are usually more efficient if you let them work on batches of texts. <code class="docutils literal notranslate"><span class="pre">spaCy</span></code>’s <code class="docutils literal notranslate"><span class="pre">nlp.pipe</span></code> method takes an iterable of texts and yields processed Doc objects. The batching is done internally.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_train_embeddings</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">text</span><span class="o">.</span><span class="n">vector</span> <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">nlp</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">X_train</span><span class="p">)])</span>
+<span class="n">X_test_embeddings</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">text</span><span class="o">.</span><span class="n">vector</span> <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">nlp</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">X_test</span><span class="p">)])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>We have reduced dimensionality from 7,290 to 300!</p></li>
+<li><p>Let’s examine the average embedding representation.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_train_embeddings</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(4392, 300)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_train_embeddings</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>0</th>
+      <th>1</th>
+      <th>2</th>
+      <th>3</th>
+      <th>4</th>
+      <th>5</th>
+      <th>6</th>
+      <th>7</th>
+      <th>8</th>
+      <th>9</th>
+      <th>...</th>
+      <th>290</th>
+      <th>291</th>
+      <th>292</th>
+      <th>293</th>
+      <th>294</th>
+      <th>295</th>
+      <th>296</th>
+      <th>297</th>
+      <th>298</th>
+      <th>299</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.715993</td>
+      <td>3.024856</td>
+      <td>-2.961218</td>
+      <td>-1.086345</td>
+      <td>-0.123557</td>
+      <td>1.467904</td>
+      <td>0.605043</td>
+      <td>1.832471</td>
+      <td>-1.459403</td>
+      <td>1.153033</td>
+      <td>...</td>
+      <td>1.261182</td>
+      <td>-1.051472</td>
+      <td>2.565378</td>
+      <td>-0.258263</td>
+      <td>-0.795342</td>
+      <td>-1.271816</td>
+      <td>1.410173</td>
+      <td>0.542111</td>
+      <td>-2.229493</td>
+      <td>0.399477</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-1.152375</td>
+      <td>2.198183</td>
+      <td>-1.196150</td>
+      <td>-0.821115</td>
+      <td>-3.005700</td>
+      <td>1.658515</td>
+      <td>-1.853075</td>
+      <td>0.124950</td>
+      <td>-1.718775</td>
+      <td>0.598058</td>
+      <td>...</td>
+      <td>2.667635</td>
+      <td>1.316750</td>
+      <td>3.139700</td>
+      <td>-2.422225</td>
+      <td>-1.294870</td>
+      <td>0.072875</td>
+      <td>0.978452</td>
+      <td>0.597100</td>
+      <td>-0.651000</td>
+      <td>-0.551250</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>-1.602497</td>
+      <td>0.539487</td>
+      <td>-3.950199</td>
+      <td>-0.231717</td>
+      <td>3.366309</td>
+      <td>1.425058</td>
+      <td>0.639011</td>
+      <td>5.092289</td>
+      <td>-0.926476</td>
+      <td>1.030533</td>
+      <td>...</td>
+      <td>0.059342</td>
+      <td>0.789078</td>
+      <td>0.788769</td>
+      <td>-0.503864</td>
+      <td>-2.172607</td>
+      <td>1.765752</td>
+      <td>-0.544203</td>
+      <td>0.092374</td>
+      <td>-1.417742</td>
+      <td>0.930287</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>-1.045790</td>
+      <td>0.533385</td>
+      <td>0.852775</td>
+      <td>0.121400</td>
+      <td>1.923370</td>
+      <td>-1.106279</td>
+      <td>0.762420</td>
+      <td>1.016824</td>
+      <td>0.512271</td>
+      <td>-0.578976</td>
+      <td>...</td>
+      <td>-0.834322</td>
+      <td>0.673255</td>
+      <td>-0.743473</td>
+      <td>0.170571</td>
+      <td>1.052062</td>
+      <td>1.092318</td>
+      <td>-0.634580</td>
+      <td>0.277500</td>
+      <td>-1.026040</td>
+      <td>-0.318937</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>-1.155673</td>
+      <td>0.535273</td>
+      <td>-3.451900</td>
+      <td>0.234435</td>
+      <td>0.763545</td>
+      <td>0.880550</td>
+      <td>-0.420211</td>
+      <td>2.144348</td>
+      <td>-1.498447</td>
+      <td>1.755801</td>
+      <td>...</td>
+      <td>-0.229825</td>
+      <td>-0.634347</td>
+      <td>1.154722</td>
+      <td>-1.226543</td>
+      <td>-1.740660</td>
+      <td>-1.192653</td>
+      <td>-0.402632</td>
+      <td>0.358389</td>
+      <td>-1.776468</td>
+      <td>-0.638905</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 300 columns</p>
+</div></div></div>
+</div>
+<p><strong>Sentiment classification using average embeddings</strong></p>
+<ul class="simple">
+<li><p>What are the train and test accuracies with average word embedding representation?</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lgr</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">lgr</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_embeddings</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Train accuracy </span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lgr</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_train_embeddings</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Test accuracy </span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lgr</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test_embeddings</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Train accuracy 0.82
+Test accuracy 0.77
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>The test accuracy is a bit better with less overfitting.</p></li>
+<li><p>Note that the embeddings are trained on a completely different corpus and we are leveraging semantic similarities it has learned from this huge training corpus to represent sentences from our fairly small corpus.</p></li>
+</ul>
+<p><strong><code class="docutils literal notranslate"><span class="pre">spaCy</span></code>’s pre-trained embeddings</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">spaCy</span></code>’s pre-trained embeddings are trained on <a class="reference external" href="https://catalog.ldc.upenn.edu/LDC2013T19">OntoNotes corpus</a>.</p></li>
+<li><p>This corpus has a collection of different styles of texts such as telephone conversations, newswire, newsgroups, broadcast news, broadcast conversation, weblogs, religious texts.</p></li>
+<li><p>If you are working with a specific style (e.g., tweets or healthcare) you may want to use different pre-trained embeddings. In that case you’ll have to get average embeddings on your own.</p></li>
+</ul>
+<p><strong>Comments on using average embeddings in your applications</strong></p>
+<ul class="simple">
+<li><p>Maintain realistic expectations about the information average embeddings provide.</p></li>
+<li><p>Since embedding of a phrase or a sentence is the average of embeddings of words in it we do not necessarily get expected representation of text.</p>
+<ul>
+<li><p>Example: embedding of “machine learning” is going to be average of embedding of “machine” and embedding of “learning” which is not necessarily representative of the phrase “machine learning”.</p></li>
+</ul>
+</li>
+<li><p>For long sentences or documents the average embedding can get very noisy, as there will be a mix of many different signals.</p></li>
+</ul>
+</section>
+<section id="extensions-and-more-advanced-models">
+<h3>2.3 Extensions and more advanced models<a class="headerlink" href="#extensions-and-more-advanced-models" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality.pdf">Include phrases</a></p>
+<ul>
+<li><p>New York : New York Times :: Vancouver : Vancouver Sun?</p></li>
+</ul>
+</li>
+<li><p>Contextual representations of words (<a class="reference external" href="https://github.com/allenai/allennlp/blob/master/tutorials/how_to/elmo.md">ELMo</a>)</p>
+<ul>
+<li><p>I went to the <strong>bank</strong> to deposit a cheque.</p></li>
+<li><p>She loves to walk along the <b>bank</b> of a river, and look into the water.</p></li>
+</ul>
+</li>
+<li><p><a class="reference external" href="https://radimrehurek.com/gensim/models/doc2vec.html">doc2vec</a> and <a class="reference external" href="https://arxiv.org/abs/1405.4053">paragraph2vec</a></p>
+<ul>
+<li><p>Learns fixed-length feature representations from variable-length pieces of texts</p></li>
+</ul>
+</li>
+</ul>
+<p><br><br><br><br></p>
+</section>
+</section>
+<section id="questions-for-you">
+<h2>❓❓ Questions for you<a class="headerlink" href="#questions-for-you" title="Permalink to this heading">#</a></h2>
+<section id="exercise-6-1-select-all-of-the-following-statements-which-are-true-iclicker">
+<h3>Exercise 6.1 Select all of the following statements which are <strong>True</strong> (iClicker)<a class="headerlink" href="#exercise-6-1-select-all-of-the-following-statements-which-are-true-iclicker" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>(A) Consider Google News pre-trained word2vec embeddings. If I take word vector for “Computer_Science” and an average of the word vectors for “Computer” and “Science”, they will result in the same word vector.</p></li>
+<li><p>(B) One of the problems with using pre-trained embeddings built on a text in a particular domain with text in another domain is that there could be many unknown words.</p></li>
+<li><p>(C) Once you have a trained word2vec model, finding most similar items means finding <span class="math notranslate nohighlight">\(k\)</span>-nearest neighbours on your word embeddings.</p></li>
+<li><p>(D) Instead of getting sentence embeddings, you could have used average word embeddings of recipe names in lab1.</p></li>
+<li><p>(E) When you are using average embedding representation on large documents, the representation can get quite noisy.</p></li>
+</ul>
+<p><br><br><br><br></p>
+<div class="tip dropdown admonition">
+<p class="admonition-title">Exercise 6.1: V’s Solutions!</p>
+<ul class="simple">
+<li><p>(A)</p></li>
+<li><p>(B)</p></li>
+<li><p>(C)</p></li>
+<li><p>(D)</p></li>
+<li><p>(E)</p></li>
+</ul>
+</div>
+<p><br><br><br><br></p>
+</section>
+</section>
+<section id="word2vec-for-product-recommendation">
+<h2>3. word2vec for product recommendation<a class="headerlink" href="#word2vec-for-product-recommendation" title="Permalink to this heading">#</a></h2>
+<p>word2vec is not limited to text and words and it has been used in many different domains and for many different applications.</p>
+<ul class="simple">
+<li><p>Examples</p>
+<ul>
+<li><p><a class="reference external" href="https://github.com/benedekrozemberczki/graph2vec">graph2vec</a></p></li>
+<li><p><a class="reference external" href="https://github.com/topics/node2vec">node2vec</a></p></li>
+<li><p><a class="reference external" href="https://github.com/lihenryhfl/song2vec">song2vec</a></p></li>
+<li><p>…</p></li>
+</ul>
+</li>
+</ul>
+<ul class="simple">
+<li><p>In the lab you will be using word2vec for product recommendation.</p></li>
+<li><p>word2vec exploits the sequential nature of text data and assumes that the words in similar contexts tend to be similar or related.</p></li>
+<li><p>We could apply the same intuition to product purchasing behaviour of customers!</p>
+<ul>
+<li><p>If we consider products bought together with each other as contexts of each other, then we can say that the products that occur in similar contexts are related or similar.</p></li>
+</ul>
+</li>
+</ul>
+<section id="purchase-history-example">
+<h3>3.1 Purchase history example<a class="headerlink" href="#purchase-history-example" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Bike light and waterproof pants occur in similar contexts</p></li>
+<li><p>How about recommending waterproof pants to Sam and Bike light to Jamie?</p></li>
+</ul>
+<a class="reference internal image-reference" href="../_images/customer_purchase_history_example.png"><img alt="../_images/customer_purchase_history_example.png" src="../_images/customer_purchase_history_example.png" style="width: 600px; height: 600px;" /></a>
+<p>(Credit: https://www.bicycling.com/bikes-gear/g20011461/winter-cycling-gear-0/)</p>
+<ul class="simple">
+<li><p>How to train word2vec for this?</p></li>
+<li><p>What are words, sentences, and vocabulary?</p>
+<ul>
+<li><p>Words <span class="math notranslate nohighlight">\(\rightarrow\)</span> products</p></li>
+<li><p>Sentences <span class="math notranslate nohighlight">\(\rightarrow\)</span> purchase histories</p></li>
+<li><p>Vocabulary <span class="math notranslate nohighlight">\(\rightarrow\)</span> all unique products</p></li>
+</ul>
+</li>
+</ul>
+<p><img alt="" src="../_images/customer_purchase_history_labeled.png" /></p>
+<!-- <img src="img/customer_purchase_history_labeled.png" width="800" height="800"> -->
+<p>(Credit: https://www.bicycling.com/bikes-gear/g20011461/winter-cycling-gear-0/)</p>
+<ul class="simple">
+<li><p>The idea is to model similarity/relatedness between products based on the distributional hypothesis; the products that occur in similar contexts tend to be related/similar.</p></li>
+<li><p>Using the word2vec algorithm, we learn short and dense representations for all products based on the contexts in which they appear.</p></li>
+<li><p>If we have a large dataset, we learn meaningful representations of products.</p></li>
+<li><p>To train word2vec model we need:</p>
+<ul>
+<li><p>preprocessed corpus</p></li>
+<li><p>embedding dimension</p></li>
+<li><p>window size</p></li>
+</ul>
+</li>
+</ul>
+<p>Let’s prepare the data for training word2vec.</p>
+<ul>
+<li><p>Create a list of lists of purchase histories for all customers.</p></li>
+<li><p>We want the data in the following format.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+ <span class="p">[</span><span class="n">item1_customer1</span><span class="p">,</span> <span class="n">item2_customer1</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="c1"># purchase history for customer1</span>
+ <span class="p">[</span><span class="n">item1_customer2</span><span class="p">,</span> <span class="n">item2_customer2</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="c1"># purchase history for customer2</span>
+ <span class="o">...</span>
+ <span class="p">[</span><span class="n">item1_customer100</span><span class="p">,</span> <span class="n">item2_customer100</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="c1"># purchase history for customer100</span>
+ <span class="o">...</span>
+ <span class="p">]</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<ul class="simple">
+<li><p>Each inner list corresponds to purchase history of a customer.</p></li>
+<li><p>Elements of each inner list are items bought by that particular customer ordered by time when they were bought.</p></li>
+<li><p>Each inner list of items purchased by a customer is equivalent to a sentence in a typical word2vec model.</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">[item1_customer1,</span> <span class="pre">item2_customer1,</span> <span class="pre">....]</span></code></p></li>
+</ul>
+</li>
+<li><p>Each item within each inner list corresponds to a word in a typical word2vec model.</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">item1_customer2</span></code> would be equivalent to a word in a typical word2vec model.</p></li>
+</ul>
+</li>
+<li><p>The items following and preceding a given item form context of the given item.</p></li>
+</ul>
+<ul class="simple">
+<li><p>Now that you have input for the word2vec algorithm, you can train is by setting the appropriate hyperparameters</p>
+<ul>
+<li><p>window size</p></li>
+<li><p>embedding dimensions</p></li>
+</ul>
+</li>
+</ul>
+<ul class="simple">
+<li><p>What to do with the trained product embeddings?</p></li>
+<li><p>With the trained model, we can find products similar to the product of interest in the vector space and recommend it to the user.</p></li>
+<li><p>Example: Recommend waterproof pants to Sam and bike light to Jamie.</p></li>
+</ul>
+<a class="reference internal image-reference" href="../_images/customer_purchase_history_example.png"><img alt="../_images/customer_purchase_history_example.png" src="../_images/customer_purchase_history_example.png" style="width: 600px; height: 600px;" /></a>
+<p>(Credit: https://www.bicycling.com/bikes-gear/g20011461/winter-cycling-gear-0/)</p>
+<p><br><br><br><br></p>
+</section>
+</section>
+<section id="manifold-learning">
+<h2>4. Manifold learning<a class="headerlink" href="#manifold-learning" title="Permalink to this heading">#</a></h2>
+<section id="definition-and-motivation">
+<h3>4.1 Definition and motivation<a class="headerlink" href="#definition-and-motivation" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>One of the major goals of unsupervised learning is uncovering underlying structure of the data.</p></li>
+<li><p><strong>Manifold learning</strong> is about understanding how the data is organized on a geometrically simpler shape that is twisted and folded in a higher-dimensional space.</p></li>
+<li><p>It is a type of unsupervised learning that aims to uncover the simpler, intrinsic structure hidden within complex, high-dimensional data.</p></li>
+<li><p>The idea is that you have some shape in 2D and it’s embedded in a higher dimensional space in some weird twisted, crumbled way, and you want to recover the underlying structure of the data in two dimensions.</p></li>
+<li><p>A classic example is a swiss role, as shown below.</p></li>
+<li><p>The unrolled 2D layout of the swiss role is on the right.</p></li>
+</ul>
+<p><img alt="" src="../_images/swiss_roll.png" /></p>
+<!-- <img src="img/swiss_roll.png" width="800" height="800"> -->
+<p><a class="reference external" href="https://www.cs.ubc.ca/~schmidtm/Courses/340-F19/L31.pdf">source</a></p>
+<p><strong>Why does it matter?</strong></p>
+<ul class="simple">
+<li><p>In many real-world scenarios, data collected from sensors, speech, videos, or interactions is high-dimensional but doesn’t uniformly occupy the high-dimensional space.</p></li>
+<li><p>Instead, it tends to be concentrated on or near a manifold of much lower dimensionality.</p></li>
+</ul>
+<ul class="simple">
+<li><p>A number of manifold learning methods are out there which apply more complicated transformations on the data.</p>
+<ul>
+<li><p><a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.manifold.MDS.html">Multi-dimensional scaling (MDS)</a></p></li>
+<li><p><a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.manifold.Isomap.html#sklearn.manifold.Isomap">ISOMAP</a></p></li>
+<li><p><a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.manifold.LocallyLinearEmbedding.html">Locally linear embedding (LLE)</a></p></li>
+<li><p><a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html">t-SNE</a></p></li>
+<li><p><a class="reference external" href="https://umap-learn.readthedocs.io/en/latest/">UMAP</a></p></li>
+</ul>
+</li>
+<li><p>These are based on the idea of finding a low dimensional (usually two-dimensional) representation of the data that preserves the distances between points as best as possible.</p></li>
+<li><p>They directly optimize the location of <span class="math notranslate nohighlight">\(Z_i\)</span> values in the transformed space because that’s what we care about in visualization.</p></li>
+<li><p>We will focus on t-SNE.</p></li>
+<li><p>Note that UMAP is a more flexible and useful manifold learning tool and you might want to explore it further.</p></li>
+</ul>
+<p><br><br></p>
+</section>
+<section id="t-distributed-stochastic-neighbour-embedding-t-sne">
+<h3>4.2 t-distributed Stochastic Neighbour Embedding (t-SNE)<a class="headerlink" href="#t-distributed-stochastic-neighbour-embedding-t-sne" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>So far we have been using PCA for dimensionality reduction and visualizing high dimensional data.</p></li>
+<li><p>Recall that PCA is a linear dimensionality reduction technique.</p></li>
+<li><p>t-SNE applies complicated non-linear transformations on the data.</p></li>
+<li><p>t-SNE is mostly used for visualization. Instead of constructing an explicit function which maps high dimensional points to low dimensional space, it optimizes the position of the points in the low dimensional space.</p></li>
+</ul>
+<section id="pca-on-t-sne-the-digits-dataset">
+<h4>4.2.1 PCA on t-SNE the digits dataset<a class="headerlink" href="#pca-on-t-sne-the-digits-dataset" title="Permalink to this heading">#</a></h4>
+<p>Let’s try this out on the digits dataset.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_digits</span>
+
+<span class="n">digits</span> <span class="o">=</span> <span class="n">load_digits</span><span class="p">()</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">subplot_kw</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;xticks&quot;</span><span class="p">:</span> <span class="p">(),</span> <span class="s2">&quot;yticks&quot;</span><span class="p">:</span> <span class="p">()})</span>
+<span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">img</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axes</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">digits</span><span class="o">.</span><span class="n">images</span><span class="p">):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/68e43b0f6b6cad933cea54a2436101391543494b5738c5bac0b100316225f8f0.png" src="../_images/68e43b0f6b6cad933cea54a2436101391543494b5738c5bac0b100316225f8f0.png" />
+</div>
+</div>
+<ul class="simple">
+<li><p>Let’s try PCA and visualize digits in two dimensions.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pca</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">pca</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">digits</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+<span class="n">digits_pca</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">digits</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+<span class="n">plot_digits</span><span class="p">(</span><span class="n">digits</span><span class="p">,</span> <span class="n">digits_pca</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;PCA digits visualization&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/b867d035eb7816b5af2b3d547aaf5f2c87ef5f917c1254ebe7f4df17aec2e2e1.png" src="../_images/b867d035eb7816b5af2b3d547aaf5f2c87ef5f917c1254ebe7f4df17aec2e2e1.png" />
+</div>
+</div>
+<ul class="simple">
+<li><p>Let’s try t-SNE to visualize digits in two dimensions.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.manifold</span> <span class="kn">import</span> <span class="n">TSNE</span>
+
+<span class="n">tsne</span> <span class="o">=</span> <span class="n">TSNE</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">123</span><span class="p">)</span>
+<span class="n">digits_tsne</span> <span class="o">=</span> <span class="n">tsne</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">digits</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+<span class="n">plot_digits</span><span class="p">(</span><span class="n">digits</span><span class="p">,</span> <span class="n">digits_tsne</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;t-SNE digits visualization&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/5b5d158308962686f6f6c5074f555a5f1501cf4787fca648127a36c047fe8299.png" src="../_images/5b5d158308962686f6f6c5074f555a5f1501cf4787fca648127a36c047fe8299.png" />
+</div>
+</div>
+<p>Much better separation of clusters. Remember that this is completely unsupervised!</p>
+<ul class="simple">
+<li><p>Start with a random embedding (or PCA initialized embedding) in the lower dimensional space</p></li>
+<li><p>Iteratively update points to make</p>
+<ul>
+<li><p>close points in the original space closer in the new space (more emphasis)</p></li>
+<li><p>Far apart points in the original space further apart</p></li>
+</ul>
+</li>
+</ul>
+<p>Let’s try it out on the swiss roll toy dataset.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">mpl_toolkits.mplot3d</span> <span class="kn">import</span> <span class="n">Axes3D</span>
+<span class="kn">import</span> <span class="nn">mpl_toolkits.mplot3d.axes3d</span> <span class="k">as</span> <span class="nn">p3</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">make_swiss_roll</span>
+
+<span class="n">X</span><span class="p">,</span> <span class="n">colour</span> <span class="o">=</span> <span class="n">make_swiss_roll</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">3000</span><span class="p">,</span> <span class="n">noise</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.manifold</span> <span class="kn">import</span> <span class="n">TSNE</span>
+
+<span class="n">tsne</span> <span class="o">=</span> <span class="n">TSNE</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span> <span class="n">perplexity</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s1">&#39;pca&#39;</span><span class="p">)</span>
+<span class="n">swiss_tsne</span> <span class="o">=</span> <span class="n">tsne</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_swiss_roll</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">colour</span><span class="p">,</span> <span class="n">swiss_tsne</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/d4d2cfe60d520c4af4cd666c993f7a30f671c99a8437375178b703000e69cfaf.png" src="../_images/d4d2cfe60d520c4af4cd666c993f7a30f671c99a8437375178b703000e69cfaf.png" />
+</div>
+</div>
+<ul class="simple">
+<li><p>It’s identifying more or less clear clusters from this complicated structure.</p></li>
+<li><p>We’re not going to talk about the details of the algorithm.</p></li>
+<li><p>My goal is to give you an intuition, let you know that it exists, and show you how to use it for visualization.</p></li>
+</ul>
+</section>
+</section>
+<section id="how-does-it-work-high-level">
+<h3>4.2.2 How does it work? (high-level)<a class="headerlink" href="#how-does-it-work-high-level" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>t-SNE is designed to measure how well the low-dimensional representation of the data preserves the pairwise similarities between points compared to the original high-dimensional data.</p></li>
+</ul>
+<p><strong>In the high-dimensional space</strong></p>
+<ul class="simple">
+<li><p>t-SNE begins by calculating the pairwise similarities between points as probabilities.</p></li>
+<li><p>The similarity between points <span class="math notranslate nohighlight">\(x_i\)</span> and <span class="math notranslate nohighlight">\(x_j\)</span> is represented by probability <span class="math notranslate nohighlight">\(p_{ij}\)</span> which is high when the points are close together in the high-dimensional space and low when they are further apart.</p></li>
+<li><p>The probability is calculated using Gaussian distribution, centered at each point <span class="math notranslate nohighlight">\(x_i\)</span>. Then <span class="math notranslate nohighlight">\(p_{ij}\)</span> is the density of <span class="math notranslate nohighlight">\(x_j\)</span> under this Gaussian distribution.</p></li>
+<li><p>The variance of the Gaussian distribution is influenced by the hyperparameter <code class="docutils literal notranslate"><span class="pre">perplexity</span></code>.</p></li>
+<li><p>You can think of this probability as given that I’m at point <span class="math notranslate nohighlight">\(x_i\)</span> what’s the probability that <span class="math notranslate nohighlight">\(x_j\)</span> is my neighbour. The <code class="docutils literal notranslate"><span class="pre">perplexity</span></code> hyperparamter determines how many neighbors effectively participate in the distribution.</p></li>
+</ul>
+<p><strong>In the low-dimensional space</strong></p>
+<ul class="simple">
+<li><p>t-SNE begins by randomly initializing the points in the low-dimensional map</p></li>
+<li><p>Then it calculates a similar set of pairwise probabilities <span class="math notranslate nohighlight">\(q_{ij}\)</span> in low-dimensional space</p></li>
+<li><p>Similar to high-dimensional space, these probabilities indicate how close or far apart the points are in the low-dimensional representation.</p></li>
+<li><p>The calculation uses a similar idea but with a crucial difference: it uses a <strong>t-distribution</strong> rather than a Gaussian distribution to calculate the probabilities in the lower-dimensional space to mitigate the “crowding problem”.</p></li>
+<li><p>The heavier tails of t-distribution mean that it assigns a higher probability to events further away from the mean. This ensures that local structures are preserved and the distances between moderately distant points are exaggerated (compared to a Gaussian distribution), making clusters more distinct and easier to identify visually.</p></li>
+</ul>
+<section id="optional-4-2-2-loss-function-of-t-sne">
+<h4>(Optional) 4.2.2 Loss function of t-SNE<a class="headerlink" href="#optional-4-2-2-loss-function-of-t-sne" title="Permalink to this heading">#</a></h4>
+<p>The loss function of t-SNE measures the mismatch between the high-dimensional probabilities <span class="math notranslate nohighlight">\(p_{ij}\)</span> and the low-dimensional probabilities <span class="math notranslate nohighlight">\(q_{ij}\)</span>. It uses the Kullback-Leibler (KL) divergence to quantify the difference between two probability distributions.</p>
+<div class="math notranslate nohighlight">
+\[
+KL(P||Q) = \sum_{i,j}p_{ij}\log\left(\frac{p_{ij}}{q_{ij}}\right)
+\]</div>
+<p>Where</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(p_{ij} \rightarrow\)</span> Similaries in the high-dimensional space</p></li>
+<li><p><span class="math notranslate nohighlight">\(q_{ij} \rightarrow\)</span> Similaries in the low-dimensional space</p></li>
+</ul>
+<p>Intuitively, this loss function penalizes two types of errors:</p>
+<ul class="simple">
+<li><p>If two points are close in the high-dimensional space but far in the low-dimensional space, (high <span class="math notranslate nohighlight">\(p_{ij}\)</span> but low <span class="math notranslate nohighlight">\(q_{ij}\)</span>), the loss will be high.</p></li>
+<li><p>If two points are far away in the high-dimensional space but end up close in the low-dimensional space (low <span class="math notranslate nohighlight">\(p_{ij}\)</span> but high <span class="math notranslate nohighlight">\(q_{ij}\)</span>), the loss is high (although to a lesser extent due to the log).</p></li>
+<li><p>The loss function is not symmetric, i.e., different error will be penalized differently.</p></li>
+<li><p>This method is focused on keeping the local structure.</p></li>
+<li><p>There is a high penalty for putting neighbours far away.</p></li>
+</ul>
+<p><strong>(Optional) How to define <span class="math notranslate nohighlight">\(p_{ij}\)</span> and <span class="math notranslate nohighlight">\(q_{ij}\)</span>?</strong></p>
+<ul class="simple">
+<li><p>In the original space, compute the following (Gaussian distribution):
+$<span class="math notranslate nohighlight">\(
+p_{j|i} = \frac{\exp(||x_{i}-x_j||^2/2\sigma_i^2)}{\sum_{i\neq k}\exp(||x_{i}-x_k||^2/2\sigma_i^2)},
+\)</span><span class="math notranslate nohighlight">\(
+and \)</span>p_{i|i}=0$. Then, obtain the probability:</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[p_{ij} = \frac{p_{j|i}+p_{i|j}}{2n}\]</div>
+<ul class="simple">
+<li><p>For the projected points in the low dimensional space compute the following (t-distribution)
+$<span class="math notranslate nohighlight">\(
+q_{ij}= \frac{\left(1+||z_{i}-z_j||^2\right)^{-1}}{\sum_{i\neq k}\left(1+||z_{i}-z_k||^2\right)^{-1}}
+\)</span>$</p></li>
+</ul>
+<ul class="simple">
+<li><p>In summary, t-SNE uses distances between points to come up with a probability distribution for the neighborhood of each point.</p>
+<ul>
+<li><p>closer points have a higher probability to be neighbors</p></li>
+</ul>
+</li>
+<li><p>Then, we look for a configuration in the low dimensional space that approximates these probabilities.</p></li>
+<li><p>We have definitions for <span class="math notranslate nohighlight">\(p_{ij}\)</span>, <span class="math notranslate nohighlight">\(q_{ij}\)</span> and the loss function.</p></li>
+<li><p>You can use gradient-descent to optimize this function.</p></li>
+</ul>
+<p><br><br></p>
+</section>
+<section id="important-hyperparameter-perplexity">
+<h4>4.2.3 Important hyperparameter: <code class="docutils literal notranslate"><span class="pre">perplexity</span></code><a class="headerlink" href="#important-hyperparameter-perplexity" title="Permalink to this heading">#</a></h4>
+<p>Recall the t-SNE plot we saw before.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.manifold</span> <span class="kn">import</span> <span class="n">TSNE</span>
+
+<span class="n">tsne</span> <span class="o">=</span> <span class="n">TSNE</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">digits_tsne</span> <span class="o">=</span> <span class="n">tsne</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">digits</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+<span class="n">plot_digits</span><span class="p">(</span><span class="n">digits</span><span class="p">,</span> <span class="n">digits_tsne</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;t-SNE digits visualization&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/95bfb4cb595047f8a5e7dc884e4ce63012bb1d03b4e607355fba9824135c7eca.png" src="../_images/95bfb4cb595047f8a5e7dc884e4ce63012bb1d03b4e607355fba9824135c7eca.png" />
+</div>
+</div>
+<ul class="simple">
+<li><p>Almost all classes are clearly separated and form a single dense group.</p></li>
+<li><p>Impressive given that it’s a completely unsupervised method.</p></li>
+<li><p>It’s placing the points in two dimensions solely based on how close the points are in the original space.</p></li>
+<li><p>Axes are not usually meaningful and do not correspond to anything in the input space.</p></li>
+</ul>
+<p><img alt="" src="../_images/t-sne-viz.gif" /></p>
+<p><a class="reference external" href="https://github.com/oreillymedia/t-SNE-tutorial">Source</a></p>
+<ul class="simple">
+<li><p>Intuitively it refers to the bandwidth of neighbours to consider</p>
+<ul>
+<li><p>low perplexity: consider only close neighbours</p></li>
+<li><p>smaller datasets try lower perplexity</p></li>
+<li><p>authors say perplexity of 30 always works well! 🪄</p></li>
+</ul>
+</li>
+</ul>
+<p>Let’s examine different perplexity values on the digits dataset.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_perplexity_tsne</span><span class="p">(</span><span class="n">digits</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/e59fe30a01f85bdd85e849bf54e99bc9fbe2bee21d7967effff14085ad90cd2a.png" src="../_images/e59fe30a01f85bdd85e849bf54e99bc9fbe2bee21d7967effff14085ad90cd2a.png" />
+</div>
+</div>
+<p><strong>Observations</strong></p>
+<ul class="simple">
+<li><p>For <code class="docutils literal notranslate"><span class="pre">perplexity=2</span></code> we only consider close neighbourhoods so the clusters do not look compact.</p></li>
+<li><p>Perplexity values of 10, 15, 30 seem to produce reasonable clusters.</p></li>
+<li><p>Perplexity of 30 is actually producing most compact clusters!!</p></li>
+</ul>
+<p><strong>Important points about t-SNE</strong></p>
+<ul class="simple">
+<li><p>Start with a random embedding</p></li>
+<li><p>Iteratively update points to make “close” points close.</p></li>
+<li><p>Local distances are more important and global distances are less important.</p></li>
+<li><p>Good for getting coarse view of topology.</p></li>
+<li><p>t-distribution heavy-tailed so no overcrowding.</p></li>
+<li><p>low perplexity: only close neighbors</p></li>
+<li><p>It tends to be slower and does not scale well on large datasets.</p></li>
+<li><p>Results can vary significantly between different runs, especially due to its sensitivity to hyperparameters like perplexity and the random initialization.</p></li>
+<li><p>Lacks an easy way to embed new data points into an existing embedding without re-running the entire algorithm, which can be computationally intensive.</p></li>
+</ul>
+<p><br><br><br><br></p>
+</section>
+</section>
+</section>
+<section id="id1">
+<h2>❓❓ Questions for you<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h2>
+<section id="exercise-6-2-select-all-of-the-following-statements-which-are-true-iclicker">
+<h3>Exercise 6.2 Select all of the following statements which are <strong>True</strong> (iClicker)<a class="headerlink" href="#exercise-6-2-select-all-of-the-following-statements-which-are-true-iclicker" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>(A) In product recommendation application of word2vec above, we are not using item descriptions when training the model.</p></li>
+<li><p>(B) Similar to PCA, t-SNE is a linear dimensionality reduction technique.</p></li>
+</ul>
+<p><br><br><br><br></p>
+<p>Discuss the following questions.</p>
+<ul class="simple">
+<li><p>Discuss how could you build a song recommendation system using word2vec.</p></li>
+<li><p>Discuss the problems associated with word2vec recommendation systems.</p></li>
+</ul>
+<p><br><br><br><br></p>
+</section>
+</section>
+<section id="final-comments-summary-reflection">
+<h2>5. Final comments, summary, reflection<a class="headerlink" href="#final-comments-summary-reflection" title="Permalink to this heading">#</a></h2>
+<p><strong>Summary: Using word embeddings</strong></p>
+<ul class="simple">
+<li><p>It’s not that straightforward to effectively use word representations directly in text classification tasks but later when we learn about sequential models such as recurrent neural networks (RNNs) you’ll appreciate word representations more.</p></li>
+<li><p>Two simplistic ways to use word embeddings with traditional ML models.</p>
+<ul>
+<li><p>Averaging (noisy but works OK if your text is not too long)</p></li>
+<li><p>Concatenating (we have to chop some text)</p></li>
+</ul>
+</li>
+<li><p>We can use them more naturally with sequential models such as recurrent neural networks (DSCI 575).</p></li>
+</ul>
+<p><strong>Summary: word2vec beyond words</strong></p>
+<ul class="simple">
+<li><p>word2vec is not limited to text and words. You can use it wherever distributional hypothesis makes sense.</p></li>
+<li><p>We looked an application of word2vec for product recommendation.</p></li>
+</ul>
+<p><strong>Summary: Manifold learning with t-SNE</strong></p>
+<ul class="simple">
+<li><p>Manifold learning algorithms apply complicated transformations on the data.</p>
+<ul>
+<li><p>Useful for pretty pictures and visualization.</p></li>
+<li><p>Usually we cannot use them to transform new data.</p></li>
+</ul>
+</li>
+<li><p>t-SNE focuses on neighbouring distances by allowing large variance in other distances.</p>
+<ul>
+<li><p>A popular technique used for visualizing high dimensional data</p></li>
+<li><p>Usually produces well-separated and compact clusters compared to PCA</p></li>
+<li><p>Axes do not correspond to anything meaningful in the input space</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="resources">
+<h2>Resources<a class="headerlink" href="#resources" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.jmlr.org/papers/volume9/vandermaaten08a/vandermaaten08a.pdf">Visualizing data with t-SNE</a></p></li>
+<li><p><a class="reference external" href="https://www.cs.toronto.edu/~hinton/absps/sne.pdf">Stochastic Neighbor Embedding</a></p></li>
+<li><p><a class="reference external" href="https://www.youtube.com/watch?v=MnRskV3NY1k">A nice video on detailed explanation of t-SNE</a></p></li>
+<li><p><a class="reference external" href="https://www.youtube.com/watch?v=NEaUSP4YerM">t-SNE StatQuest</a></p></li>
+<li><p><a class="reference external" href="https://github.com/oreillymedia/t-SNE-tutorial">t-SNE tutorial</a></p></li>
+<li><p><a class="reference external" href="https://distill.pub/2016/misread-tsne/">How to use t-SNE effectively</a></p></li>
+<li><p><a class="reference external" href="https://github.com/elbamos/largeVis">LargeVis</a></p></li>
+<li><p><a class="reference external" href="https://github.com/lmcinnes/umap">UMAP</a></p></li>
+</ul>
+<p><br><br><br><br></p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "conda-env-563-py"
+        },
+        kernelOptions: {
+            name: "conda-env-563-py",
+            path: "./lectures"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'conda-env-563-py'</script>
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="05_word-embeddings.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Lecture 5: Word Embeddings, word2vec</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="07_recommender-systems1.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Lecture 7: Recommender Systems Part I</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lecture-plan-imports-and-los">Lecture plan, imports, and LOs</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lecture-plan">Lecture plan</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#imports">Imports</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#learning-outcomes">Learning outcomes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#context-and-motivation">1. Context and motivation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-word-embeddings-in-document-similarity-and-text-classification">2. Using word embeddings in document similarity and text classification</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#averaging-embeddings">2.1 Averaging embeddings</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#concatenating-embeddings">2.2 Concatenating embeddings</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#airline-sentiment-analysis-using-average-embedding-representation">2.3 Airline sentiment analysis using average embedding representation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#extensions-and-more-advanced-models">2.3 Extensions and more advanced models</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#questions-for-you">❓❓ Questions for you</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-1-select-all-of-the-following-statements-which-are-true-iclicker">Exercise 6.1 Select all of the following statements which are <strong>True</strong> (iClicker)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#word2vec-for-product-recommendation">3. word2vec for product recommendation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#purchase-history-example">3.1 Purchase history example</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#manifold-learning">4. Manifold learning</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#definition-and-motivation">4.1 Definition and motivation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#t-distributed-stochastic-neighbour-embedding-t-sne">4.2 t-distributed Stochastic Neighbour Embedding (t-SNE)</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pca-on-t-sne-the-digits-dataset">4.2.1 PCA on t-SNE the digits dataset</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-does-it-work-high-level">4.2.2 How does it work? (high-level)</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-4-2-2-loss-function-of-t-sne">(Optional) 4.2.2 Loss function of t-SNE</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#important-hyperparameter-perplexity">4.2.3 Important hyperparameter: <code class="docutils literal notranslate"><span class="pre">perplexity</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">❓❓ Questions for you</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-2-select-all-of-the-following-statements-which-are-true-iclicker">Exercise 6.2 Select all of the following statements which are <strong>True</strong> (iClicker)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#final-comments-summary-reflection">5. Final comments, summary, reflection</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#resources">Resources</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Varada Kolhatkar
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2022.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
