@@ -344,7 +344,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#learning-outcomes">Learning outcomes</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#recap-and-motivation">1. Recap and Motivation</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#recap">1. Recap</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#recap-recommender-systems-problem">1.1 Recap: Recommender systems problem</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#recap-main-approaches">1.2 Recap: Main approaches</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#recap-collaborative-filtering">1.3 Recap: Collaborative filtering</a></li>
@@ -375,7 +375,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reminder">Reminder</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">❓❓ Questions for you</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#questions-for-you-time-permitting">❓❓ Questions for you (time-permitting)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#course-roadmap">Course roadmap</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#time-for-course-evaluations">Time for course evaluations</a></li>
 </ul>
@@ -411,7 +411,7 @@ document.write(`
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
-<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;code/.&quot;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">),</span> <span class="s2">&quot;code&quot;</span><span class="p">))</span>
 <span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">cross_validate</span><span class="p">,</span> <span class="n">train_test_split</span>
 
@@ -425,13 +425,13 @@ document.write(`
 <section id="lecture-plan">
 <h3>Lecture plan<a class="headerlink" href="#lecture-plan" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
-<li><p>Motivation (~5 mins)</p></li>
-<li><p>Content-based filtering (30 mins)</p></li>
+<li><p>Recap (~15 mins)</p></li>
+<li><p>Content-based filtering (25 mins)</p></li>
 <li><p>Break (~5 mins)</p></li>
 <li><p>Questions for class discussion ( ~5 mins)</p></li>
-<li><p>Hybrid approaches sparse utility matrix (~10 mins)</p></li>
+<li><p>Miscellaneous topics (~10 mins)</p></li>
 <li><p>Final comments, summary, reflection (~5 mins)</p></li>
-<li><p>Course evaluations (~5 mins)</p></li>
+<li><p>Course evaluations (time-permitting) (~5 mins)</p></li>
 </ul>
 <p><br><br></p>
 </section>
@@ -449,8 +449,8 @@ document.write(`
 </ul>
 </section>
 </section>
-<section id="recap-and-motivation">
-<h2>1. Recap and Motivation<a class="headerlink" href="#recap-and-motivation" title="Permalink to this heading">#</a></h2>
+<section id="recap">
+<h2>1. Recap<a class="headerlink" href="#recap" title="Permalink to this heading">#</a></h2>
 <hr><section id="recap-recommender-systems-problem">
 <h3>1.1 Recap: Recommender systems problem<a class="headerlink" href="#recap-recommender-systems-problem" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
@@ -460,30 +460,6 @@ document.write(`
 <li><p>We defined recommendation systems problem as <strong>matrix completion problem</strong>.</p></li>
 </ul>
 <p><img alt="" src="../_images/utility_matrix.png" /></p>
-</section>
-<section id="recap-main-approaches">
-<h3>1.2 Recap: Main approaches<a class="headerlink" href="#recap-main-approaches" title="Permalink to this heading">#</a></h3>
-<ul class="simple">
-<li><p>Collaborative filtering (last lecture)</p>
-<ul>
-<li><p>“Unsupervised” learning</p></li>
-<li><p>We only have labels <span class="math notranslate nohighlight">\(y_{ij}\)</span> (rating of user <span class="math notranslate nohighlight">\(i\)</span> for item <span class="math notranslate nohighlight">\(j\)</span>).</p></li>
-<li><p>We learn latent features.</p></li>
-</ul>
-</li>
-<li><p><strong>Content-based recommenders (today’s focus)</strong></p>
-<ul>
-<li><p>Supervised learning</p></li>
-<li><p>Extract features <span class="math notranslate nohighlight">\(x_i\)</span> of users and/or items building a model to predict rating <span class="math notranslate nohighlight">\(y_i\)</span> given <span class="math notranslate nohighlight">\(x_i\)</span>.</p></li>
-<li><p>Apply model to predict for new users/items.</p></li>
-</ul>
-</li>
-<li><p>Hybrid</p>
-<ul>
-<li><p>Combining collaborative filtering with content-based filtering</p></li>
-</ul>
-</li>
-</ul>
 <p>Let’s load some toy data.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -791,6 +767,32 @@ Number of movies (M): 12
 </table>
 </div></div></div>
 </div>
+<p><br><br></p>
+</section>
+<section id="recap-main-approaches">
+<h3>1.2 Recap: Main approaches<a class="headerlink" href="#recap-main-approaches" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Collaborative filtering (last lecture)</p>
+<ul>
+<li><p>“Unsupervised” learning</p></li>
+<li><p>We only have labels <span class="math notranslate nohighlight">\(y_{ij}\)</span> (rating of user <span class="math notranslate nohighlight">\(i\)</span> for item <span class="math notranslate nohighlight">\(j\)</span>).</p></li>
+<li><p>We learn latent features.</p></li>
+</ul>
+</li>
+<li><p><strong>Content-based recommenders (today’s focus)</strong></p>
+<ul>
+<li><p>Supervised learning</p></li>
+<li><p>Extract features <span class="math notranslate nohighlight">\(x_i\)</span> of users and/or items building a model to predict rating <span class="math notranslate nohighlight">\(y_i\)</span> given <span class="math notranslate nohighlight">\(x_i\)</span>.</p></li>
+<li><p>Apply model to predict for new users/items.</p></li>
+</ul>
+</li>
+<li><p>Hybrid</p>
+<ul>
+<li><p>Combining collaborative filtering with content-based filtering</p></li>
+</ul>
+</li>
+</ul>
+<p><br><br></p>
 </section>
 <section id="recap-collaborative-filtering">
 <h3>1.3 Recap: Collaborative filtering<a class="headerlink" href="#recap-collaborative-filtering" title="Permalink to this heading">#</a></h3>
@@ -822,18 +824,18 @@ Number of movies (M): 12
 <li><p>There are two primary similarity measures used in this context:</p>
 <ul>
 <li><p><strong>Dot products</strong> measure the similarity through the alignment of vectors in a high-dimensional space. Higher dot product means a greater degree of similarity, assuming that the vectors are non-negative.<br />
-$<span class="math notranslate nohighlight">\(similarity_{dot-product}(u, v) = u.v\)</span>$</p></li>
+$<span class="math notranslate nohighlight">\(similarity_{dot\_product}(u, v) = u.v\)</span>$</p></li>
 <li><p><strong>Cosine similarity</strong> measures the cosine of the angle between two vectors
 $<span class="math notranslate nohighlight">\(similarity_{cosine}(u,v) = cosine(u,v) = \frac{u.v}{\left\lVert u\right\rVert_2 \left\lVert v\right\rVert_2}\)</span>$</p></li>
 </ul>
 </li>
 </ul>
 <p><strong>Discussion question</strong></p>
-<p>Suppose you are recommending items based on similarity between items. Given a query vector “Query” in the picture below and the three item vectors, determine the ranking for the three similarity measures below:</p>
+<p>Suppose you are recommending items based on similarity between items. Given a query vector “Query” in the picture below and the three item vectors, determine the ranking of the items for the three similarity measures below:</p>
 <ul class="simple">
-<li><p>Similarity based on Euclidean distance</p></li>
-<li><p>Similarity based on dot product</p></li>
-<li><p>Cosine similarity</p></li>
+<li><p><strong>Example: Similarity based on Euclidean distance: item 3 &gt; item 1 &gt; item 2</strong></p></li>
+<li><p>Similarity based on dot product: <strong>item 2 &gt; item 3 &gt; item 1</strong></p></li>
+<li><p>Cosine similarity: <strong>item 1 &gt; item 2 &gt; item 3</strong></p></li>
 </ul>
 <!-- <img src="img/distance-metrics.png" alt="" height="800" width="500">  -->
 <p><img alt="" src="../_images/distance-metrics.png" /></p>
@@ -868,12 +870,13 @@ $<span class="math notranslate nohighlight">\(similarity_{cosine}(u,v) = cosine(
 </ul>
 </li>
 <li><p>Content-based filtering is suitable to predict ratings for new items and new users.</p></li>
-<li><p>Content-based filtering is a supervised machine learning approach to recommender systems.</p></li>
+<li><p>Content-based filtering is a <strong>upervised machine learning</strong> approach to recommender systems.</p></li>
 <li><p>In collaborative filtering we assumed that we only have ratings data.</p></li>
-<li><p>Usually there is some information available on items and users.</p></li>
+<li><p>Usually there is some information available about items and users.</p></li>
 <li><p>Examples</p>
 <ul>
 <li><p>Netflix can describe movies as action, romance, comedy, documentaries.</p></li>
+<li><p>Netflix has some demographic and preference information on users.</p></li>
 <li><p>Amazon could describe books according to topics: math, languages, history.</p></li>
 <li><p>Tinder could describe people according to age, location, employment.</p></li>
 </ul>
@@ -884,6 +887,7 @@ $<span class="math notranslate nohighlight">\(similarity_{cosine}(u,v) = cosine(
 </ul>
 </li>
 </ul>
+<p><strong>Overview</strong></p>
 <p>In content-based filtering,</p>
 <ul class="simple">
 <li><p>We assume that we are given item or user feature.</p></li>
@@ -891,7 +895,8 @@ $<span class="math notranslate nohighlight">\(similarity_{cosine}(u,v) = cosine(
 <li><p>We treat ratings prediction problem as <strong>a set of regression problems</strong> and build regression model for each user.</p></li>
 <li><p>Once we have trained regression models for each user, we <strong>complete the utility matrix by predicting ratings for each user</strong> using their corresponding models.</p></li>
 </ul>
-<p>Let’s look into each of these steps one by one.</p>
+<p><img alt="" src="lectures/img/content-based-filtering.png" /></p>
+<p>Let’s look into each of these steps one by one with a toy example.</p>
 <section id="movie-features">
 <h3>2.1 Movie features<a class="headerlink" href="#movie-features" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
@@ -1207,23 +1212,12 @@ Name: Lion King, dtype: int64
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Z</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Z</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[0, 1, 1, 0, 0, 0],
-       [0, 0, 1, 0, 1, 0],
-       [0, 1, 1, 0, 0, 0],
-       [0, 0, 0, 0, 0, 1],
-       [1, 0, 1, 0, 0, 0],
-       [0, 1, 1, 1, 0, 0],
-       [0, 0, 1, 0, 1, 0],
-       [0, 0, 0, 0, 0, 1],
-       [0, 0, 0, 0, 0, 1],
-       [0, 1, 1, 1, 0, 0],
-       [0, 0, 0, 0, 0, 1],
-       [0, 1, 1, 0, 0, 0]])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(12, 6)
 </pre></div>
 </div>
 </div>
@@ -2265,10 +2259,10 @@ $<span class="math notranslate nohighlight">\(\hat{y}_{ij} = w_j^T z_{i}\)</span
 </ul>
 </li>
 <li><p>A linear model approach to content-based filtering, where we reconstruct rating for user <span class="math notranslate nohighlight">\(i\)</span> and item <span class="math notranslate nohighlight">\(j\)</span> as:<br />
-$<span class="math notranslate nohighlight">\(\hat{y}_{ij} = w^T x_{ij}\)</span>$</p>
+$<span class="math notranslate nohighlight">\(\hat{y}_{ij} = w_i^T x_{ij}\)</span>$</p>
 <ul>
 <li><p><span class="math notranslate nohighlight">\(x_{ij}\)</span> is a feature vector for user <span class="math notranslate nohighlight">\(i\)</span> and item <span class="math notranslate nohighlight">\(j\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(w\)</span> are the feature vectors for user <span class="math notranslate nohighlight">\(i\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(w\)</span> are the weights learned for user <span class="math notranslate nohighlight">\(i\)</span></p></li>
 <li><p>Our usual supervised learning setup for linear regression.</p></li>
 </ul>
 </li>
@@ -2293,7 +2287,7 @@ $<span class="math notranslate nohighlight">\(\hat{y}_{ij} = w^T x_{ij}\)</span>
 <li><p>This would not have been possible with collaborative filtering.</p></li>
 </ul>
 </li>
-<li><p>Recommendations are more interpretable.</p>
+<li><p>Recommendations are more interpretable (if you use linear models)</p>
 <ul>
 <li><p>You can explain to the user why you are recommending an item because you have learned weights.</p></li>
 </ul>
@@ -2334,7 +2328,7 @@ $<span class="math notranslate nohighlight">\(\hat{y}_{ij} = w^T x_{ij}\)</span>
 </section>
 <section id="questions-for-you">
 <h2>❓❓ Questions for you<a class="headerlink" href="#questions-for-you" title="Permalink to this heading">#</a></h2>
-<p><strong>iClicker cloud join link: https://join.iclicker.com/FTXK</strong></p>
+<p><strong>iClicker cloud join link: https://join.iclicker.com/NGJD</strong></p>
 <section id="exercise-8-1-select-all-of-the-following-statements-which-are-true-iclicker">
 <h3>Exercise 8.1 Select all of the following statements which are <strong>True</strong> (iClicker)<a class="headerlink" href="#exercise-8-1-select-all-of-the-following-statements-which-are-true-iclicker" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
@@ -2342,9 +2336,15 @@ $<span class="math notranslate nohighlight">\(\hat{y}_{ij} = w^T x_{ij}\)</span>
 <li><p>(B) In content-based filtering you represent each user in terms of <strong>known</strong> features of items whereas in collaborative filtering each user is represented with <strong>latent</strong> features of items.</p></li>
 <li><p>(C) In the set up of content-based filtering we discussed, if you have a new movie, you would have problems predicting ratings for that movie.</p></li>
 <li><p>(D) Interpretation of recommendations might be easier with content-based filtering compared to collaborative filtering.</p></li>
-<li><p>(E) In content-based filtering if a user has a number of ratings in the training utility matrix but does not have any ratings in the validation utility matrix then we won’t be able to calculate RMSE for the validation set.</p></li>
+<li><p>(E) In content-based filtering if a user has a number of ratings in the training utility matrix but does not have any ratings in the validation utility matrix then we won’t be able to calculate RMSE for the validation utility matrix.</p></li>
 </ul>
 <p><br><br><br><br></p>
+<div class="tip dropdown admonition">
+<p class="admonition-title">V’s Solutions!</p>
+<ul class="simple">
+<li><p>B, D</p></li>
+</ul>
+</div>
 <p><br><br><br><br></p>
 </section>
 </section>
@@ -2614,10 +2614,10 @@ Using sparse matrix data structure, the size of X is: 7.94792mb
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Evaluating RMSE, MAE of algorithm SVD on 5 split(s).
 
                   Fold 1  Fold 2  Fold 3  Fold 4  Fold 5  Mean    Std     
-RMSE (testset)    1.2895  1.2900  1.2905  1.2936  1.2894  1.2906  0.0015  
-MAE (testset)     1.0186  1.0196  1.0192  1.0224  1.0191  1.0198  0.0013  
-Fit time          4.47    4.80    4.95    4.92    4.72    4.77    0.17    
-Test time         0.83    0.58    0.57    0.88    0.84    0.74    0.14    
+RMSE (testset)    1.2882  1.2891  1.2916  1.2912  1.2945  1.2909  0.0022  
+MAE (testset)     1.0183  1.0186  1.0204  1.0200  1.0230  1.0200  0.0017  
+Fit time          4.32    4.61    4.74    4.53    4.50    4.54    0.14    
+Test time         0.81    0.56    0.89    0.84    0.83    0.79    0.11    
 </pre></div>
 </div>
 <div class="output text_html"><div>
@@ -2647,38 +2647,38 @@ Test time         0.83    0.58    0.57    0.88    0.84    0.74    0.14
   <tbody>
     <tr>
       <th>0</th>
-      <td>1.289507</td>
-      <td>1.018644</td>
-      <td>4.472877</td>
-      <td>0.834112</td>
+      <td>1.288163</td>
+      <td>1.018274</td>
+      <td>4.317557</td>
+      <td>0.812768</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>1.290035</td>
-      <td>1.019590</td>
-      <td>4.796521</td>
-      <td>0.575037</td>
+      <td>1.289117</td>
+      <td>1.018571</td>
+      <td>4.605982</td>
+      <td>0.561459</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>1.290472</td>
-      <td>1.019231</td>
-      <td>4.947930</td>
-      <td>0.567933</td>
+      <td>1.291561</td>
+      <td>1.020410</td>
+      <td>4.735909</td>
+      <td>0.886149</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>1.293559</td>
-      <td>1.022418</td>
-      <td>4.919927</td>
-      <td>0.878786</td>
+      <td>1.291203</td>
+      <td>1.020018</td>
+      <td>4.530619</td>
+      <td>0.840300</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>1.289420</td>
-      <td>1.019148</td>
-      <td>4.718410</td>
-      <td>0.837832</td>
+      <td>1.294515</td>
+      <td>1.022971</td>
+      <td>4.504056</td>
+      <td>0.830336</td>
     </tr>
   </tbody>
 </table>
@@ -2695,7 +2695,7 @@ Test time         0.83    0.58    0.57    0.88    0.84    0.74    0.14
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Prediction(uid=&#39;A2VNYWOPJ13AFP&#39;, iid=&#39;B00IJB5MCS&#39;, r_ui=None, est=4.884295205539753, details={&#39;was_impossible&#39;: False})
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Prediction(uid=&#39;A2VNYWOPJ13AFP&#39;, iid=&#39;B00IJB5MCS&#39;, r_ui=None, est=4.771523282269237, details={&#39;was_impossible&#39;: False})
 </pre></div>
 </div>
 </div>
@@ -2747,7 +2747,7 @@ Test time         0.83    0.58    0.57    0.88    0.84    0.74    0.14
 <ul class="simple">
 <li><p>If a system gives the best RMSE it doesn’t necessarily mean that it’s going to give best recommendations.</p></li>
 <li><p>In recommendation systems we do not have ground truth in the sense that there is no notion of “perfect” recommendations.</p></li>
-<li><p>Just training your model and evaluating it offline is not ideal.</p></li>
+<li><p>Training your model and evaluating it offline is not ideal.</p></li>
 <li><p>Other aspects such as simplicity, interpretation, code maintainability are equally (if not more) important than best validation error.</p></li>
 <li><p>Winning system of Netflix Challenge was never adopted.</p>
 <ul>
@@ -2762,7 +2762,7 @@ Test time         0.83    0.58    0.57    0.88    0.84    0.74    0.14
 <p><img alt="" src="../_images/reco-diversity.png" /></p>
 <p>Now suppose you’ve recently bought Education Solar Robot Toy and rated them highly. Are these good recommendations now?</p>
 <ul class="simple">
-<li><p>Not really. Even though you really liked them you don’t need them anymore.</p></li>
+<li><p>Not really. Even though you really liked the item you don’t need similar items anymore.</p></li>
 <li><p><strong>Diversity</strong> is about how different are the recommendations.</p>
 <ul>
 <li><p>Another example: Even if you really really like Star Wars, you might want non-Star-Wars suggestions.</p></li>
@@ -2820,15 +2820,15 @@ Test time         0.83    0.58    0.57    0.88    0.84    0.74    0.14
 <section id="reminder">
 <h3>Reminder<a class="headerlink" href="#reminder" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
-<li><p>Recommendation systems can have terrible consequences, especially in the context of politics.</p></li>
-<li><p>They can cause the phenomenon called “filter bubbles”</p></li>
+<li><p>Recommendation systems can have terrible consequences, especially in the context of politics and extremism.</p></li>
+<li><p>They can cause the phenomenon called “filter bubbles”.</p></li>
 <li><p>Ask hard and uncomfortable questions to yourself (and to your employer if possible) before implementing and deploying a recommendation system.</p></li>
 </ul>
 <p><br><br><br><br></p>
 </section>
 </section>
-<section id="id1">
-<h2>❓❓ Questions for you<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h2>
+<section id="questions-for-you-time-permitting">
+<h2>❓❓ Questions for you (time-permitting)<a class="headerlink" href="#questions-for-you-time-permitting" title="Permalink to this heading">#</a></h2>
 <ul class="simple">
 <li><p>Discuss memory-related problems that may cause when dealing with large number of users and items.</p></li>
 <li><p>We have been ignoring the timestamp column in ratings datasets. How you might use this information when making recommendations?</p></li>
@@ -2949,7 +2949,7 @@ Test time         0.83    0.58    0.57    0.88    0.84    0.74    0.14
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#learning-outcomes">Learning outcomes</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#recap-and-motivation">1. Recap and Motivation</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#recap">1. Recap</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#recap-recommender-systems-problem">1.1 Recap: Recommender systems problem</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#recap-main-approaches">1.2 Recap: Main approaches</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#recap-collaborative-filtering">1.3 Recap: Collaborative filtering</a></li>
@@ -2980,7 +2980,7 @@ Test time         0.83    0.58    0.57    0.88    0.84    0.74    0.14
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reminder">Reminder</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">❓❓ Questions for you</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#questions-for-you-time-permitting">❓❓ Questions for you (time-permitting)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#course-roadmap">Course roadmap</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#time-for-course-evaluations">Time for course evaluations</a></li>
 </ul>

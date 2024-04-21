@@ -346,15 +346,13 @@ document.write(`
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#motivation-and-context">1. Motivation and context</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#activity-context-and-word-meaning">1.1 Activity: Context and word meaning</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#word-representations-intro">Word representations: intro</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#word-representations-intro">1.2 Word representations: intro</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#word-representations">2. Word representations</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#activity-brainstorm-ways-to-represent-words-2-mins">Activity:  Brainstorm ways to represent words (~2 mins)</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#simplest-representation-one-hot-representation-of-words">2.1 Simplest representation: One-hot representation of words</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#term-term-co-occurrence-matrix">2.2 Term-term co-occurrence matrix</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#visualizing-word-vectors-and-similarity">Visualizing word vectors and similarity</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Visualizing word vectors and similarity</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dense-representations">3. Dense representations</a><ul class="nav section-nav flex-column">
@@ -364,8 +362,6 @@ document.write(`
 </ul>
 </li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#word2vec">3.2.2 word2vec</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-simple-neural-network-architecture-source">A simple neural network architecture (Source)</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#skip-gram-objective">Skip-gram objective</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#questions-for-you">❓❓ Questions for you</a><ul class="nav section-nav flex-column">
@@ -379,18 +375,16 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#success-of-word2vec">4.4 Success of word2vec</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implicit-biases-and-stereotypes-in-word-embeddings">4.5 Implicit biases and stereotypes in word embeddings</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#other-popular-methods-to-get-embeddings">4.6 Other popular methods to get embeddings</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fasttext">fastText</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-glove-global-vectors-for-word-representation">(Optional) GloVe: Global Vectors for Word Representation</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">❓❓ Questions for you</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">❓❓ Questions for you</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-2-select-all-of-the-following-statements-which-are-true-iclicker">Exercise 5.2 Select all of the following statements which are <strong>True</strong> (iClicker)</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#final-comments-summary-and-reflection">Final comments, summary, and reflection</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#word-embeddings">Word embeddings</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">word2vec</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">Pre-trained embeddings</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">word2vec</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">Pre-trained embeddings</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#resources">Resources</a></li>
@@ -528,14 +522,13 @@ If A and B have almost identical environments we say that they are synonyms.
 </ul>
 </section>
 <section id="word-representations-intro">
-<h3>Word representations: intro<a class="headerlink" href="#word-representations-intro" title="Permalink to this heading">#</a></h3>
+<h3>1.2 Word representations: intro<a class="headerlink" href="#word-representations-intro" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>A standard way to represent meanings of words is by placing them into a vector space.</p></li>
 <li><p>Distances between words in the vector space indicate relationships between them.</p></li>
-<li></li>
 </ul>
-<a class="reference internal image-reference" href="../_images/t-SNE_word_embeddings.png"><img alt="../_images/t-SNE_word_embeddings.png" src="../_images/t-SNE_word_embeddings.png" style="width: 600px; height: 600px;" /></a>
-<!-- ![](img/t-SNE_word_embeddings.png) -->
+<!-- <img src="img/t-SNE_word_embeddings.png" width="600" height="600"> -->
+<p><img alt="" src="../_images/t-SNE_word_embeddings.png" /></p>
 <p>(Attribution: <a class="reference external" href="https://web.stanford.edu/~jurafsky/slp3/">Jurafsky and Martin 3rd edition</a>)</p>
 <ul class="simple">
 <li><p>Word meaning has been a favourite topic of philosophers for centuries.</p></li>
@@ -951,20 +944,13 @@ The dot product between tall and official: 0.00 and cosine similarity is: 0.00
 <ul class="simple">
 <li><p>So far we have been talking about documents and we created document-term co-occurrence matrix (e.g., bag-of-words representation of text).</p></li>
 <li><p>We can also do this with words. The idea is to go through a corpus of text, keeping a count of all of the words that appear in context of each word (within a window).</p></li>
-<li><p>An example:</p></li>
 </ul>
+<p><strong>Visualizing word vectors and similarity</strong></p>
+<p><img alt="" src="../_images/word_vectors_and_angles.png" /></p>
 <!-- <center>
-<img src="img/term-term_comat.png" width="600" height="600">
-</center>
-     -->
-<p>(Credit: Jurafsky and Martin 3rd edition)</p>
-</section>
-<section id="visualizing-word-vectors-and-similarity">
-<h3>Visualizing word vectors and similarity<a class="headerlink" href="#visualizing-word-vectors-and-similarity" title="Permalink to this heading">#</a></h3>
-<!-- ![](img/word_vectors_and_angles.png) -->
-<center>
 <img src="img/word_vectors_and_angles.png" width="800" height="800">
 </center>
+     -->
 <p>(Credit: Jurafsky and Martin 3rd edition)</p>
 <ul class="simple">
 <li><p>The similarity is calculated using dot products between word vectors.</p>
@@ -974,12 +960,6 @@ The dot product between tall and official: 0.00 and cosine similarity is: 0.00
 </ul>
 </li>
 </ul>
-</section>
-<section id="id1">
-<h3>Visualizing word vectors and similarity<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h3>
-<!-- ![](img/word_vectors_and_angles.png) -->
-<a class="reference internal image-reference" href="../_images/word_vectors_and_angles.png"><img alt="../_images/word_vectors_and_angles.png" src="../_images/word_vectors_and_angles.png" style="width: 600px; height: 600px;" /></a>
-<p>(Credit: Jurafsky and Martin 3rd edition)</p>
 <ul class="simple">
 <li><p>The similarity is calculated using dot products between word vectors.</p>
 <ul>
@@ -1785,10 +1765,11 @@ The similarity between GPU and hummus is 0.094
 </section>
 <section id="creating-dense-representations">
 <h3>3.2 Creating dense representations<a class="headerlink" href="#creating-dense-representations" title="Permalink to this heading">#</a></h3>
-<!-- ![](img/word2vec.png) -->
-<center>
+<p><img alt="" src="../_images/word2vec.png" /></p>
+<!-- <center>
 <img src="img/word2vec.png" width="600" height="600">
 </center>    
+ -->
 <p>There are two classes of approaches.</p>
 <ul class="simple">
 <li><p>LSA (also referred to as count-based approaches)</p></li>
@@ -2088,10 +2069,11 @@ The dot product between tall and official: 0.02 and cosine similarity is: 0.00
 <blockquote>
     Add freshly squeezed$_{context}$ pineapple$_{target}$ juice$_{context}$ to your smoothie. 
 </blockquote> 
-<!-- ![](img/target-context.png) -->
-<center>
+<p><img alt="" src="../_images/target-context.png" /></p>
+<!-- <center>
 <img src="img/target-context.png" width="300" height="300">
 </center>
+ -->
 <ul class="simple">
 <li><p>So in the example above given the target word <strong>pineapple</strong></p>
 <ul>
@@ -2102,27 +2084,24 @@ The dot product between tall and official: 0.02 and cosine similarity is: 0.00
 <li><p>Given a <strong>target word</strong> (i.e., center word) word, predict <strong>context words</strong> (i.e., surrounding words).</p></li>
 <li><p>Note that we are using “target” in a different sense here compared to how we use it in supervised machine learning.</p></li>
 </ul>
-</section>
-<section id="a-simple-neural-network-architecture-source">
-<h3>A simple neural network architecture (<a class="reference external" href="http://mccormickml.com/2016/04/19/word2vec-tutorial-the-skip-gram-model/">Source</a>)<a class="headerlink" href="#a-simple-neural-network-architecture-source" title="Permalink to this heading">#</a></h3>
+<p><strong>A simple neural network architecture (<a class="reference external" href="http://mccormickml.com/2016/04/19/word2vec-tutorial-the-skip-gram-model/">Source</a>)</strong></p>
 <ul class="simple">
 <li><p>an input layer</p></li>
 <li><p>a linear hidden layer (without any activation function)</p></li>
 <li><p>an output layer with softmax</p></li>
 </ul>
-<!-- ![](img/word2vec_skipgram.png) -->
-<a class="reference internal image-reference" href="../_images/word2vec_skipgram.png"><img alt="../_images/word2vec_skipgram.png" src="../_images/word2vec_skipgram.png" style="width: 600px; height: 800px;" /></a>
+<p><img alt="" src="../_images/word2vec_skipgram.png" /></p>
+<!-- <img src="img/word2vec_skipgram.png" width="600" height="800"> -->
 <!-- <center>
 <img src="img/word2vec_skipgram.png" width="500" height="500">
 </center>    
  -->
+<p><br><br></p>
 <!-- <img src="img/skipgram-juice.png" width="1000" height="1000"> -->
 <p><img alt="" src="../_images/skipgram-juice.png" /></p>
 <p><br><br></p>
 <p><img alt="" src="../_images/skipgram-squeezed.png" /></p>
-</section>
-<section id="skip-gram-objective">
-<h3>Skip-gram objective<a class="headerlink" href="#skip-gram-objective" title="Permalink to this heading">#</a></h3>
+<p><strong>Skip-gram objective</strong></p>
 <ul class="simple">
 <li><p>Consider the conditional probabilities <span class="math notranslate nohighlight">\(p(w_c|w_t)\)</span> and set the parameters <span class="math notranslate nohighlight">\(\theta\)</span> of <span class="math notranslate nohighlight">\(p(w_c|w_t; \theta)\)</span> so as to maximize the corpus probability.</p></li>
 </ul>
@@ -2197,7 +2176,13 @@ $<span class="math notranslate nohighlight">\( \arg \max\limits_\theta \prod\lim
 <li><p>(E) Given the following table (word 1, word 2) are more similar than (word 1, word 3) in terms of dot products.</p></li>
 </ul>
 <p><img alt="" src="../_images/similarity_question.png" /></p>
-<!-- <img src="img/similarity_question.png" width="500" height="500"> --><p><br><br><br><br></p>
+<!-- <img src="img/similarity_question.png" width="500" height="500"> --><div class="tip dropdown admonition">
+<p class="admonition-title">V’s Solutions</p>
+<ul class="simple">
+<li><p>A, B, C</p></li>
+</ul>
+</div>
+<p><br><br><br><br></p>
 </section>
 </section>
 <section id="more-word2vec">
@@ -3797,9 +3782,7 @@ if (window.Jupyter !== undefined) {
 </section>
 <section id="other-popular-methods-to-get-embeddings">
 <h3>4.6 Other popular methods to get embeddings<a class="headerlink" href="#other-popular-methods-to-get-embeddings" title="Permalink to this heading">#</a></h3>
-</section>
-<section id="fasttext">
-<h3><a class="reference external" href="https://fasttext.cc/">fastText</a><a class="headerlink" href="#fasttext" title="Permalink to this heading">#</a></h3>
+<p><strong><a class="reference external" href="https://fasttext.cc/">fastText</a></strong></p>
 <ul class="simple">
 <li><p>NLP library by Facebook research</p></li>
 <li><p>Includes an algorithm which is an extension to word2vec</p></li>
@@ -3808,9 +3791,7 @@ if (window.Jupyter !== undefined) {
 <li><p>Example: trigram sub-words for <em>berry</em> are <em>ber</em>, <em>err</em>, <em>rry</em></p></li>
 <li><p>Embedding(<em>berry</em>) = embedding(<em>ber</em>) + embedding(<em>err</em>) + embedding(rry)</p></li>
 </ul>
-</section>
-<section id="optional-glove-global-vectors-for-word-representation">
-<h3>(Optional) <a class="reference external" href="https://nlp.stanford.edu/projects/glove/">GloVe: Global Vectors for Word Representation</a><a class="headerlink" href="#optional-glove-global-vectors-for-word-representation" title="Permalink to this heading">#</a></h3>
+<p><strong>(Optional) <a class="reference external" href="https://nlp.stanford.edu/projects/glove/">GloVe: Global Vectors for Word Representation</a></strong></p>
 <ul class="simple">
 <li><p>Starts with the co-occurrence matrix</p>
 <ul>
@@ -3824,8 +3805,8 @@ if (window.Jupyter !== undefined) {
 <p><br><br><br><br></p>
 </section>
 </section>
-<section id="id2">
-<h2>❓❓ Questions for you<a class="headerlink" href="#id2" title="Permalink to this heading">#</a></h2>
+<section id="id1">
+<h2>❓❓ Questions for you<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h2>
 <section id="exercise-5-2-select-all-of-the-following-statements-which-are-true-iclicker">
 <h3>Exercise 5.2 Select all of the following statements which are <strong>True</strong> (iClicker)<a class="headerlink" href="#exercise-5-2-select-all-of-the-following-statements-which-are-true-iclicker" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
@@ -3835,6 +3816,12 @@ if (window.Jupyter !== undefined) {
 <li><p>(D) Suppose I have a HUGE corpus of biomedical text, which contains many domain-specific words and abbreviations. It makes sense to train our own embeddings to get word representations of the words in the corpus rather than using pre-trained Google News embeddings.</p></li>
 <li><p>(E) Suppose my corpus gets updated very often, and the new text tends to contain many unknown words. It makes sense to either train fastText or use pre-trained embeddings trained using fastText.</p></li>
 </ul>
+<div class="tip dropdown admonition">
+<p class="admonition-title">V’s Solutions!</p>
+<ul class="simple">
+<li><p>B, C, D, E</p></li>
+</ul>
+</div>
 <p><br><br><br><br></p>
 </section>
 </section>
@@ -3869,8 +3856,8 @@ if (window.Jupyter !== undefined) {
 </li>
 </ul>
 </section>
-<section id="id3">
-<h3>word2vec<a class="headerlink" href="#id3" title="Permalink to this heading">#</a></h3>
+<section id="id2">
+<h3>word2vec<a class="headerlink" href="#id2" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>word2vec is a recent alternative to LSA.</p></li>
 <li><p>One of the most widely used and influential algorithms in the last decade.</p></li>
@@ -3880,8 +3867,8 @@ if (window.Jupyter !== undefined) {
 <li><p>Generally do not train these models yourself. It’s very likely that there are pre-trained embedddings available for the domain of your interest.</p></li>
 </ul>
 </section>
-<section id="id4">
-<h3>Pre-trained embeddings<a class="headerlink" href="#id4" title="Permalink to this heading">#</a></h3>
+<section id="id3">
+<h3>Pre-trained embeddings<a class="headerlink" href="#id3" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Available for many different languages in a variety of domains.</p></li>
 <li><p>Finally beware of biases and stereotypes encoded in these word embeddings!</p></li>
@@ -3980,15 +3967,13 @@ if (window.Jupyter !== undefined) {
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#motivation-and-context">1. Motivation and context</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#activity-context-and-word-meaning">1.1 Activity: Context and word meaning</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#word-representations-intro">Word representations: intro</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#word-representations-intro">1.2 Word representations: intro</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#word-representations">2. Word representations</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#activity-brainstorm-ways-to-represent-words-2-mins">Activity:  Brainstorm ways to represent words (~2 mins)</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#simplest-representation-one-hot-representation-of-words">2.1 Simplest representation: One-hot representation of words</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#term-term-co-occurrence-matrix">2.2 Term-term co-occurrence matrix</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#visualizing-word-vectors-and-similarity">Visualizing word vectors and similarity</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Visualizing word vectors and similarity</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dense-representations">3. Dense representations</a><ul class="nav section-nav flex-column">
@@ -3998,8 +3983,6 @@ if (window.Jupyter !== undefined) {
 </ul>
 </li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#word2vec">3.2.2 word2vec</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-simple-neural-network-architecture-source">A simple neural network architecture (Source)</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#skip-gram-objective">Skip-gram objective</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#questions-for-you">❓❓ Questions for you</a><ul class="nav section-nav flex-column">
@@ -4013,18 +3996,16 @@ if (window.Jupyter !== undefined) {
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#success-of-word2vec">4.4 Success of word2vec</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implicit-biases-and-stereotypes-in-word-embeddings">4.5 Implicit biases and stereotypes in word embeddings</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#other-popular-methods-to-get-embeddings">4.6 Other popular methods to get embeddings</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fasttext">fastText</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-glove-global-vectors-for-word-representation">(Optional) GloVe: Global Vectors for Word Representation</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">❓❓ Questions for you</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">❓❓ Questions for you</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-2-select-all-of-the-following-statements-which-are-true-iclicker">Exercise 5.2 Select all of the following statements which are <strong>True</strong> (iClicker)</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#final-comments-summary-and-reflection">Final comments, summary, and reflection</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#word-embeddings">Word embeddings</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">word2vec</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">Pre-trained embeddings</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">word2vec</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">Pre-trained embeddings</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#resources">Resources</a></li>
