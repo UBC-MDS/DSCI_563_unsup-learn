@@ -4,12 +4,6 @@
 ## Important links 
 
 - [Course Jupyter book](https://ubc-mds.github.io/DSCI_563_unsup-learn)
-- [Course GitHub page](https://github.ubc.ca/MDS-2023-24/DSCI_563_unsup-learn_students)
-- [Slack Channel](https://ubc-mds.slack.com/messages/563_unsup-learn)
-- [Canvas](https://canvas.ubc.ca/courses/130310)
-- [Gradescope](https://www.gradescope.ca/courses/12077)
-- [YouTube videos](https://www.youtube.com/playlist?list=PLHofvQE1VlGtZoAULxcHb7lOsMved0CuM)
-- [Class + office hours calendar](https://ubc-mds.github.io/calendar/)
 ## Course learning outcomes    
 This course is about identifying underlying structure in data. We will talk about clustering, data representation (e.g., dimensionality reduction and word embeddings), and recommendation systems. 
 
