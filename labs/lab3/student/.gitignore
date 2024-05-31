@@ -1,0 +1,7 @@
+*.csv
+*.zip
+*.txt
+*.pkl
+*.ipynb_checkpoints/
+*.npy
+*.model
