@@ -1,0 +1,1563 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Lab 3: Word embeddings, T-SNE, and product similarity using Word2Vec &#8212; DSCI 563 Unsupervised Learning</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/clipboard.min.js"></script>
+    <script src="../../../_static/copybutton.js"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../../_static/togglebutton.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../../../_static/sphinx-thebe.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'labs/lab3/student/lab3';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Lab 4: Movie Recommendations" href="../../lab4/student/lab4.html" />
+    <link rel="prev" title="Lab 2: Dimensionality Reduction" href="../../lab2/student/lab2.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../../../README.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/mds-hex-sticker.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../../../_static/mds-hex-sticker.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Lectures</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/00_course-information.html">Course Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/01_K-Means.html">Lecture 1: K-Means Clustering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/02_DBSCAN-hierarchical.html">Lecture 2: DBSCAN and Hierarchical Clustering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/03_PCA-intro.html">Lecture 3: Introduction to Principal Component Analysis (PCA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/04_More-PCA-LSA-NMF.html">Lecture 4: More PCA, LSA, and NMF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/05_word-embeddings.html">Lecture 5: Word Embeddings, word2vec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/06_more-word2vec-tsne.html">Lecture 6: Using word embeddings, manifold learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/07_recommender-systems1.html">Lecture 7: Recommender Systems Part I</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/08_recommender-systems2.html">Lecture 8: Recommender Systems Part 2</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Appendices</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/AppendixA.html">Appendix A: K-Means customer segmentation case study</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Class demos</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/class_demos/01_class-demo.html">Lecture 01: Clustering class demo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/class_demos/02_class-demo.html">Lecture 02: Clustering class demo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/class_demos/03_class-demo.html">Lecture 03: PCA applications class demo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/class_demos/07_class-demo.html">Lecture 07: Collaborative filtering class demo</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">labs</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../lab1/student/lab1.html">Lab 1: Clustering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../lab2/student/lab2.html">Lab 2: Dimensionality Reduction</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Lab 3: Word embeddings, T-SNE, and product similarity using Word2Vec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../lab4/student/lab4.html">Lab 4: Movie Recommendations</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Attribution</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../attribution.html">Attributions</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/UBC-MDS/DSCI_563_unsup-learn" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../../_sources/labs/lab3/student/lab3.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Lab 3: Word embeddings, T-SNE, and product similarity using Word2Vec</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imports">Imports</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submission-instructions-a-name-si-a">Submission instructions <a name="si"></a></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-exploring-pre-trained-word-embeddings">Exercise 1: Exploring pre-trained word embeddings</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#word-similarity-using-pre-trained-embeddings">1.1 Word similarity using pre-trained embeddings</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">1.2 Word similarity using pre-trained embeddings</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#representation-of-all-words-in-english">1.3 Representation of all words in English</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#visualizing-similar-words">1.4 Visualizing similar words</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-stereotypes-and-biases-in-word-embeddings">Exercise 2: Stereotypes and biases in word embeddings</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#stereotypes-and-biases-in-embeddings">2.1 Stereotypes and biases in embeddings</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#discussion">2.2 Discussion</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-building-your-own-embeddings-a-name-2-a">Exercise 3: Building your own embeddings <a name="2"></a></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#training-word2vec-and-fasttext">3.1 Training <code class="docutils literal notranslate"><span class="pre">Word2Vec</span></code> and <code class="docutils literal notranslate"><span class="pre">fastText</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#representation-of-domain-specific-words">3.2 Representation of domain-specific words</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">3.3 Discussion</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-product-recommendation-using-word2vec">Exercise 4: Product recommendation using Word2Vec</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#prepare-data-for-word2vec">4.1 Prepare data for Word2Vec</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#train-word2vec-model">4.2 Train <code class="docutils literal notranslate"><span class="pre">Word2Vec</span></code> model</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#examine-product-similarity">4.3 Examine product similarity</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">4.4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-food-for-thought">Exercise 5: Food for thought</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#challenging-5-1-implementing-skipgram-model-on-a-toy-corpus">(Challenging) 5.1 Implementing Skipgram model on a toy corpus</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialize Otter</span>
+<span class="kn">import</span> <span class="nn">otter</span>
+<span class="n">grader</span> <span class="o">=</span> <span class="n">otter</span><span class="o">.</span><span class="n">Notebook</span><span class="p">(</span><span class="s2">&quot;lab3.ipynb&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><img alt="" src="../../../_images/563_lab_banner2.png" /></p>
+<section class="tex2jax_ignore mathjax_ignore" id="lab-3-word-embeddings-t-sne-and-product-similarity-using-word2vec">
+<h1>Lab 3: Word embeddings, T-SNE, and product similarity using Word2Vec<a class="headerlink" href="#lab-3-word-embeddings-t-sne-and-product-similarity-using-word2vec" title="Permalink to this heading">#</a></h1>
+<section id="imports">
+<h2>Imports<a class="headerlink" href="#imports" title="Permalink to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hashlib</span> <span class="kn">import</span> <span class="n">sha1</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><br><br><br><br></p>
+<!-- BEGIN QUESTION -->
+<div class="alert alert-info">
+</section>
+<section id="submission-instructions-a-name-si-a">
+<h2>Submission instructions <a name="si"></a><a class="headerlink" href="#submission-instructions-a-name-si-a" title="Permalink to this heading">#</a></h2>
+<p>rubric={mechanics}</p>
+<p>You will receive marks for correctly submitting this assignment by following the instructions below:</p>
+<ul class="simple">
+<li><p>Be sure to follow the <a class="reference external" href="https://ubc-mds.github.io/resources_pages/general_lab_instructions/">general lab instructions</a>.</p></li>
+<li><p><a class="reference external" href="https://github.com/UBC-MDS/public/tree/master/rubric">Here</a> you will find the description of each rubric used in MDS.</p></li>
+<li><p>Make at least three commits in your lab’s GitHub repository.</p></li>
+<li><p>Push the final .ipynb file with your solutions to your GitHub repository for this lab.</p></li>
+<li><p>Before submitting your lab, run all cells in your notebook to make sure there are no errors by doing <code class="docutils literal notranslate"><span class="pre">Kernel</span> <span class="pre">-&gt;</span> <span class="pre">Restart</span> <span class="pre">Kernel</span> <span class="pre">and</span> <span class="pre">Clear</span> <span class="pre">All</span> <span class="pre">Outputs</span></code> and then <code class="docutils literal notranslate"><span class="pre">Run</span> <span class="pre">-&gt;</span> <span class="pre">Run</span> <span class="pre">All</span> <span class="pre">Cells</span></code>. Notebooks without the output displayed may not be graded at all (because we need to see the output in order to grade your work).</p></li>
+<li><p>Upload the .ipynb file to Gradescope.</p></li>
+<li><p>Make sure that your plots/output are rendered properly in Gradescope.</p></li>
+<li><p>If the .ipynb file is too big or doesn’t render on Gradescope for some reason, also upload a pdf (preferably WebPDF) or html export of .ipynb file with your solutions so that TAs can view your submission on Gradescope.</p></li>
+<li><p>The data you download for this lab <b>SHOULD NOT BE PUSHED TO YOUR REPOSITORY</b> (there is also a <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> in the repo to prevent this).</p></li>
+<li><p>Include a clickable link to your GitHub repo for the lab just below this cell.</p></li>
+</ul>
+</div>    
+<p><em>Points:</em> 2</p>
+<p>YOUR REPO LINK GOES HERE</p>
+<!-- END QUESTION -->
+<blockquote>
+<div><p><strong>This lab is short compared to other labs because it’s quiz week. But note that it involves loading pre-trained models that may take a while  depending upon your machine. So please start early and do not leave this lab to the last minute.</strong></p>
+</div></blockquote>
+<p><br><br></p>
+</section>
+<section id="exercise-1-exploring-pre-trained-word-embeddings">
+<h2>Exercise 1: Exploring pre-trained word embeddings<a class="headerlink" href="#exercise-1-exploring-pre-trained-word-embeddings" title="Permalink to this heading">#</a></h2>
+<hr>
+<p>The idea of word embeddings is to represent words with short (~100 to 1000 dimensions) and dense representations such that related words are close together in the vector space. One of the most popular algorithms to create word embeddings is word2vec.</p>
+<p>Word embeddings can be created by training a model, such as word2vec, on a large corpus; however, using pre-trained word embeddings is more common. These pre-trained embeddings, developed through various algorithms across different corpora, are widely accessible. In the upcoming exercises, you will explore pre-trained embeddings that have been trained on Wikipedia using an algorithm known as <a class="reference external" href="https://nlp.stanford.edu/pubs/glove.pdf">GloVe</a>, similar to the word2vec algorithm discussed in class.</p>
+<p>In this lab, you will explore embeddings to find word relatedness and analogies. In DSCI 575 in Block 6, we will use them for transfer learning.</p>
+<p>The code below loads pre-trained word vectors trained on Wikipedia content. The original source of these word vectors is <a class="reference external" href="https://nlp.stanford.edu/projects/glove/">here</a>. You can also conveniently download them using <code class="docutils literal notranslate"><span class="pre">gensim</span></code>, as shown below.</p>
+<p>In this lab, you’ll be using <code class="docutils literal notranslate"><span class="pre">gensim</span></code> package. You can install it in the course conda environment as follows.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">conda</span> <span class="n">activate</span> <span class="mi">563</span>
+<span class="o">&gt;</span> <span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">c</span> <span class="n">anaconda</span> <span class="n">gensim</span>
+</pre></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">gensim</span>
+<span class="kn">import</span> <span class="nn">gensim.downloader</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">gensim</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">info</span><span class="p">()[</span><span class="s2">&quot;models&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">gensim.downloader</span> <span class="k">as</span> <span class="nn">api</span>
+
+<span class="n">glove_wiki_vectors</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+    <span class="s2">&quot;glove-wiki-gigaword-100&quot;</span>
+<span class="p">)</span>  <span class="c1"># This will take a while to run, especially when you run it for the first time.</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">glove_wiki_vectors</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>There are 400,000 word vectors in this pre-trained model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">glove_wiki_vectors</span><span class="p">[</span><span class="s2">&quot;learning&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Each vector is 100 dimensional. And below we see most similar words to the word <em>learning</em>. See <a class="reference external" href="https://tedboy.github.io/nlps/generated/generated/gensim.models.Word2Vec.most_similar.html">here</a> how similar words are found in <code class="docutils literal notranslate"><span class="pre">gensim</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">glove_wiki_vectors</span><span class="o">.</span><span class="n">most_similar</span><span class="p">(</span><span class="s2">&quot;learning&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+<section id="word-similarity-using-pre-trained-embeddings">
+<h3>1.1 Word similarity using pre-trained embeddings<a class="headerlink" href="#word-similarity-using-pre-trained-embeddings" title="Permalink to this heading">#</a></h3>
+<p>rubric={accuracy}</p>
+<p><strong>Your tasks:</strong></p>
+<ul class="simple">
+<li><p>Come up with a list of 4 words of your choice and find similar words to these words using <code class="docutils literal notranslate"><span class="pre">glove_wiki_vectors</span></code> embeddings.</p></li>
+</ul>
+<div class="alert alert-warning">
+<p>Solution_1_1</p>
+</div>
+<p><em>Points:</em> 2</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<!-- END QUESTION -->
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+</section>
+<section id="id1">
+<h3>1.2 Word similarity using pre-trained embeddings<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h3>
+<p>rubric={accuracy}</p>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>Calculate cosine similarity for the following word pairs (<code class="docutils literal notranslate"><span class="pre">word_pairs</span></code>) using the <a class="reference external" href="https://radimrehurek.com/gensim/models/keyedvectors.html?highlight=similarity#gensim.models.keyedvectors.KeyedVectors.similarity"><code class="docutils literal notranslate"><span class="pre">similarity</span></code></a> method of <code class="docutils literal notranslate"><span class="pre">glove_wiki_vectors</span></code>.</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">word_pairs</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s2">&quot;coast&quot;</span><span class="p">,</span> <span class="s2">&quot;shore&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;clothes&quot;</span><span class="p">,</span> <span class="s2">&quot;closet&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;old&quot;</span><span class="p">,</span> <span class="s2">&quot;new&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;smart&quot;</span><span class="p">,</span> <span class="s2">&quot;intelligent&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;dog&quot;</span><span class="p">,</span> <span class="s2">&quot;cat&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;avocado&quot;</span><span class="p">,</span> <span class="s2">&quot;lawyer&quot;</span><span class="p">),</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="alert alert-warning">
+<p>Solution_1_2</p>
+</div>
+<p><em>Points:</em> 2</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<!-- END QUESTION -->
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+</section>
+<section id="representation-of-all-words-in-english">
+<h3>1.3 Representation of all words in English<a class="headerlink" href="#representation-of-all-words-in-english" title="Permalink to this heading">#</a></h3>
+<p>rubric={accuracy}</p>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>The vocabulary size of Wikipedia embeddings is quite large. The <code class="docutils literal notranslate"><span class="pre">test_words</span></code> list below contains a few new words (called neologisms) and biomedical domain-specific abbreviations. Write code to check whether <code class="docutils literal notranslate"><span class="pre">glove_wiki_vectors</span></code> have representation for these words or not.</p></li>
+</ol>
+<blockquote>
+<div><p>If a given word <code class="docutils literal notranslate"><span class="pre">word</span></code> is in the vocabulary, <code class="docutils literal notranslate"><span class="pre">word</span> <span class="pre">in</span> <span class="pre">glove_wiki_vectors</span></code> will return True.</p>
+</div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">test_words</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;covididiot&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;virtuception&quot;</span><span class="p">,</span>    
+    <span class="s2">&quot;fomo&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;frenemies&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;anthropause&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;photobomb&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;zoomglut&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;selfie&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;pxg&quot;</span><span class="p">,</span>  <span class="c1"># Abbreviation for pseudoexfoliative glaucoma</span>
+    <span class="s2">&quot;pacg&quot;</span><span class="p">,</span>  <span class="c1"># Abbreviation for primary angle closure glaucoma</span>
+    <span class="s2">&quot;cct&quot;</span><span class="p">,</span>  <span class="c1"># Abbreviation for central corneal thickness</span>
+    <span class="s2">&quot;escc&quot;</span><span class="p">,</span>  <span class="c1"># Abbreviation for esophageal squamous cell carcinoma</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="alert alert-warning">
+<p>Solution_1_3</p>
+</div>
+<p><em>Points:</em> 2</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<!-- END QUESTION -->
+<p><br><br><br></p>
+<!-- BEGIN QUESTION -->
+</section>
+<section id="visualizing-similar-words">
+<h3>1.4 Visualizing similar words<a class="headerlink" href="#visualizing-similar-words" title="Permalink to this heading">#</a></h3>
+<p>rubric={viz,reasoning}</p>
+<p>Let’s examine the quality of embeddings by visualizing whether similar words are close together in the vector space or not.
+Our word vectors are 100 dimensional and if we want to visualize them, we need to reduce dimensionality to 3 dimensions or 2 dimensions. <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html">PCA</a> would be a simplest approach for this. For better visualization, we can also use non-linear dimensionality reduction techniques such as <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html">t-SNE</a> or <a class="reference external" href="https://umap-learn.readthedocs.io/en/latest/">UMAP</a>. In this exercise, you’ll use PCA and t-SNE to visualize a sample of word embeddings and compare the visualizations.</p>
+<p>The code below extracts word embeddings for a set of 66 words from 6 categories and stores them in the dataframe <code class="docutils literal notranslate"><span class="pre">embeddings_df</span></code>, where indices are words.</p>
+<blockquote>
+<div><p>Feel free to experiment with the categories but in your final submission keep these categories so that it’s easier for the TAs to grade your work.</p>
+</div></blockquote>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>Apply PCA to <code class="docutils literal notranslate"><span class="pre">embeddings_df</span></code> to reduce the dimensionality to 2 dimensions, and display a scatter plot of the reduced dimensions. Label the points in the plot with their corresponding words.</p></li>
+<li><p>Use t-SNE to <code class="docutils literal notranslate"><span class="pre">embeddings_df</span></code> to decrease the dimensionality to 2 dimensions and present a scatter plot of the reduced dimensions. Label the points with their respective words. Experiment with at least three different values for perplexity when adjusting the hyperparameters.</p></li>
+<li><p>Compare the scatter plots generated by PCA and t-SNE, and briefly discuss your observations.</p></li>
+</ol>
+<blockquote>
+<div><p><em>You may use the visualization library of your choice. Feel free to use code from lecture notes with appropriate attributions.</em></p>
+</div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create words and labels.</span>
+
+<span class="n">categories</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;french&quot;</span><span class="p">,</span> <span class="s2">&quot;apple&quot;</span><span class="p">,</span> <span class="s2">&quot;intelligence&quot;</span><span class="p">,</span> <span class="s2">&quot;hockey&quot;</span><span class="p">,</span> <span class="s2">&quot;cobain&quot;</span><span class="p">,</span> <span class="s2">&quot;pca&quot;</span><span class="p">]</span>
+<span class="n">subset_words</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="n">labels</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">cat</span> <span class="ow">in</span> <span class="n">categories</span><span class="p">:</span>
+    <span class="n">subset_words</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cat</span><span class="p">)</span>
+    <span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">similar_word</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">glove_wiki_vectors</span><span class="o">.</span><span class="n">most_similar</span><span class="p">(</span><span class="n">cat</span><span class="p">,</span> <span class="n">topn</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+        <span class="n">subset_words</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">similar_word</span><span class="p">)</span>
+        <span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">+=</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">embeddings_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">glove_wiki_vectors</span><span class="p">[</span><span class="n">subset_words</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="n">subset_words</span><span class="p">)</span>
+<span class="n">embeddings_df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">embeddings_df</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="alert alert-warning">
+<p>Solution_1_4</p>
+</div>
+<p><em>Points:</em> 6</p>
+<p><em>Type your answer here, replacing this text.</em></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<!-- END QUESTION -->
+<p><br><br><br><br></p>
+</section>
+</section>
+<section id="exercise-2-stereotypes-and-biases-in-word-embeddings">
+<h2>Exercise 2: Stereotypes and biases in word embeddings<a class="headerlink" href="#exercise-2-stereotypes-and-biases-in-word-embeddings" title="Permalink to this heading">#</a></h2>
+<hr><!-- BEGIN QUESTION -->
+<section id="stereotypes-and-biases-in-embeddings">
+<h3>2.1 Stereotypes and biases in embeddings<a class="headerlink" href="#stereotypes-and-biases-in-embeddings" title="Permalink to this heading">#</a></h3>
+<p>rubric={reasoning}</p>
+<p>Word vectors contain lots of useful information. But they also contain stereotypes and biases of the texts they were trained on. In the lecture, we saw an example of gender bias in Google News word embeddings. Here we are using pre-trained embeddings trained on Wikipedia data.</p>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>Explore whether there are any worrisome biases or stereotypes present in these embeddings by trying out at least 4 examples. You can use the following two methods or other methods of your choice to explore this.</p>
+<ul class="simple">
+<li><p>the <code class="docutils literal notranslate"><span class="pre">analogy</span></code> function below which gives word analogies (an example shown below)</p></li>
+<li><p><a class="reference external" href="https://radimrehurek.com/gensim/models/keyedvectors.html?highlight=similarity#gensim.models.keyedvectors.KeyedVectors.similarity">similarity</a> or <a class="reference external" href="https://radimrehurek.com/gensim/models/keyedvectors.html?highlight=distance#gensim.models.keyedvectors.KeyedVectors.distances">distance</a> methods (an example is shown below)</p></li>
+</ul>
+</li>
+</ol>
+<blockquote>
+<div><p>Note that most of the recent embeddings are de-biased. But you might still observe some biases in them. Also, not all stereotypes present in pre-trained embeddings are necessarily bad. But you should be aware of them when you use them in your models.</p>
+</div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">analogy</span><span class="p">(</span><span class="n">word1</span><span class="p">,</span> <span class="n">word2</span><span class="p">,</span> <span class="n">word3</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">glove_wiki_vectors</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns analogy word using the given model.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    --------------</span>
+<span class="sd">    word1 : (str)</span>
+<span class="sd">        word1 in the analogy relation</span>
+<span class="sd">    word2 : (str)</span>
+<span class="sd">        word2 in the analogy relation</span>
+<span class="sd">    word3 : (str)</span>
+<span class="sd">        word3 in the analogy relation</span>
+<span class="sd">    model :</span>
+<span class="sd">        word embedding model</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    ---------------</span>
+<span class="sd">        pd.dataframe</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> : </span><span class="si">%s</span><span class="s2"> :: </span><span class="si">%s</span><span class="s2"> : ?&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">word1</span><span class="p">,</span> <span class="n">word2</span><span class="p">,</span> <span class="n">word3</span><span class="p">))</span>
+    <span class="n">sim_words</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">most_similar</span><span class="p">(</span><span class="n">positive</span><span class="o">=</span><span class="p">[</span><span class="n">word3</span><span class="p">,</span> <span class="n">word2</span><span class="p">],</span> <span class="n">negative</span><span class="o">=</span><span class="p">[</span><span class="n">word1</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">sim_words</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Analogy word&quot;</span><span class="p">,</span> <span class="s2">&quot;Score&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Examples of using analogy to explore biases and stereotypes.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">analogy</span><span class="p">(</span><span class="s2">&quot;man&quot;</span><span class="p">,</span> <span class="s2">&quot;doctor&quot;</span><span class="p">,</span> <span class="s2">&quot;woman&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">glove_wiki_vectors</span><span class="o">.</span><span class="n">similarity</span><span class="p">(</span><span class="s2">&quot;aboriginal&quot;</span><span class="p">,</span> <span class="s2">&quot;success&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">glove_wiki_vectors</span><span class="o">.</span><span class="n">similarity</span><span class="p">(</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="s2">&quot;success&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="alert alert-warning">
+<p>Solution_2_1</p>
+</div>
+<p><em>Points:</em> 4</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<!-- END QUESTION -->
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+</section>
+<section id="discussion">
+<h3>2.2 Discussion<a class="headerlink" href="#discussion" title="Permalink to this heading">#</a></h3>
+<p>rubric={reasoning}</p>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>Discuss your observations from 2.1. Are there any worrisome biases in these embeddings trained on Wikipedia?</p></li>
+<li><p>Give an example of how using embeddings with biases could cause harm in the real world.</p></li>
+</ol>
+<div class="alert alert-warning">
+<p>Solution_2_2</p>
+</div>
+<p><em>Points:</em> 4</p>
+<p><em>Type your answer here, replacing this text.</em></p>
+<!-- END QUESTION -->
+<p><br><br><br><br></p>
+</section>
+</section>
+<section id="exercise-3-building-your-own-embeddings-a-name-2-a">
+<h2>Exercise 3: Building your own embeddings <a name="2"></a><a class="headerlink" href="#exercise-3-building-your-own-embeddings-a-name-2-a" title="Permalink to this heading">#</a></h2>
+<hr><p>When you work in specific domains, you might need to train your own word embeddings. In this exercise, you will train your own embeddings on a biomedical corpus using <a class="reference external" href="https://radimrehurek.com/gensim/"><code class="docutils literal notranslate"><span class="pre">gensim</span></code></a>.</p>
+<p>We’ll use a small subset of a corpus of <a class="reference external" href="https://www.kaggle.com/cvltmao/pmc-articles?select=a_b.csv">biomedical abstracts downloaded from PMC</a>. The original corpus is large and to get meaningful embeddings, we would ideally use the full corpus. But training meaningful word embeddings is resource intensive and not suitable for an assignment. The main purpose here is to familiarize yourself with the process of training your own embeddings.</p>
+<p><strong>Your tasks:</strong></p>
+<ul class="simple">
+<li><p>Download <code class="docutils literal notranslate"><span class="pre">a_b.csv</span></code> from <a class="reference external" href="https://www.kaggle.com/cvltmao/pmc-articles?select=a_b.csv">kaggle</a>, and put it under the data directory in the lab folder.</p></li>
+<li><p>Run the code below which reads the CSV and extracts a sample of the CSV.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;data/a_b.csv&quot;</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+<span class="n">df_subset</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">5000</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df_subset</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Word2Vec requires data to be in a specific format, as shown below.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="n">sent1word1</span><span class="p">,</span> <span class="n">sent1word2</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> 
+ <span class="p">[</span><span class="n">sent2word1</span><span class="p">,</span> <span class="n">sent2word2</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> 
+ <span class="o">...</span>
+ <span class="p">[</span><span class="n">sent1000word1</span><span class="p">,</span> <span class="n">sent1000word2</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+ <span class="o">...</span>
+ <span class="p">]</span>
+ 
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Gensim</span></code>, the package we are using to train Word2Vec, only requires that the input provides sentences sequentially, when iterated over. There is no need to keep everything in RAM. So we can provide one sentence, process it, forget it, load another sentence.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">preprocessing.py</span></code> file has class <code class="docutils literal notranslate"><span class="pre">MyPreprocessor</span></code> which preprocesses a given list of documents and <strong>yields a memory-friendly iterator</strong> for text which you can pass to Word2Vec model. The preprocessing carries out the following steps:</p>
+<ul class="simple">
+<li><p>sentence segmentation</p></li>
+<li><p>tokenization</p></li>
+<li><p>turning the text into lowercase</p></li>
+<li><p>removing stopwords</p></li>
+</ul>
+<p>The purpose of preprocessing is to “normalize” the text so that equivalent things (e.g., <em>Data</em> and <em>data</em>) match with each other in the context of your task.</p>
+<p>Run the code below to carry out preprocessing of the corpus.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">preprocessing</span> <span class="kn">import</span> <span class="n">MyPreprocessor</span>
+
+<span class="n">corpus</span> <span class="o">=</span> <span class="n">df_subset</span><span class="p">[</span><span class="s2">&quot;abstract&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<span class="n">sentences</span> <span class="o">=</span> <span class="n">MyPreprocessor</span><span class="p">(</span><span class="n">corpus</span><span class="p">)</span>  <span class="c1"># memory friendly iterator</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+<section id="training-word2vec-and-fasttext">
+<h3>3.1 Training <code class="docutils literal notranslate"><span class="pre">Word2Vec</span></code> and <code class="docutils literal notranslate"><span class="pre">fastText</span></code><a class="headerlink" href="#training-word2vec-and-fasttext" title="Permalink to this heading">#</a></h3>
+<p>rubric={accuracy,reasoning}</p>
+<p>Now that we have an iterator of the data in the expected format, let’s train our own word embeddings. In this exercise, you will train <code class="docutils literal notranslate"><span class="pre">Word2Vec</span></code> and <code class="docutils literal notranslate"><span class="pre">fastText</span></code> models on the <code class="docutils literal notranslate"><span class="pre">sentences</span></code> iterator above.</p>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>Train <a class="reference external" href="https://radimrehurek.com/gensim/models/word2vec.html">Word2Vec model</a> on <code class="docutils literal notranslate"><span class="pre">sentences</span></code> with the following hyperparameters. (This might take some time so I recommend saving the model with <code class="docutils literal notranslate"><span class="pre">model.save</span></code> for later use. See usage example <a class="reference external" href="https://radimrehurek.com/gensim/models/word2vec.html#usage-examples">here</a>.)</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">vector_size=100</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">window=5</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">min_count=2</span></code>,</p></li>
+</ul>
+</li>
+<li><p>Train <a class="reference external" href="https://radimrehurek.com/gensim/models/fasttext.html">fastText model</a> on <code class="docutils literal notranslate"><span class="pre">sentences</span></code> with the same hyperparameters above. (This might take some time so I recommend saving the model for later use.)</p></li>
+</ol>
+<blockquote>
+<div><p>Note that the word embeddings will be better quality if we use the full corpus instead of the subset. We are using a subset in this exercise to save time. On my iMac it took ~50s to train Word2Vec and ~52s to train fastText on the sample above. If you are feeling adventurous and if your computer can handle it, you are welcome to train it on the full corpus. If your computer is struggling to create embeddings with 5000 documents, reduce the sample size.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Please do not submit your saved models.</strong></p>
+</div></blockquote>
+<div class="alert alert-warning">
+<p>Solution_3_1</p>
+</div>
+<p><em>Points:</em> 4</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<!-- END QUESTION -->
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+</section>
+<section id="representation-of-domain-specific-words">
+<h3>3.2 Representation of domain-specific words<a class="headerlink" href="#representation-of-domain-specific-words" title="Permalink to this heading">#</a></h3>
+<p>rubric={accuracy,reasoning}</p>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>What is the vocabulary size in each model above?</p></li>
+<li><p>Below are the test words we tried before. Write code to check which of these words have representations in  word2vec and fasttext models you have trained above.</p></li>
+</ol>
+<blockquote>
+<div><p>Note that you might have to access word vector for a word <code class="docutils literal notranslate"><span class="pre">word</span></code> as <code class="docutils literal notranslate"><span class="pre">model.wv['word']</span></code> if <code class="docutils literal notranslate"><span class="pre">model</span></code> is your trained model.</p>
+</div></blockquote>
+<blockquote>
+<div><p>You might have to access the vocabulary size as <code class="docutils literal notranslate"><span class="pre">len(model.wv)</span></code> and word vectors as <code class="docutils literal notranslate"><span class="pre">model.wv[word]</span></code>, if <code class="docutils literal notranslate"><span class="pre">model</span></code> is your trained model.</p>
+</div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">test_words</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;covididiot&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;virtuception&quot;</span><span class="p">,</span>    
+    <span class="s2">&quot;fomo&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;frenemies&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;anthropause&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;photobomb&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;zoomglut&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;selfie&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;pxg&quot;</span><span class="p">,</span>  <span class="c1"># Abbreviation for pseudoexfoliative glaucoma</span>
+    <span class="s2">&quot;pacg&quot;</span><span class="p">,</span>  <span class="c1"># Abbreviation for primary angle closure glaucoma</span>
+    <span class="s2">&quot;cct&quot;</span><span class="p">,</span>  <span class="c1"># Abbreviation for central corneal thickness</span>
+    <span class="s2">&quot;escc&quot;</span><span class="p">,</span>  <span class="c1"># Abbreviation for esophageal squamous cell carcinoma</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="alert alert-warning">
+<p>Solution_3_2</p>
+</div>
+<p><em>Points:</em> 2</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<!-- END QUESTION -->
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+</section>
+<section id="id2">
+<h3>3.3 Discussion<a class="headerlink" href="#id2" title="Permalink to this heading">#</a></h3>
+<p>rubric={reasoning}</p>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>Discuss your observations from 3.2.</p></li>
+<li><p>Give an example scenarios when you would train your own embeddings vs. when you would use pre-trained embeddings.</p></li>
+</ol>
+<div class="alert alert-warning">
+<p>Solution_3_3</p>
+</div>
+<p><em>Points:</em> 4</p>
+<p><em>Type your answer here, replacing this text.</em></p>
+<!-- END QUESTION -->
+<p><br><br><br><br></p>
+</section>
+</section>
+<section id="exercise-4-product-recommendation-using-word2vec">
+<h2>Exercise 4: Product recommendation using Word2Vec<a class="headerlink" href="#exercise-4-product-recommendation-using-word2vec" title="Permalink to this heading">#</a></h2>
+<hr>
+<p>The word2vec algorithm can also be used in tasks beyond text and word similarity. In this exercise, you will explore using it for product recommendations. We will build a word2vec model so that similar products (products occurring in similar contexts) occur close together in the vector space. The context of products can be determined by the purchase histories of customers. Once we have reasonable representation of products in the vector space, we can recommend products to customers that are “similar” (as depicted by the algorithm) to their previously purchased items.</p>
+<p>For this exercise, we will be using the <a class="reference external" href="https://www.kaggle.com/jihyeseo/online-retail-data-set-from-uci-ml-repo#__sid=js0">Online Retail Data Set from UCI ML repo</a>. The starter code below reads the data as a pandas dataframe <code class="docutils literal notranslate"><span class="pre">df</span></code>.</p>
+<blockquote>
+<div><p>You might have to install <code class="docutils literal notranslate"><span class="pre">openpyxl</span></code> in your <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment to open the <code class="docutils literal notranslate"><span class="pre">xlsx</span></code> file.</p>
+</div></blockquote>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">c</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span> <span class="n">openpyxl</span>
+</pre></div>
+</div>
+<p>Make sure that you have <code class="docutils literal notranslate"><span class="pre">openpyxl-3.1.2</span></code>. If the previous version is installed, please update the package by</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>conda update openpyxlc�k`
+
+Download the data and save it under the data directory in your lab folder. **Please do not push the data to your repository.** 
+
+Run the code below which reads the data and carries out basic preprocessing. 
+</pre></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="s2">&quot;data/Online_Retail.xlsx&quot;</span><span class="p">)</span>  <span class="c1"># Takes a while to read the data.</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Data frame shape: &quot;</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape after dropping rows with NaNs: &quot;</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+<span class="c1"># Convert StockCode and CustomerID columns to strings</span>
+<span class="n">df</span><span class="p">[</span><span class="s2">&quot;StockCode&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;StockCode&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s2">&quot;CustomerID&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;CustomerID&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;StockCode&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">()</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+<section id="prepare-data-for-word2vec">
+<h3>4.1 Prepare data for Word2Vec<a class="headerlink" href="#prepare-data-for-word2vec" title="Permalink to this heading">#</a></h3>
+<p>rubric={accuracy,quality}</p>
+<p>We will be training word2vec on customer purchase histories. But before training the model, we need to get the data into the appropriate format. Remember that word2vec requires data in the following form.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="n">sent1word1</span><span class="p">,</span> <span class="n">sent1word2</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> 
+ <span class="p">[</span><span class="n">sent2word1</span><span class="p">,</span> <span class="n">sent2word2</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> 
+ <span class="o">...</span>
+ <span class="p">[</span><span class="n">sent1000word1</span><span class="p">,</span> <span class="n">sent1000word2</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+ <span class="o">...</span>
+ <span class="p">]</span>
+ 
+</pre></div>
+</div>
+<p>In this context, sentences are customer purchase histories for unique customers and words are stock codes in purchases histories representing items purchased by customers.</p>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>How many unique customers and unique products are present in the data above?</p></li>
+<li><p>For each unique customer, create purchasing history for the customer in the following format, where each inner list corresponds to the purchase history of a unique customer. Each item in the list is a <code class="docutils literal notranslate"><span class="pre">StockCode</span></code> in the purchase history of that customer, ordered by the time of purchase.</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="n">StockCode1</span> <span class="n">of</span> <span class="n">CustomerID1</span><span class="p">,</span> <span class="n">StockCode2</span> <span class="n">of</span> <span class="n">CustomerID1</span><span class="p">,</span> <span class="o">....</span><span class="p">],</span> 
+ <span class="p">[</span><span class="n">StockCode1</span> <span class="n">of</span> <span class="n">CustomerID2</span><span class="p">,</span> <span class="n">StockCode2</span> <span class="n">of</span> <span class="n">CustomerID2</span><span class="p">,</span> <span class="o">....</span><span class="p">],</span> 
+ <span class="o">...</span>
+ <span class="p">[</span><span class="n">StockCode1</span> <span class="n">of</span> <span class="n">CustomerID1000</span><span class="p">,</span> <span class="n">StockCode2</span> <span class="n">of</span> <span class="n">CustomerID1000</span><span class="p">,</span> <span class="o">....</span><span class="p">],</span>
+ <span class="o">...</span>
+ <span class="p">]</span>
+ 
+</pre></div>
+</div>
+<div class="alert alert-warning">
+<p>Solution_4_1</p>
+</div>
+<p><em>Points:</em> 6</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># A list containing purchase histories of all customers</span>
+<span class="n">all_purchase_history</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<!-- END QUESTION -->
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+</section>
+<section id="train-word2vec-model">
+<h3>4.2 Train <code class="docutils literal notranslate"><span class="pre">Word2Vec</span></code> model<a class="headerlink" href="#train-word2vec-model" title="Permalink to this heading">#</a></h3>
+<p>rubric={accuracy}</p>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>Now that your data is in the suitable format, train <code class="docutils literal notranslate"><span class="pre">Word2Vec</span></code> model with the following hyperparameters:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">window=10</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">negative=10</span></code> (for negative sampling)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">seed=8</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">min_count=1</span></code></p></li>
+</ul>
+</li>
+</ol>
+<div class="alert alert-warning">
+<p>Solution_4_2</p>
+</div>
+<p><em>Points:</em> 2</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<!-- END QUESTION -->
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+</section>
+<section id="examine-product-similarity">
+<h3>4.3 Examine product similarity<a class="headerlink" href="#examine-product-similarity" title="Permalink to this heading">#</a></h3>
+<p>rubric={accuracy,reasoning}</p>
+<p>Given a product description and a word2vec model trained on purchase histories, the function <code class="docutils literal notranslate"><span class="pre">get_most_similar</span></code> below returns descriptions of top <code class="docutils literal notranslate"><span class="pre">n</span></code> most similar products. An example usage is shown below for the product description: ‘SWIRLY CIRCULAR RUBBERS IN BAG’.</p>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>Now pick 4 product descriptions of your choice from the data. Call <code class="docutils literal notranslate"><span class="pre">get_most_similar</span></code> for these product descriptions and examine similar products returned by the function.</p></li>
+<li><p>Do the recommendations given by the model make sense? Discuss your observations.</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create products id_name and name_id dictionaries</span>
+<span class="n">products_id_name_dict</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">Description</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">StockCode</span>
+<span class="p">)</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+<span class="n">products_name_id_dict</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">StockCode</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">Description</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+<span class="p">)</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_most_similar</span><span class="p">(</span><span class="n">prod_desc</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given product description, prod_desc, return the most similar</span>
+<span class="sd">    products</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ---------</span>
+<span class="sd">    prod_desc : str</span>
+<span class="sd">        Product description</span>
+
+<span class="sd">    n : integer</span>
+<span class="sd">        the number of similar items to return</span>
+
+<span class="sd">    model : gensim Word2Vec model</span>
+<span class="sd">        trained gensim word2vec model on customer purchase histories</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pandas.DataFrame</span>
+<span class="sd">        A pandas dataframe containing n names of similar products</span>
+<span class="sd">        and their similarity scores with the input product</span>
+<span class="sd">        with desciption prod_desc.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">stock_id</span> <span class="o">=</span> <span class="n">products_name_id_dict</span><span class="p">[</span><span class="n">prod_desc</span><span class="p">]</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">similar_stock_ids</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">wv</span><span class="o">.</span><span class="n">most_similar</span><span class="p">(</span><span class="n">stock_id</span><span class="p">,</span> <span class="n">topn</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The product </span><span class="si">%s</span><span class="s2"> is not in the vocabulary&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prod_desc</span><span class="p">))</span>
+        <span class="k">return</span>
+
+    <span class="n">similar_prods</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">sim_stock_id</span><span class="p">,</span> <span class="n">score</span><span class="p">)</span> <span class="ow">in</span> <span class="n">similar_stock_ids</span><span class="p">:</span>
+        <span class="n">similar_prods</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">products_id_name_dict</span><span class="p">[</span><span class="n">sim_stock_id</span><span class="p">],</span> <span class="n">score</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+        <span class="n">similar_prods</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Product description&quot;</span><span class="p">,</span> <span class="s2">&quot;Similarity score&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">get_most_similar</span><span class="p">(</span><span class="s2">&quot;SWIRLY CIRCULAR RUBBERS IN BAG&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="alert alert-warning">
+<p>Solution_4_3</p>
+</div>
+<p><em>Points:</em> 4</p>
+<p><em>Type your answer here, replacing this text.</em></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<!-- END QUESTION -->
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+</section>
+<section id="id3">
+<h3>4.4<a class="headerlink" href="#id3" title="Permalink to this heading">#</a></h3>
+<p>rubric={reasoning}</p>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>Suppose you get a purchase history for a new customer which has <code class="docutils literal notranslate"><span class="pre">StockCode</span></code> of a new product, which was not present in the training data. Would your word2vec model be able to provide recommendations for this product? What about fastText? Does it make sense to use the <code class="docutils literal notranslate"><span class="pre">fastText</span></code> algorithm in this case instead of word2vec? What would be a reasonable recommendation strategy for new products?</p></li>
+</ol>
+<div class="alert alert-warning">
+<p>Solution_4_4</p>
+</div>
+<p><em>Points:</em> 2</p>
+<p><em>Type your answer here, replacing this text.</em></p>
+<!-- END QUESTION -->
+<p><br><br><br><br></p>
+</section>
+</section>
+<section id="exercise-5-food-for-thought">
+<h2>Exercise 5: Food for thought<a class="headerlink" href="#exercise-5-food-for-thought" title="Permalink to this heading">#</a></h2>
+<hr>
+<p>As you know, each lab has a few challenging questions. These are usually low-risk questions and will contribute to maximum 5% of the lab grade. The main purpose here is to challenge yourself, dig deeper in a particular area, and going beyond what we explicitly discussed in the class. When you start working on labs, attempt all other questions before moving to these challenging questions. If you are running out of time, please skip the challenging questions.</p>
+<p>We will be more strict with the marking of these questions. There might not be model answers. If you want to get full points in these questions, your answers need to</p>
+<ul class="simple">
+<li><p>be thorough, thoughtful, and well-written</p></li>
+<li><p>provide convincing justification and appropriate evidence for the claims you make</p></li>
+<li><p>impress the reader of your lab with your understanding of the material, your analytical and critical reasoning skills, and your ability to think on your own</p></li>
+</ul>
+<p><img alt="" src="../../../_images/eva-game-on2.png" /></p>
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+<section id="challenging-5-1-implementing-skipgram-model-on-a-toy-corpus">
+<h3>(Challenging) 5.1 Implementing Skipgram model on a toy corpus<a class="headerlink" href="#challenging-5-1-implementing-skipgram-model-on-a-toy-corpus" title="Permalink to this heading">#</a></h3>
+<p>rubric={reasoning}</p>
+<p>In this exercise, you will implement your own <code class="docutils literal notranslate"><span class="pre">SkipGramModel</span></code> class and a training loop to create word embeddings from the given toy_corpus.</p>
+<p>Below, the <code class="docutils literal notranslate"><span class="pre">create_input_pairs</span></code> function is provided, which generates training pairs for the SkipGram model from a preprocessed, tokenized corpus. For each word in the corpus, it considers a fixed-sized window around the word to find context words. These pairs of target words and their context words are crucial for training the SkipGram model.</p>
+<p><strong>Your tasks:</strong></p>
+<ul class="simple">
+<li><p>Define the <code class="docutils literal notranslate"><span class="pre">SkipGramModel</span></code> class. Your model should include an embedding layer for the input words and a linear layer to predict context words. Remember to initialize your model parameters appropriately.</p></li>
+<li><p>Write the training loop. Implement a loop that trains your <code class="docutils literal notranslate"><span class="pre">SkipGramModel</span></code> using the training pairs generated by <code class="docutils literal notranslate"><span class="pre">create_input_pairs</span></code>. You will need to define an appropriate loss function (e.g., negative loglikelihood loss or cross-entropy loss) and an optimizer.</p></li>
+<li><p>Train your <code class="docutils literal notranslate"><span class="pre">SkipGramModel</span></code> for at least 100 epochs. Ensure your model learns meaningful embeddings by adjusting the learning rate and other hyperparameters as necessary.</p></li>
+<li><p>Visualize the learned embeddings. Use <code class="docutils literal notranslate"><span class="pre">PCA</span></code> or <code class="docutils literal notranslate"><span class="pre">t-SNE</span></code> to reduce the dimensionality of your embeddings to 2D and plot them. Analyze and discuss any interesting patterns or clusters you observe among the words.</p></li>
+</ul>
+<p><em>Feel free to modify the toy corpus, the functions below, or the hyperparameter values as you see fit.</em></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">toy_corpus</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;eat banana cake&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;eat blueberry muffin&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;eat chocolate cake&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;eat glazed blueberry muffin&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;eat banana bread&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;drink strawberry smoothie&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;drink banana smoothie&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;drink blueberry smoothie&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;eat strawberry yogurt&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;eat blueberry yogurt&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;drink yogurt&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;drink smoothie&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;eat muffin&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;run marathon&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;run sprint&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;swim butterfly&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;swim freestyle&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;run in park&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;swim in pool&quot;</span>
+<span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">create_input_pairs</span><span class="p">(</span><span class="n">pp_corpus</span><span class="p">,</span> <span class="n">word2idx</span><span class="p">,</span> <span class="n">context_size</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate training pairs of word indices for the SkipGram model.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        pp_corpus (list of list of str): Preprocessed corpus where each sub-list represents a tokenized sentence.</span>
+<span class="sd">        word2idx (dict): A dictionary mapping words to their respective indices in the vocabulary.</span>
+<span class="sd">        context_size (int): The size of the context window around the target word.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        np.array: An array of tuples, each containing a pair of indices (target_word_index, context_word_index).</span>
+<span class="sd">    &quot;&quot;&quot;</span>    
+    <span class="n">idx_pairs</span> <span class="o">=</span> <span class="p">[(</span><span class="n">word2idx</span><span class="p">[</span><span class="n">sentence</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span> <span class="n">word2idx</span><span class="p">[</span><span class="n">sentence</span><span class="p">[</span><span class="n">j</span><span class="p">]])</span>
+                 <span class="k">for</span> <span class="n">sentence</span> <span class="ow">in</span> <span class="n">pp_corpus</span>
+                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sentence</span><span class="p">))</span>
+                 <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="n">context_size</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="n">context_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">sentence</span><span class="p">)))</span>
+                 <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">j</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">idx_pairs</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">get_vocab</span><span class="p">(</span><span class="n">tokenized_corpus</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a vocabulary list from a tokenized corpus.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        tokenized_corpus (list of list of str): The corpus where each sub-list represents a tokenized sentence.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        list: A list of unique tokens found in the corpus, representing the vocabulary.</span>
+<span class="sd">    &quot;&quot;&quot;</span>    
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">token</span> <span class="k">for</span> <span class="n">sentence</span> <span class="ow">in</span> <span class="n">tokenized_corpus</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">sentence</span><span class="p">))</span>
+
+
+<span class="n">EMBEDDING_DIM</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">CONTEXT_SIZE</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="c1"># Uses the `MyPreprocessor` class from the provided preprocessing.py file</span>
+<span class="n">toy_pp_corpus</span> <span class="o">=</span> <span class="n">MyPreprocessor</span><span class="p">(</span><span class="n">toy_corpus</span><span class="p">)</span>
+<span class="n">vocab</span> <span class="o">=</span> <span class="n">get_vocab</span><span class="p">(</span><span class="n">toy_pp_corpus</span><span class="p">)</span>
+<span class="n">word2idx</span> <span class="o">=</span> <span class="p">{</span><span class="n">w</span><span class="p">:</span> <span class="n">idx</span> <span class="k">for</span> <span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">vocab</span><span class="p">)}</span>
+<span class="n">idx2word</span> <span class="o">=</span> <span class="p">{</span><span class="n">idx</span><span class="p">:</span> <span class="n">w</span> <span class="k">for</span> <span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">vocab</span><span class="p">)}</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">vocab</span><span class="p">)</span>
+
+<span class="n">idx_pairs</span> <span class="o">=</span> <span class="n">create_input_pairs</span><span class="p">(</span><span class="n">toy_pp_corpus</span><span class="p">,</span> <span class="n">word2idx</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="alert alert-warning">
+<p>Solution_5_1</p>
+</div><div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">SkipgramModel</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">,</span> <span class="n">embedding_dim</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">context_size</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+        <span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><br><br><br><br></p>
+<p>Before submitting your assignment, please make sure you have followed all the instructions in the Submission Instructions section at the top.</p>
+<p>Well done!! Congratulations on finishing the lab and have a restful weekend!</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">Image</span>
+
+<span class="n">Image</span><span class="p">(</span><span class="s2">&quot;img/eva-resting.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "563"
+        },
+        kernelOptions: {
+            name: "563",
+            path: "./labs/lab3/student"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = '563'</script>
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../../lab2/student/lab2.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Lab 2: Dimensionality Reduction</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../../lab4/student/lab4.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Lab 4: Movie Recommendations</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imports">Imports</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submission-instructions-a-name-si-a">Submission instructions <a name="si"></a></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-exploring-pre-trained-word-embeddings">Exercise 1: Exploring pre-trained word embeddings</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#word-similarity-using-pre-trained-embeddings">1.1 Word similarity using pre-trained embeddings</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">1.2 Word similarity using pre-trained embeddings</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#representation-of-all-words-in-english">1.3 Representation of all words in English</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#visualizing-similar-words">1.4 Visualizing similar words</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-stereotypes-and-biases-in-word-embeddings">Exercise 2: Stereotypes and biases in word embeddings</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#stereotypes-and-biases-in-embeddings">2.1 Stereotypes and biases in embeddings</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#discussion">2.2 Discussion</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-building-your-own-embeddings-a-name-2-a">Exercise 3: Building your own embeddings <a name="2"></a></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#training-word2vec-and-fasttext">3.1 Training <code class="docutils literal notranslate"><span class="pre">Word2Vec</span></code> and <code class="docutils literal notranslate"><span class="pre">fastText</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#representation-of-domain-specific-words">3.2 Representation of domain-specific words</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">3.3 Discussion</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-product-recommendation-using-word2vec">Exercise 4: Product recommendation using Word2Vec</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#prepare-data-for-word2vec">4.1 Prepare data for Word2Vec</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#train-word2vec-model">4.2 Train <code class="docutils literal notranslate"><span class="pre">Word2Vec</span></code> model</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#examine-product-similarity">4.3 Examine product similarity</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">4.4</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-food-for-thought">Exercise 5: Food for thought</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#challenging-5-1-implementing-skipgram-model-on-a-toy-corpus">(Challenging) 5.1 Implementing Skipgram model on a toy corpus</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Varada Kolhatkar
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2022.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

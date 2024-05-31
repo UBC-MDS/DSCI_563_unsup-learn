@@ -1,0 +1,1474 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Lab 4: Movie Recommendations &#8212; DSCI 563 Unsupervised Learning</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/clipboard.min.js"></script>
+    <script src="../../../_static/copybutton.js"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../../_static/togglebutton.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../../../_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'labs/lab4/student/lab4';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Attributions" href="../../../attribution.html" />
+    <link rel="prev" title="Lab 3: Word embeddings, T-SNE, and product similarity using Word2Vec" href="../../lab3/student/lab3.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../../../README.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/mds-hex-sticker.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../../../_static/mds-hex-sticker.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Lectures</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/00_course-information.html">Course Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/01_K-Means.html">Lecture 1: K-Means Clustering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/02_DBSCAN-hierarchical.html">Lecture 2: DBSCAN and Hierarchical Clustering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/03_PCA-intro.html">Lecture 3: Introduction to Principal Component Analysis (PCA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/04_More-PCA-LSA-NMF.html">Lecture 4: More PCA, LSA, and NMF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/05_word-embeddings.html">Lecture 5: Word Embeddings, word2vec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/06_more-word2vec-tsne.html">Lecture 6: Using word embeddings, manifold learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/07_recommender-systems1.html">Lecture 7: Recommender Systems Part I</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/08_recommender-systems2.html">Lecture 8: Recommender Systems Part 2</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Appendices</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/AppendixA.html">Appendix A: K-Means customer segmentation case study</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Class demos</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/class_demos/01_class-demo.html">Lecture 01: Clustering class demo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/class_demos/02_class-demo.html">Lecture 02: Clustering class demo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/class_demos/03_class-demo.html">Lecture 03: PCA applications class demo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/class_demos/07_class-demo.html">Lecture 07: Collaborative filtering class demo</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">labs</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../lab1/student/lab1.html">Lab 1: Clustering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../lab2/student/lab2.html">Lab 2: Dimensionality Reduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../lab3/student/lab3.html">Lab 3: Word embeddings, T-SNE, and product similarity using Word2Vec</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Lab 4: Movie Recommendations</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Attribution</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../attribution.html">Attributions</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/UBC-MDS/DSCI_563_unsup-learn" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../../_sources/labs/lab4/student/lab4.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Lab 4: Movie Recommendations</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imports">Imports</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submission-instructions-a-name-si-a">Submission instructions <a name="si"></a></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-data-and-warm-up">Exercise 1: Data and warm-up</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#terminology">1.1 Terminology</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">1.1.1</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">1.1.2</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">1.1.3</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">1.1.4</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#data-splitting">1.2 Data splitting</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#utility-matrix">1.3 Utility matrix</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#evaluation">1.4 Evaluation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-baselines">Exercise 2: Baselines</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#per-user-average-baseline">2.1 Per-user average baseline</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#per-movie-average-baseline">2.2 Per-movie average baseline</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#average-of-per-user-and-per-movie-average-baselines">2.3 Average of per-user and per-movie average baselines</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#k-nearest-neighbours-imputation">2.4 <span class="math notranslate nohighlight">\(k\)</span>-nearest neighbours imputation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#discussion">2.5 Discussion</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-collaborative-filtering">Exercise 3: Collaborative filtering</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#truncatedsvd-by-replacing-missing-values-with-zeros">3.1 <code class="docutils literal notranslate"><span class="pre">TruncatedSVD</span></code> by replacing missing values with zeros</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">3.2 Discussion</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#collaborative-filtering-with-surprise-package">3.3 Collaborative filtering with <code class="docutils literal notranslate"><span class="pre">surprise</span></code> package</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-content-based-recommenders">Exercise 4: Content-based recommenders</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#create-x-and-y-per-user">4.1 Create <code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code> per user</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#number-of-examples-for-each-user">4.2 Number of examples for each user</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#training-regression-models-per-user">4.3 Training regression models per user</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">4.4 Discussion</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-food-for-thought">Exercise 5: Food for thought</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#challenging-5-1-top-n-predictions">(Challenging) 5.1 <code class="docutils literal notranslate"><span class="pre">top_n</span></code> predictions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#challenging-exercise-5-2-incorporating-user-and-movie-biases">(Challenging) Exercise 5.2 Incorporating user and movie biases</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#challenging-exercise-5-3-your-takeaway-from-the-course">(Challenging) Exercise 5.3 Your takeaway from the course</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialize Otter</span>
+<span class="kn">import</span> <span class="nn">otter</span>
+<span class="n">grader</span> <span class="o">=</span> <span class="n">otter</span><span class="o">.</span><span class="n">Notebook</span><span class="p">(</span><span class="s2">&quot;lab4.ipynb&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><img alt="" src="../../../_images/563_lab_banner3.png" /></p>
+<section class="tex2jax_ignore mathjax_ignore" id="lab-4-movie-recommendations">
+<h1>Lab 4: Movie Recommendations<a class="headerlink" href="#lab-4-movie-recommendations" title="Permalink to this heading">#</a></h1>
+<section id="imports">
+<h2>Imports<a class="headerlink" href="#imports" title="Permalink to this heading">#</a></h2>
+<hr><div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">hashlib</span> <span class="kn">import</span> <span class="n">sha1</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">TruncatedSVD</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+<div class="alert alert-info">
+</section>
+<section id="submission-instructions-a-name-si-a">
+<h2>Submission instructions <a name="si"></a><a class="headerlink" href="#submission-instructions-a-name-si-a" title="Permalink to this heading">#</a></h2>
+<p>rubric={mechanics}</p>
+<p>You will receive marks for correctly submitting this assignment by following the instructions below:</p>
+<ul class="simple">
+<li><p>Be sure to follow the <a class="reference external" href="https://ubc-mds.github.io/resources_pages/general_lab_instructions/">general lab instructions</a>.</p></li>
+<li><p><a class="reference external" href="https://github.com/UBC-MDS/public/tree/master/rubric">Here</a> you will find the description of each rubric used in MDS.</p></li>
+<li><p>Make at least three commits in your lab’s GitHub repository.</p></li>
+<li><p>Push the final .ipynb file with your solutions to your GitHub repository for this lab.</p></li>
+<li><p>Before submitting your lab, run all cells in your notebook to make sure there are no errors by doing <code class="docutils literal notranslate"><span class="pre">Kernel</span> <span class="pre">-&gt;</span> <span class="pre">Restart</span> <span class="pre">Kernel</span> <span class="pre">and</span> <span class="pre">Clear</span> <span class="pre">All</span> <span class="pre">Outputs</span></code> and then <code class="docutils literal notranslate"><span class="pre">Run</span> <span class="pre">-&gt;</span> <span class="pre">Run</span> <span class="pre">All</span> <span class="pre">Cells</span></code>. Notebooks without the output displayed may not be graded at all (because we need to see the output in order to grade your work).</p></li>
+<li><p>Upload the .ipynb file to Gradescope.</p></li>
+<li><p>Make sure that your plots/output are rendered properly in Gradescope.</p></li>
+<li><p>If the .ipynb file is too big or doesn’t render on Gradescope for some reason, also upload a pdf (preferably WebPDF) or html export of .ipynb file with your solutions so that TAs can view your submission on Gradescope.</p></li>
+<li><p>The data you download for this lab <b>SHOULD NOT BE PUSHED TO YOUR REPOSITORY</b> (there is also a <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> in the repo to prevent this).</p></li>
+<li><p>Include a clickable link to your GitHub repo for the lab just below this cell.</p></li>
+</ul>
+</div>    
+<p><em>Points:</em> 2</p>
+<p>YOUR REPO LINK GOES HERE</p>
+<!-- END QUESTION -->
+<p><br><br><br><br></p>
+</section>
+<section id="exercise-1-data-and-warm-up">
+<h2>Exercise 1: Data and warm-up<a class="headerlink" href="#exercise-1-data-and-warm-up" title="Permalink to this heading">#</a></h2>
+<hr>
+<p>In this lab, you will build a variety of movie recommendation systems using the <a class="reference external" href="https://www.kaggle.com/prajitdatta/movielens-100k-dataset/data">MovieLens dataset</a>. The original source of the data is <a class="reference external" href="https://grouplens.org/datasets/movielens/">here</a>, and the structure of the data is described in the <a class="reference external" href="http://files.grouplens.org/datasets/movielens/ml-latest-small-README.html">README</a> that comes with it.</p>
+<p>Run the code below which reads the ratings data as a CSV assuming that the file “u.data” is under <code class="docutils literal notranslate"><span class="pre">data/ml-100k/</span></code> directory in your lab folder. Timestamp can be useful in recommendation systems but we are going to ignore it in this assignment.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">r_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;user_id&quot;</span><span class="p">,</span> <span class="s2">&quot;movie_id&quot;</span><span class="p">,</span> <span class="s2">&quot;rating&quot;</span><span class="p">,</span> <span class="s2">&quot;timestamp&quot;</span><span class="p">]</span>
+<span class="n">ratings</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;ml-100k&quot;</span><span class="p">,</span> <span class="s2">&quot;u.data&quot;</span><span class="p">),</span>
+    <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">names</span><span class="o">=</span><span class="n">r_cols</span><span class="p">,</span>
+    <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;latin-1&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">ratings</span> <span class="o">=</span> <span class="n">ratings</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;timestamp&quot;</span><span class="p">])</span>
+<span class="n">ratings</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># We&#39;ll be using these keys later in the starter code</span>
+<span class="n">user_key</span> <span class="o">=</span> <span class="s2">&quot;user_id&quot;</span>
+<span class="n">item_key</span> <span class="o">=</span> <span class="s2">&quot;movie_id&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="terminology">
+<h3>1.1 Terminology<a class="headerlink" href="#terminology" title="Permalink to this heading">#</a></h3>
+<p>Here is some notation we will be using in this lab.</p>
+<p><strong>Constants</strong>:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(N\)</span>: the number of users, indexed by <span class="math notranslate nohighlight">\(n\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(M\)</span>: the number of movies, indexed by <span class="math notranslate nohighlight">\(m\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\mathcal{R}\)</span>: the set of indices <span class="math notranslate nohighlight">\((n,m)\)</span> where we have ratings in the utility matrix <span class="math notranslate nohighlight">\(Y\)</span></p>
+<ul>
+<li><p>Thus <span class="math notranslate nohighlight">\(|\mathcal{R}|\)</span> is the total number of ratings</p></li>
+</ul>
+</li>
+<li><p><span class="math notranslate nohighlight">\(k\)</span>: the number of latent dimensions we use in collaborative filtering</p></li>
+</ul>
+<p><strong>The data</strong>:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(Y\)</span>: the utility matrix containing ratings, with a lot of missing entries</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">train_mat</span></code> and <code class="docutils literal notranslate"><span class="pre">valid_mat</span></code>: Utility matrices for train and validation sets, respectively</p></li>
+</ul>
+<section id="id1">
+<h4>1.1.1<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h4>
+<p>rubric={accuracy}</p>
+<p><strong>Your tasks:</strong></p>
+<p>How many users and items are there in the movie ratings data?</p>
+<div class="alert alert-warning">
+<p>Solution_1_1_1</p>
+</div>
+<p><em>Points:</em> 1</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">N</span> <span class="o">=</span> <span class="o">...</span>
+<span class="n">M</span> <span class="o">=</span> <span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of users (N)  : </span><span class="si">{</span><span class="n">N</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of movies (M) : </span><span class="si">{</span><span class="n">M</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">grader</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="s2">&quot;q1.1.1&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><br><br></p>
+</section>
+<section id="id2">
+<h4>1.1.2<a class="headerlink" href="#id2" title="Permalink to this heading">#</a></h4>
+<p>rubric={accuracy}</p>
+<p><strong>Your tasks:</strong></p>
+<p>What would be the shape of the utility matrix <span class="math notranslate nohighlight">\(Y\)</span>?</p>
+<div class="alert alert-warning">
+<p>Solution_1_1_2</p>
+</div>
+<p><em>Points:</em> 1</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># How many rows in the utility matrix?</span>
+<span class="n">utility_n_rows</span> <span class="o">=</span> <span class="o">...</span>
+
+<span class="c1"># How many columns in the utility matrix?</span>
+<span class="n">utility_n_cols</span> <span class="o">=</span> <span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">grader</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="s2">&quot;q1.1.2&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><br><br></p>
+</section>
+<section id="id3">
+<h4>1.1.3<a class="headerlink" href="#id3" title="Permalink to this heading">#</a></h4>
+<p>rubric={accuracy}</p>
+<p><strong>Your tasks:</strong></p>
+<p>What is the percentage of non-nan ratings in the utility matrix <span class="math notranslate nohighlight">\(Y\)</span>?</p>
+<div class="alert alert-warning">
+<p>Solution_1_1_3</p>
+</div>
+<p><em>Points:</em> 1</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">non_nan_ratings_percentage</span> <span class="o">=</span> <span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Non-nan ratings percentage: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">non_nan_ratings_percentage</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">grader</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="s2">&quot;q1.1.3&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><br><br></p>
+</section>
+<section id="id4">
+<h4>1.1.4<a class="headerlink" href="#id4" title="Permalink to this heading">#</a></h4>
+<p>rubric={accuracy}</p>
+<p><strong>Your tasks:</strong></p>
+<p>What are the average number of ratings per user and per movie?</p>
+<div class="alert alert-warning">
+<p>Solution_1_1_4</p>
+</div>
+<p><em>Points:</em> 2</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">avg_nratings_per_user</span> <span class="o">=</span> <span class="o">...</span>
+<span class="n">avg_nratings_per_movie</span> <span class="o">=</span> <span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Average number of ratings per user : </span><span class="si">{</span><span class="n">avg_nratings_per_user</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Average number of ratings per movie: </span><span class="si">{</span><span class="n">avg_nratings_per_movie</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">grader</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="s2">&quot;q1.1.4&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><br><br></p>
+</section>
+</section>
+<section id="data-splitting">
+<h3>1.2 Data splitting<a class="headerlink" href="#data-splitting" title="Permalink to this heading">#</a></h3>
+<p>rubric={accuracy}</p>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>Split the ratings data into train and validation splits with <code class="docutils literal notranslate"><span class="pre">test_size=0.2</span></code> and <code class="docutils literal notranslate"><span class="pre">random_state=42</span></code>.</p></li>
+</ol>
+<div class="alert alert-warning">
+<p>Solution_1_2_1</p>
+</div>
+<p><em>Points:</em> 1</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_valid</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_valid</span> <span class="o">=</span> <span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">grader</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="s2">&quot;q1.2&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><br><br></p>
+</section>
+<section id="utility-matrix">
+<h3>1.3 Utility matrix<a class="headerlink" href="#utility-matrix" title="Permalink to this heading">#</a></h3>
+<p>rubric={accuracy}</p>
+<p>The code below creates user and item mappers which map user ids and item ids to indices.</p>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>Create utility matrices for train and validation sets and store them in <code class="docutils literal notranslate"><span class="pre">train_mat</span></code> and <code class="docutils literal notranslate"><span class="pre">valid_mat</span></code> variables, respectively.</p></li>
+<li><p>How many non-nan elements are there in each of these matrices?</p></li>
+</ol>
+<blockquote>
+<div><p>You may use the code from lecture notes with appropriate attributions.</p>
+</div></blockquote>
+<blockquote>
+<div><p>You won’t do it in real life but since our dataset is not that big, create a dense utility matrix in this assignment. You are welcome to try sparse matrix but then you may have to change some starter code provided in the later exercises.</p>
+</div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">user_mapper</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">ratings</span><span class="p">[</span><span class="n">user_key</span><span class="p">]),</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">))))</span>
+<span class="n">item_mapper</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">ratings</span><span class="p">[</span><span class="n">item_key</span><span class="p">]),</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">))))</span>
+<span class="n">user_inverse_mapper</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">ratings</span><span class="p">[</span><span class="n">user_key</span><span class="p">])))</span>
+<span class="n">item_inverse_mapper</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">ratings</span><span class="p">[</span><span class="n">item_key</span><span class="p">])))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">train_mat</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">valid_mat</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="alert alert-warning">
+<p>Solution_1_3</p>
+</div>
+<p><em>Points:</em> 4</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># What&#39;s the number of non-nan elements in train_mat (nnn_train_mat)?</span>
+<span class="n">nnn_train_mat</span> <span class="o">=</span> <span class="o">...</span>
+
+<span class="c1"># What&#39;s the number of non-nan elements in valid_mat (nnn_valid_mat)?</span>
+<span class="n">nnn_valid_mat</span> <span class="o">=</span> <span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of non-nan elements in train_mat: </span><span class="si">{</span><span class="n">nnn_train_mat</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of non-nan elements in valid_mat: </span><span class="si">{</span><span class="n">nnn_valid_mat</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">grader</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="s2">&quot;q1.3&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+</section>
+<section id="evaluation">
+<h3>1.4 Evaluation<a class="headerlink" href="#evaluation" title="Permalink to this heading">#</a></h3>
+<p>rubric={reasoning}</p>
+<p>In this assignment, you will develop various models to complete the utility matrix. To assess their performance, you will use the following evaluation functions:</p>
+<ul class="simple">
+<li><p>An error function called <code class="docutils literal notranslate"><span class="pre">error</span></code> that calculates the Root Mean Square Error (RMSE) for non-NaN elements between two matrices.</p></li>
+<li><p>An evaluation function called <code class="docutils literal notranslate"><span class="pre">evaluate</span></code> that computes and displays the RMSE for both the training and validation utility matrices, by calling the <code class="docutils literal notranslate"><span class="pre">error</span></code> function for each set.</p></li>
+</ul>
+<p><strong>Your task:</strong></p>
+<p>Discuss this evaluation metric within the framework of recommender systems, addressing the points below:</p>
+<ul class="simple">
+<li><p>Is there a “ground truth” in recommender systems against which we can compare our predictions?</p></li>
+<li><p>What exactly are we comparing when evaluating recommender systems?</p></li>
+<li><p>Can a system that achieves a low RMSE necessarily guarantee the effectiveness of its recommendations? That is, are customers more likely to engage with items recommended by such a system? Briefly discuss.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="n">Y1</span><span class="p">,</span> <span class="n">Y2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given two matrices of the same shape, </span>
+<span class="sd">    returns the root mean squared error (RMSE).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">((</span><span class="n">Y1</span> <span class="o">-</span> <span class="n">Y2</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="n">pred_Y</span><span class="p">,</span> <span class="n">train_mat</span><span class="p">,</span> <span class="n">valid_mat</span><span class="p">,</span> <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;Global average&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given predicted utility matrix and train and validation utility matrices </span>
+<span class="sd">    print train and validation RMSEs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> train RMSE: </span><span class="si">%0.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">error</span><span class="p">(</span><span class="n">pred_Y</span><span class="p">,</span> <span class="n">train_mat</span><span class="p">)))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> valid RMSE: </span><span class="si">%0.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">error</span><span class="p">(</span><span class="n">pred_Y</span><span class="p">,</span> <span class="n">valid_mat</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="alert alert-warning">
+<p>Solution_1_4</p>
+</div>
+<p><em>Points:</em> 3</p>
+<p><em>Type your answer here, replacing this text.</em></p>
+<!-- END QUESTION -->
+<p><br><br><br><br></p>
+</section>
+</section>
+<section id="exercise-2-baselines">
+<h2>Exercise 2: Baselines<a class="headerlink" href="#exercise-2-baselines" title="Permalink to this heading">#</a></h2>
+<hr>
+<p>In this exercise you’ll implement a number of baseline models to fill in the missing entries of the utility matrix.</p>
+<p>As an example, the code below implements the global average rating baseline.</p>
+<p><strong>global average rating baseline</strong></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">avg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">train_mat</span><span class="p">)</span>
+<span class="n">pred_g</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">train_mat</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">+</span> <span class="n">avg</span>
+<span class="n">evaluate</span><span class="p">(</span><span class="n">pred_g</span><span class="p">,</span> <span class="n">train_mat</span><span class="p">,</span> <span class="n">valid_mat</span><span class="p">,</span> <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;Global average&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+<section id="per-user-average-baseline">
+<h3>2.1 Per-user average baseline<a class="headerlink" href="#per-user-average-baseline" title="Permalink to this heading">#</a></h3>
+<p>rubric={accuracy}</p>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>Implement per-user average baseline and report train and validation RMSEs.</p></li>
+</ol>
+<p><em>Hint: The <code class="docutils literal notranslate"><span class="pre">np.tile</span></code> function may be useful for this task.</em></p>
+<div class="alert alert-warning">
+<p>Solution_2_1</p>
+</div>
+<p><em>Points:</em> 3</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pred_n</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<!-- END QUESTION -->
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+</section>
+<section id="per-movie-average-baseline">
+<h3>2.2 Per-movie average baseline<a class="headerlink" href="#per-movie-average-baseline" title="Permalink to this heading">#</a></h3>
+<p>rubric={accuracy}</p>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>Implement per-movie average baseline and report train and validation RMSEs.</p></li>
+</ol>
+<p><em>Hint: The <code class="docutils literal notranslate"><span class="pre">np.tile</span></code> function may be useful for this task.</em></p>
+<div class="alert alert-warning">
+<p>Solution_2_2</p>
+</div>
+<p><em>Points:</em> 2</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pred_m</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<!-- END QUESTION -->
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+</section>
+<section id="average-of-per-user-and-per-movie-average-baselines">
+<h3>2.3 Average of per-user and per-movie average baselines<a class="headerlink" href="#average-of-per-user-and-per-movie-average-baselines" title="Permalink to this heading">#</a></h3>
+<p>rubric={accuracy}</p>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>Implement average of per-movie and per-user averages baseline and report train and validation RMSEs.</p></li>
+</ol>
+<div class="alert alert-warning">
+<p>Solution_2_3</p>
+</div>
+<p><em>Points:</em> 2</p>
+<p><em>Type your answer here, replacing this text.</em></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pred_n_m</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<!-- END QUESTION -->
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+</section>
+<section id="k-nearest-neighbours-imputation">
+<h3>2.4 <span class="math notranslate nohighlight">\(k\)</span>-nearest neighbours imputation<a class="headerlink" href="#k-nearest-neighbours-imputation" title="Permalink to this heading">#</a></h3>
+<p>rubric={accuracy}</p>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>Try <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.impute.KNNImputer.html">KNNImputer</a> with at least 3 choices for the hyperparameter <code class="docutils literal notranslate"><span class="pre">n_neighbors</span></code> to fill in the missing entries.</p></li>
+<li><p>Report train and validation RMSEs.</p></li>
+</ol>
+<div class="alert alert-warning">
+<p>Solution_2_4</p>
+</div>
+<p><em>Points:</em> 4</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<!-- END QUESTION -->
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+</section>
+<section id="discussion">
+<h3>2.5 Discussion<a class="headerlink" href="#discussion" title="Permalink to this heading">#</a></h3>
+<p>rubric={reasoning}</p>
+<p><strong>Your tasks:</strong></p>
+<p>Compare the results of all the baseline methods you tried in this exercise.</p>
+<div class="alert alert-warning">
+<p>Solution_2_5</p>
+</div>
+<p><em>Points:</em> 4</p>
+<p><em>Type your answer here, replacing this text.</em></p>
+<!-- END QUESTION -->
+<p><br><br><br><br></p>
+</section>
+</section>
+<section id="exercise-3-collaborative-filtering">
+<h2>Exercise 3: Collaborative filtering<a class="headerlink" href="#exercise-3-collaborative-filtering" title="Permalink to this heading">#</a></h2>
+<p><strong>Collaborative filtering</strong> is one of the most popular approaches to fill in the missing entries of the utility matrix, which is based on something similar to LSA or <code class="docutils literal notranslate"><span class="pre">TruncatedSVD</span></code>.</p>
+<!-- BEGIN QUESTION -->
+<section id="truncatedsvd-by-replacing-missing-values-with-zeros">
+<h3>3.1 <code class="docutils literal notranslate"><span class="pre">TruncatedSVD</span></code> by replacing missing values with zeros<a class="headerlink" href="#truncatedsvd-by-replacing-missing-values-with-zeros" title="Permalink to this heading">#</a></h3>
+<p>rubric={accuracy,quality}</p>
+<p>Utility matrices are typically large and contain many missing entries. If we want to use scikit-learn’s <code class="docutils literal notranslate"><span class="pre">TruncatedSVD</span></code>, we first need to impute these missing values with numeric values. In this exercise, you’ll first center the non-NaN ratings, replace missing entries with zeros, and experiment with <code class="docutils literal notranslate"><span class="pre">TruncatedSVD</span></code> with different values of <span class="math notranslate nohighlight">\(k\)</span> (<code class="docutils literal notranslate"><span class="pre">n_components</span></code> hyperparameter of <code class="docutils literal notranslate"><span class="pre">TruncatedSVD</span></code>) to fill in the missing entries in the utility matrix.</p>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>Subtract the average ratings for each user and each movie from the non-NaN ratings in the utility matrix.</p></li>
+<li><p>Replace missing values in the train utility matrix with zeros.</p></li>
+</ol>
+<blockquote>
+<div><p>Hint: See help of <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.nan_to_num.html"><code class="docutils literal notranslate"><span class="pre">np.nan_to_num</span></code></a>.</p>
+</div></blockquote>
+<ol class="arabic simple" start="3">
+<li><p>Train <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.TruncatedSVD.html"><code class="docutils literal notranslate"><span class="pre">TruncatedSVD</span></code></a> on the processed matrix and use it to reconstruct the missing entries in the utility matrix. Remember to add back the averages you subtracted in the first step when you reconstruct the data. Experiment with at least a few different values for <code class="docutils literal notranslate"><span class="pre">n_components</span></code> hyperparamter of <code class="docutils literal notranslate"><span class="pre">TruncatedSVD</span></code>. Report tain and validation RMSEs in each case.</p></li>
+</ol>
+<div class="alert alert-warning">
+<p>Solution_3_1</p>
+</div>
+<p><em>Points:</em> 6</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<!-- END QUESTION -->
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+</section>
+<section id="id5">
+<h3>3.2 Discussion<a class="headerlink" href="#id5" title="Permalink to this heading">#</a></h3>
+<p>rubric={reasoning}</p>
+<ol class="arabic simple">
+<li><p>What’s wrong with the approach in 3.1? Why isn’t it typical to use <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>’s <code class="docutils literal notranslate"><span class="pre">TruncatedSVD</span></code> for collaborative filtering? Why do we need an alternative apporpach or a different package?</p></li>
+</ol>
+<div class="alert alert-warning">
+<p>Solution_3_2</p>
+</div>
+<p><em>Points:</em> 3</p>
+<p><em>Type your answer here, replacing this text.</em></p>
+<!-- END QUESTION -->
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+</section>
+<section id="collaborative-filtering-with-surprise-package">
+<h3>3.3 Collaborative filtering with <code class="docutils literal notranslate"><span class="pre">surprise</span></code> package<a class="headerlink" href="#collaborative-filtering-with-surprise-package" title="Permalink to this heading">#</a></h3>
+<p>rubric={accuracy,reasoning}</p>
+<p>Use the <a class="reference external" href="https://surprise.readthedocs.io/en/stable/"><code class="docutils literal notranslate"><span class="pre">surprise</span></code></a> package which has implementation of collaborative filtering with proper handling of missing values, which is suitable for recommendation systems. You can install it as follows in your environment.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">conda</span> <span class="n">activate</span> <span class="mi">563</span>
+<span class="o">&gt;&gt;</span> <span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">c</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span> <span class="n">scikit</span><span class="o">-</span><span class="n">surprise</span>
+<span class="ow">or</span> 
+<span class="o">&gt;&gt;</span> <span class="n">pip</span> <span class="n">install</span> <span class="n">scikit</span><span class="o">-</span><span class="n">surprise</span>
+</pre></div>
+</div>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>Carry out cross-validation using the <a class="reference external" href="https://surprise.readthedocs.io/en/stable/"><code class="docutils literal notranslate"><span class="pre">surprise</span></code></a> package and SVD algorithm. Report mean RMSEs for each fold.</p></li>
+<li><p>Briefly comment on the results.</p></li>
+</ol>
+<div class="alert alert-warning">
+<p>Solution_3_3</p>
+</div>
+<p><em>Points:</em> 4</p>
+<p><em>Type your answer here, replacing this text.</em></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<!-- END QUESTION -->
+<p><br><br><br><br></p>
+</section>
+</section>
+<section id="exercise-4-content-based-recommenders">
+<h2>Exercise 4: Content-based recommenders<a class="headerlink" href="#exercise-4-content-based-recommenders" title="Permalink to this heading">#</a></h2>
+<hr> 
+<p>Collaborative filtering uses an unsupervised learning approach to fill in missing entries in the utility matrix. In this exercise, you’ll explore content-based filtering, a supervised machine learning approach to recommendation systems.</p>
+<p>Unlike collaborative filtering, which relies solely on the utility matrix, content-based filtering takes advantage of available information about items (e.g., movies) or users. This approach uses both item/user information and ratings data to understand a user’s preferences and predict their ratings for items they haven’t yet rated or consumed.</p>
+<p>The following code snippet demonstrates how to load movie genre features from data/ml-100k/u.item and store them in a variable named <code class="docutils literal notranslate"><span class="pre">item_feats</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cols</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;movie_id&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;movie title&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;release date&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;video release date&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;IMDb URL&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;unknown&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Action&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Adventure&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Animation&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Children&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Comedy&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Crime&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Documentary&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Drama&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Fantasy&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Film-Noir&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Horror&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Musical&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Mystery&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Romance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Sci-Fi&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Thriller&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;War&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Western&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">movies_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;ml-100k&quot;</span><span class="p">,</span> <span class="s2">&quot;u.item&quot;</span><span class="p">),</span>
+    <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;|&quot;</span><span class="p">,</span>
+    <span class="n">names</span><span class="o">=</span><span class="n">cols</span><span class="p">,</span>
+    <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;latin-1&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">movies_data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">genres</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;Action&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Adventure&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Animation&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Children&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Comedy&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Crime&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Documentary&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Drama&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Fantasy&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Film-Noir&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Horror&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Musical&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Mystery&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Romance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Sci-Fi&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Thriller&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;War&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Western&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="n">movie_genres</span> <span class="o">=</span> <span class="n">movies_data</span><span class="p">[</span><span class="n">genres</span><span class="p">]</span>
+<span class="n">movie_genres</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">item_feats</span> <span class="o">=</span> <span class="n">movie_genres</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+<span class="n">item_feats</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Average number of genres per movie: </span><span class="si">{</span><span class="p">(</span><span class="n">item_feats</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">M</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+<section id="create-x-and-y-per-user">
+<h3>4.1 Create <code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code> per user<a class="headerlink" href="#create-x-and-y-per-user" title="Permalink to this heading">#</a></h3>
+<p>rubric={accuracy)</p>
+<p>In content-based filtering, we create a separate profile (<code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code>) for each user depending upon how many items they have rated so far. Since the number of items rated by each user is different, the size of <code class="docutils literal notranslate"><span class="pre">X</span></code> is going to be different for each user. The function <code class="docutils literal notranslate"><span class="pre">get_X_y_per_user</span></code> below creates <code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code> for each user with movie genre features.</p>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>Create <code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code> per user by calling the function <code class="docutils literal notranslate"><span class="pre">get_X_y_per_user</span></code> below on <code class="docutils literal notranslate"><span class="pre">X_train</span></code> that you created in Exercise 1.2. (The function <code class="docutils literal notranslate"><span class="pre">get_X_y_per_user</span></code> assumes that you have all three columns in your <code class="docutils literal notranslate"><span class="pre">X_train</span></code>: <code class="docutils literal notranslate"><span class="pre">user_id,</span> <span class="pre">movie_id,</span> <span class="pre">rating</span></code>.)</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+
+
+<span class="k">def</span> <span class="nf">get_X_y_per_user</span><span class="p">(</span><span class="n">ratings</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="n">item_feats</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns X and y for each user.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ratings : pandas.DataFrame</span>
+<span class="sd">         ratings data as a dataframe</span>
+
+<span class="sd">    d : int</span>
+<span class="sd">        number of item features</span>
+
+<span class="sd">    Return:</span>
+<span class="sd">    ----------</span>
+<span class="sd">        dictionaries containing X and y for all users</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lr_y</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">lr_X</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">ratings</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">user_mapper</span><span class="p">[</span><span class="n">val</span><span class="p">[</span><span class="n">user_key</span><span class="p">]]</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">item_mapper</span><span class="p">[</span><span class="n">val</span><span class="p">[</span><span class="n">item_key</span><span class="p">]]</span>
+        <span class="n">lr_X</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item_feats</span><span class="p">[</span><span class="n">m</span><span class="p">])</span>
+        <span class="n">lr_y</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">[</span><span class="s2">&quot;rating&quot;</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">lr_X</span><span class="p">:</span>
+        <span class="n">lr_X</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lr_X</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
+        <span class="n">lr_y</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lr_y</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">lr_X</span><span class="p">,</span> <span class="n">lr_y</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="alert alert-warning">
+<p>Solution_4_1</p>
+</div>
+<p><em>Points:</em> 1</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<!-- END QUESTION -->
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+</section>
+<section id="number-of-examples-for-each-user">
+<h3>4.2 Number of examples for each user<a class="headerlink" href="#number-of-examples-for-each-user" title="Permalink to this heading">#</a></h3>
+<p>rubric={accuracy,reasoning}</p>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>Write code to extract the user IDs that have the smallest and largest numbers of ratings in their respective <code class="docutils literal notranslate"><span class="pre">X</span></code> dataset. Display both the user IDs and the count of ratings for these users. If multiple users share the minimum or maximum number of ratings, you may choose any one of them to display.</p></li>
+<li><p>Would the size of <code class="docutils literal notranslate"><span class="pre">X</span></code> have an impact on the quality of recommendations given by a content-based recommender system for that user? Briefly discuss.</p></li>
+</ol>
+<div class="alert alert-warning">
+<p>Solution_4_2</p>
+</div>
+<p><em>Points:</em> 4</p>
+<p><em>Type your answer here, replacing this text.</em></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<!-- END QUESTION -->
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+</section>
+<section id="training-regression-models-per-user">
+<h3>4.3 Training regression models per user<a class="headerlink" href="#training-regression-models-per-user" title="Permalink to this heading">#</a></h3>
+<p>rubric={accuracy}</p>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>For each user, train regression models of your choice to predict missing ratings in the utility matrix.</p></li>
+<li><p>Report train and validation RMSEs.</p></li>
+</ol>
+<div class="alert alert-warning">
+<p>Solution_4_3</p>
+</div>
+<p><em>Points:</em> 6</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<!-- END QUESTION -->
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+</section>
+<section id="id6">
+<h3>4.4 Discussion<a class="headerlink" href="#id6" title="Permalink to this heading">#</a></h3>
+<p>rubric={reasoning}</p>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>Compare the validation RMSE from 4.3 with the validation RMSE you got with collaborative filtering.</p></li>
+<li><p>Discuss advantages and disadvantages of content-based filtering over collaborative filtering.</p></li>
+</ol>
+<div class="alert alert-warning">
+<p>Solution_4_4</p>
+</div>
+<p><em>Points:</em> 3</p>
+<p><em>Type your answer here, replacing this text.</em></p>
+<!-- END QUESTION -->
+<p><br><br><br><br></p>
+</section>
+</section>
+<section id="exercise-5-food-for-thought">
+<h2>Exercise 5: Food for thought<a class="headerlink" href="#exercise-5-food-for-thought" title="Permalink to this heading">#</a></h2>
+<hr>
+<p>Each lab will have a few challenging questions. These are usually low-risk questions and will contribute to maximum 5% of the lab grade. The main purpose here is to challenge yourself, dig deeper in a particular area, and going beyond what we explicitly discussed in the class. When you start working on labs, attempt all other questions before moving to these challenging questions. If you are running out of time, please skip the challenging questions.</p>
+<p>We will be more strict with the marking of these questions. There might not be model answers. If you want to get full points in these questions, your answers need to</p>
+<ul class="simple">
+<li><p>be thorough, thoughtful, and well-written</p></li>
+<li><p>provide convincing justification and appropriate evidence for the claims you make</p></li>
+<li><p>impress the reader of your lab with your understanding of the material, your analytical and critical reasoning skills, and your ability to think on your own</p></li>
+</ul>
+<p><img alt="" src="../../../_images/eva-game-on3.png" /></p>
+<!-- BEGIN QUESTION -->
+<section id="challenging-5-1-top-n-predictions">
+<h3>(Challenging) 5.1 <code class="docutils literal notranslate"><span class="pre">top_n</span></code> predictions<a class="headerlink" href="#challenging-5-1-top-n-predictions" title="Permalink to this heading">#</a></h3>
+<hr>
+<p>rubric={reasoning}</p>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>Fit the SVD model on the train set using the <code class="docutils literal notranslate"><span class="pre">surprise</span></code> package. Write a function which returns <code class="docutils literal notranslate"><span class="pre">top_n</span></code> movie rating predictions for a given user id. Movies with these top ratings could be recommended to the user.</p></li>
+</ol>
+<blockquote>
+<div><p>You may adapt <a class="reference external" href="https://github.com/NicolasHug/Surprise/blob/master/examples/top_n_recommendations.py">this code</a> from the developer of the surprise package. If you do so, provide proper attributions.</p>
+</div></blockquote>
+<div class="alert alert-warning">
+<p>Solution_5_1</p>
+</div>
+<p><em>Points:</em> 1</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<!-- END QUESTION -->
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+</section>
+<section id="challenging-exercise-5-2-incorporating-user-and-movie-biases">
+<h3>(Challenging) Exercise 5.2 Incorporating user and movie biases<a class="headerlink" href="#challenging-exercise-5-2-incorporating-user-and-movie-biases" title="Permalink to this heading">#</a></h3>
+<p>rubric={reasoning}</p>
+<p>During our lecture, we saw PyTorch code designed for implementing the loss function used in collaborative filtering. This implementation included regularization for both the user matrix <code class="docutils literal notranslate"><span class="pre">Z</span></code> and item matrix <code class="docutils literal notranslate"><span class="pre">W</span></code>. Furthermore, we discussed the concept of user and movie biases, acknowledging that certain users may consistently rate movies more generously or more critically, while certain movies might typically receive higher or lower ratings.</p>
+<p><strong>Your tasks:</strong></p>
+<ul class="simple">
+<li><p>Modify the PyTorch code provided in the lecture notes to include both user and movie biases in the model. Ensure you also incorporate the regularization terms for these biases.</p></li>
+<li><p>Calculate and report the RMSEs for both the training and validation datasets.</p></li>
+</ul>
+<div class="alert alert-warning">
+<p>Solution_5_2</p>
+</div>
+<p><em>Points:</em> 1</p>
+<!-- END QUESTION -->
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+</section>
+<section id="challenging-exercise-5-3-your-takeaway-from-the-course">
+<h3>(Challenging) Exercise 5.3 Your takeaway from the course<a class="headerlink" href="#challenging-exercise-5-3-your-takeaway-from-the-course" title="Permalink to this heading">#</a></h3>
+<hr>
+rubric={reasoning:1}
+<p><strong>Your tasks:</strong></p>
+<ul class="simple">
+<li><p>Reflect on your journey through this course. What are your three key takeaways? Also, consider how you would apply the knowledge gained in this course to your own domain or personal projects. Please provide a thoughtful and specific response.</p></li>
+</ul>
+<div class="alert alert-warning">
+<p>Solution_5.3</p>
+</div>
+<p><em>Points:</em> 1</p>
+<!-- END QUESTION -->
+<p><br><br><br><br></p>
+<p>Before submitting your assignment, please make sure you have followed all the instructions in the Submission Instructions section at the top.</p>
+<p>Congratulations on finishing the last lab of this course 🎉!!</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="n">Image</span><span class="p">(</span><span class="s2">&quot;img/eva-congrats.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "conda-env-563-py"
+        },
+        kernelOptions: {
+            name: "conda-env-563-py",
+            path: "./labs/lab4/student"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'conda-env-563-py'</script>
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../../lab3/student/lab3.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Lab 3: Word embeddings, T-SNE, and product similarity using Word2Vec</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../../../attribution.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Attributions</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imports">Imports</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submission-instructions-a-name-si-a">Submission instructions <a name="si"></a></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-data-and-warm-up">Exercise 1: Data and warm-up</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#terminology">1.1 Terminology</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">1.1.1</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">1.1.2</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">1.1.3</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">1.1.4</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#data-splitting">1.2 Data splitting</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#utility-matrix">1.3 Utility matrix</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#evaluation">1.4 Evaluation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-baselines">Exercise 2: Baselines</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#per-user-average-baseline">2.1 Per-user average baseline</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#per-movie-average-baseline">2.2 Per-movie average baseline</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#average-of-per-user-and-per-movie-average-baselines">2.3 Average of per-user and per-movie average baselines</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#k-nearest-neighbours-imputation">2.4 <span class="math notranslate nohighlight">\(k\)</span>-nearest neighbours imputation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#discussion">2.5 Discussion</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-collaborative-filtering">Exercise 3: Collaborative filtering</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#truncatedsvd-by-replacing-missing-values-with-zeros">3.1 <code class="docutils literal notranslate"><span class="pre">TruncatedSVD</span></code> by replacing missing values with zeros</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">3.2 Discussion</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#collaborative-filtering-with-surprise-package">3.3 Collaborative filtering with <code class="docutils literal notranslate"><span class="pre">surprise</span></code> package</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-content-based-recommenders">Exercise 4: Content-based recommenders</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#create-x-and-y-per-user">4.1 Create <code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code> per user</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#number-of-examples-for-each-user">4.2 Number of examples for each user</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#training-regression-models-per-user">4.3 Training regression models per user</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">4.4 Discussion</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-food-for-thought">Exercise 5: Food for thought</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#challenging-5-1-top-n-predictions">(Challenging) 5.1 <code class="docutils literal notranslate"><span class="pre">top_n</span></code> predictions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#challenging-exercise-5-2-incorporating-user-and-movie-biases">(Challenging) Exercise 5.2 Incorporating user and movie biases</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#challenging-exercise-5-3-your-takeaway-from-the-course">(Challenging) Exercise 5.3 Your takeaway from the course</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Varada Kolhatkar
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2022.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

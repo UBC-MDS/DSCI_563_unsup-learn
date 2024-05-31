@@ -1,0 +1,1696 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Lab 2: Dimensionality Reduction &#8212; DSCI 563 Unsupervised Learning</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/clipboard.min.js"></script>
+    <script src="../../../_static/copybutton.js"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../../_static/togglebutton.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../../../_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'labs/lab2/student/lab2';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Lab 3: Word embeddings, T-SNE, and product similarity using Word2Vec" href="../../lab3/student/lab3.html" />
+    <link rel="prev" title="Lab 1: Clustering" href="../../lab1/student/lab1.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../../../README.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/mds-hex-sticker.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../../../_static/mds-hex-sticker.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Lectures</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/00_course-information.html">Course Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/01_K-Means.html">Lecture 1: K-Means Clustering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/02_DBSCAN-hierarchical.html">Lecture 2: DBSCAN and Hierarchical Clustering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/03_PCA-intro.html">Lecture 3: Introduction to Principal Component Analysis (PCA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/04_More-PCA-LSA-NMF.html">Lecture 4: More PCA, LSA, and NMF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/05_word-embeddings.html">Lecture 5: Word Embeddings, word2vec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/06_more-word2vec-tsne.html">Lecture 6: Using word embeddings, manifold learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/07_recommender-systems1.html">Lecture 7: Recommender Systems Part I</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/08_recommender-systems2.html">Lecture 8: Recommender Systems Part 2</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Appendices</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/AppendixA.html">Appendix A: K-Means customer segmentation case study</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Class demos</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/class_demos/01_class-demo.html">Lecture 01: Clustering class demo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/class_demos/02_class-demo.html">Lecture 02: Clustering class demo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/class_demos/03_class-demo.html">Lecture 03: PCA applications class demo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lectures/class_demos/07_class-demo.html">Lecture 07: Collaborative filtering class demo</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">labs</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../lab1/student/lab1.html">Lab 1: Clustering</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Lab 2: Dimensionality Reduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../lab3/student/lab3.html">Lab 3: Word embeddings, T-SNE, and product similarity using Word2Vec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../lab4/student/lab4.html">Lab 4: Movie Recommendations</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Attribution</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../attribution.html">Attributions</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/UBC-MDS/DSCI_563_unsup-learn" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../../_sources/labs/lab2/student/lab2.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Lab 2: Dimensionality Reduction</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imports-a-name-im-a">Imports <a name="im"></a></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submission-instructions-a-name-si-a">Submission instructions <a name="si"></a></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-warm-up">Exercise 1: Warm-up</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dimensionality-reduction-notation">1.1 Dimensionality reduction notation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#picking-the-number-of-components-k">1.2 Picking the number of components <span class="math notranslate nohighlight">\(k\)</span></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pca-by-hand">1.3 PCA by hand</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">1.3.1</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">1.3.2</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">1.3.3</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">1.3.4</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reconstruction-error">1.4 Reconstruction error</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">1.4.1</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">1.4.2</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">1.4.3</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-implementing-pca-using-svd">Exercise 2: Implementing PCA using SVD</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dimensionality-reduction-on-animal-faces">Dimensionality reduction on animal faces</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-dimensionality-reduction-with-pca">Exercise 3: Dimensionality reduction with PCA</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#varying-the-number-of-components">3.1 Varying the number of components</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#applying-pca">3.2 Applying PCA</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-interpreting-the-components-learned-by-pca">Exercise 4: Interpreting the components learned by PCA</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#plotting-strong-component-images">4.1 Plotting strong component images</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#visualization-of-first-two-dimensions">4.2 Visualization of first two dimensions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#image-tiling">4.3 Image tiling</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-pca-vs-nmf-vs-lsa">Exercise 5: PCA vs. NMF vs. LSA</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-food-for-thought">Exercise 6: Food for thought</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#challenging-6-1-cnn-autoencoder-on-the-mnist-dataset">(Challenging) 6.1 CNN Autoencoder on the MNIST dataset</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#challenging-6-2-latent-semantic-analysis-lsa">(Challenging) 6.2 Latent Semantic Analysis (LSA)</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialize Otter</span>
+<span class="kn">import</span> <span class="nn">otter</span>
+<span class="n">grader</span> <span class="o">=</span> <span class="n">otter</span><span class="o">.</span><span class="n">Notebook</span><span class="p">(</span><span class="s2">&quot;lab2.ipynb&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><img alt="" src="../../../_images/563_lab_banner1.png" /></p>
+<section class="tex2jax_ignore mathjax_ignore" id="lab-2-dimensionality-reduction">
+<h1>Lab 2: Dimensionality Reduction<a class="headerlink" href="#lab-2-dimensionality-reduction" title="Permalink to this heading">#</a></h1>
+<section id="imports-a-name-im-a">
+<h2>Imports <a name="im"></a><a class="headerlink" href="#imports-a-name-im-a" title="Permalink to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">from</span> <span class="nn">hashlib</span> <span class="kn">import</span> <span class="n">sha1</span>
+
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">datasets</span>
+<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">NMF</span><span class="p">,</span> <span class="n">PCA</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><br><br><br><br></p>
+<!-- BEGIN QUESTION -->
+<div class="alert alert-info">
+</section>
+<section id="submission-instructions-a-name-si-a">
+<h2>Submission instructions <a name="si"></a><a class="headerlink" href="#submission-instructions-a-name-si-a" title="Permalink to this heading">#</a></h2>
+<p>rubric={mechanics}</p>
+<p>You will receive marks for correctly submitting this assignment by following the instructions below:</p>
+<ul class="simple">
+<li><p>Be sure to follow the <a class="reference external" href="https://ubc-mds.github.io/resources_pages/general_lab_instructions/">general lab instructions</a>.</p></li>
+<li><p><a class="reference external" href="https://github.com/UBC-MDS/public/tree/master/rubric">Here</a> you will find the description of each rubric used in MDS.</p></li>
+<li><p>Make at least three commits in your lab’s GitHub repository.</p></li>
+<li><p>Push the final .ipynb file with your solutions to your GitHub repository for this lab.</p></li>
+<li><p>Before submitting your lab, run all cells in your notebook to make sure there are no errors by doing <code class="docutils literal notranslate"><span class="pre">Kernel</span> <span class="pre">-&gt;</span> <span class="pre">Restart</span> <span class="pre">Kernel</span> <span class="pre">and</span> <span class="pre">Clear</span> <span class="pre">All</span> <span class="pre">Outputs</span></code> and then <code class="docutils literal notranslate"><span class="pre">Run</span> <span class="pre">-&gt;</span> <span class="pre">Run</span> <span class="pre">All</span> <span class="pre">Cells</span></code>. Notebooks without the output displayed may not be graded at all (because we need to see the output in order to grade your work).</p></li>
+<li><p>Make sure to enroll to Gradescope via <a class="reference external" href="https://canvas.ubc.ca/courses/130310">Canvas</a>.</p></li>
+<li><p>Upload the .ipynb file to Gradescope.</p></li>
+<li><p>Make sure that your plots/output are rendered properly in Gradescope.</p></li>
+<li><p>If the .ipynb file is too big or doesn’t render on Gradescope for some reason, also upload a pdf (preferably WebPDF) or html export of .ipynb file with your solutions so that TAs can view your submission on Gradescope.</p></li>
+<li><p>The data you download for this lab <b>SHOULD NOT BE PUSHED TO YOUR REPOSITORY</b> (there is also a <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> in the repo to prevent this).</p></li>
+<li><p>Include a clickable link to your GitHub repo for the lab just below this cell.</p></li>
+</ul>
+</div>    
+<p><em>Points:</em> 3</p>
+<p>YOUR REPO LINK GOES HERE</p>
+<!-- END QUESTION -->
+<p><br><br><br><br></p>
+</section>
+<section id="exercise-1-warm-up">
+<h2>Exercise 1: Warm-up<a class="headerlink" href="#exercise-1-warm-up" title="Permalink to this heading">#</a></h2>
+<hr><section id="dimensionality-reduction-notation">
+<h3>1.1 Dimensionality reduction notation<a class="headerlink" href="#dimensionality-reduction-notation" title="Permalink to this heading">#</a></h3>
+<p>rubric={accuracy}</p>
+<p><strong>Your tasks:</strong></p>
+<p>Suppose you apply dimensionality reduction on a data matrix <span class="math notranslate nohighlight">\(X_{n \times d}\)</span> using a dimensionality reduction technique such as Principal Component Analysis (PCA) with <span class="math notranslate nohighlight">\(k\)</span> comsponents, where</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(n \rightarrow \)</span> number of examples</p></li>
+<li><p><span class="math notranslate nohighlight">\(d \rightarrow \)</span> number of features</p></li>
+<li><p><span class="math notranslate nohighlight">\(k \rightarrow \)</span> number of components</p></li>
+</ul>
+<p>Considering the PCA notation discussed in class, what are the dimensions of the matrices <code class="docutils literal notranslate"><span class="pre">W</span></code>, <code class="docutils literal notranslate"><span class="pre">Z</span></code>, and <code class="docutils literal notranslate"><span class="pre">X_hat</span></code>? Please select from the options below.</p>
+<ul class="simple">
+<li><p>(A) <span class="math notranslate nohighlight">\(n \times k\)</span></p></li>
+<li><p>(B) <span class="math notranslate nohighlight">\(n \times d\)</span></p></li>
+<li><p>(C) <span class="math notranslate nohighlight">\(k \times d\)</span></p></li>
+</ul>
+<div class="alert alert-warning">
+<p>Solution_1_1</p>
+</div>
+<p><em>Points:</em> 2</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Assign the variables to either &quot;A&quot;, &quot;B&quot;, or &quot;C&quot; </span>
+<span class="n">W_dim</span> <span class="o">=</span> <span class="o">...</span>
+<span class="n">Z_dim</span> <span class="o">=</span> <span class="o">...</span>
+<span class="n">X_hat_dim</span> <span class="o">=</span> <span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">grader</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="s2">&quot;q1.1&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+</section>
+<section id="picking-the-number-of-components-k">
+<h3>1.2 Picking the number of components <span class="math notranslate nohighlight">\(k\)</span><a class="headerlink" href="#picking-the-number-of-components-k" title="Permalink to this heading">#</a></h3>
+<p>rubric={reasoning}</p>
+<p><strong>Your tasks:</strong></p>
+<p>If you want to reduce dimensionality, why is it not a good idea to pick the number of components <span class="math notranslate nohighlight">\(k\)</span> (<code class="docutils literal notranslate"><span class="pre">n_components</span></code> in <code class="docutils literal notranslate"><span class="pre">sklearn</span></code>) which gives the lowest reconstruction error?</p>
+<div class="alert alert-warning">
+<p>Solution_1_2</p>
+</div>
+<p><em>Points:</em> 2</p>
+<p><em>Type your answer here, replacing this text.</em></p>
+<!-- END QUESTION -->
+<p><br><br></p>
+</section>
+<section id="pca-by-hand">
+<h3>1.3 PCA by hand<a class="headerlink" href="#pca-by-hand" title="Permalink to this heading">#</a></h3>
+<p>Suppose you train the standard PCA algorithm on an already centered data matrix <code class="docutils literal notranslate"><span class="pre">X</span></code> (not shown) and you get <code class="docutils literal notranslate"><span class="pre">Z</span></code> and <code class="docutils literal notranslate"><span class="pre">W</span></code> shown below.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">]])</span>
+<span class="n">W</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">]])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Z</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">W</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="id1">
+<h4>1.3.1<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h4>
+<p>rubric={accuracy}</p>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>How many rows and columns would be there in the data matrix <code class="docutils literal notranslate"><span class="pre">X</span></code>?</p></li>
+</ol>
+<div class="alert alert-warning">
+<p>Solution_1_3_1</p>
+</div>
+<p><em>Points:</em> 1</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_rows</span> <span class="o">=</span> <span class="o">...</span>
+<span class="n">X_cols</span> <span class="o">=</span> <span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">grader</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="s2">&quot;q1.3.1&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><br><br></p>
+</section>
+<section id="id2">
+<h4>1.3.2<a class="headerlink" href="#id2" title="Permalink to this heading">#</a></h4>
+<p>rubric={accuracy}</p>
+<p><strong>Your tasks:</strong></p>
+<p>Fill in the blanks:</p>
+<ul class="simple">
+<li><p>In this toy example, we are reducing dimensionality from <strong><span class="math notranslate nohighlight">\(d\)</span></strong> dimensions to <strong><span class="math notranslate nohighlight">\(p\)</span></strong> dimensions.</p></li>
+</ul>
+<div class="alert alert-warning">
+<p>Solution_1_3_2</p>
+</div>
+<p><em>Points:</em> 1</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># original dimensions</span>
+<span class="n">d</span> <span class="o">=</span> <span class="o">...</span>
+
+<span class="c1"># reduced_dimensions</span>
+<span class="n">p</span> <span class="o">=</span> <span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">grader</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="s2">&quot;q1.3.2&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><br><br></p>
+</section>
+<section id="id3">
+<h4>1.3.3<a class="headerlink" href="#id3" title="Permalink to this heading">#</a></h4>
+<p>rubric={accuracy}</p>
+<p>Find the low-dimensional representation of the already centered <code class="docutils literal notranslate"><span class="pre">X_new</span></code> below.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="alert alert-warning">
+<p>Solution_1_3_3</p>
+</div>
+<p><em>Points:</em> 1</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Z_new</span> <span class="o">=</span> <span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">grader</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="s2">&quot;q1.3.3&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+</section>
+<section id="id4">
+<h4>1.3.4<a class="headerlink" href="#id4" title="Permalink to this heading">#</a></h4>
+<p>rubric={reasoning}</p>
+<p>The third and fourth rows of the transformed matrix <code class="docutils literal notranslate"><span class="pre">Z</span></code> and the original matrix <code class="docutils literal notranslate"><span class="pre">X</span></code> are identical in our toy example. Does this mean that, in general, for two arbitrary data points in a dataset if the lower dimensional representations are identical, the higher dimensional representations in the original space have to be identical? Briefly explain.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Z</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="alert alert-warning">
+<p>Solution_1_3_4</p>
+</div>
+<p><em>Points:</em> 2</p>
+<p><em>Type your answer here, replacing this text.</em></p>
+<!-- END QUESTION -->
+<p><br><br></p>
+</section>
+</section>
+<section id="reconstruction-error">
+<h3>1.4 Reconstruction error<a class="headerlink" href="#reconstruction-error" title="Permalink to this heading">#</a></h3>
+<p>Let’s get an intuition for reconstruction error on a toy dataset.</p>
+<p>The code below creates a toy dataset with a few outliers. The function <code class="docutils literal notranslate"><span class="pre">get_recon_error_df</span></code> calculates normalized reconstruction errors between the original and reconstructed data points. Run the code and answer the following questions.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">outliers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">4</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.8</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]])</span>
+<span class="n">x1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">x2</span> <span class="o">=</span> <span class="n">x1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+<span class="n">X_noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">X</span><span class="p">,</span> <span class="n">outliers</span><span class="p">])</span>
+<span class="n">X_noise_scaled</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_noise</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X_noise_scaled</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">X_noise_scaled</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">edgecolors</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;xkcd:azure&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+<!-- BEGIN QUESTION -->
+<section id="id5">
+<h4>1.4.1<a class="headerlink" href="#id5" title="Permalink to this heading">#</a></h4>
+<p>rubric={reasoning}</p>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>Write a docstring for the function <code class="docutils literal notranslate"><span class="pre">get_recon_error_df</span></code> provided below.</p></li>
+</ol>
+<div class="alert alert-warning">
+<p>Solution_1_4_1</p>
+</div>
+<p><em>Points:</em> 2</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_recon_error_df</span><span class="p">(</span><span class="n">orig</span><span class="p">,</span> <span class="n">recon</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ...</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">orig</span> <span class="o">-</span> <span class="n">recon</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="p">(</span><span class="n">loss</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">loss</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">loss</span><span class="p">))</span>  <span class="c1"># normalization</span>
+    <span class="n">loss_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">loss</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;recon_error&quot;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">loss_df</span>
+</pre></div>
+</div>
+</div>
+</div>
+<!-- END QUESTION -->
+<p><br><br></p>
+</section>
+<section id="id6">
+<h4>1.4.2<a class="headerlink" href="#id6" title="Permalink to this heading">#</a></h4>
+<p>rubric={accuracy}</p>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>Fit <code class="docutils literal notranslate"><span class="pre">PCA</span></code> with <code class="docutils literal notranslate"><span class="pre">n_components=1</span></code> on <code class="docutils literal notranslate"><span class="pre">X_noise_scaled</span></code> with <code class="docutils literal notranslate"><span class="pre">random_state=123</span></code> and store the returned dataframe in <code class="docutils literal notranslate"><span class="pre">recon_df</span></code> below.</p></li>
+</ol>
+<div class="alert alert-warning">
+<p>Solution_1_4_2</p>
+</div>
+<p><em>Points:</em> 2</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">recon_df</span> <span class="o">=</span> <span class="o">...</span>
+<span class="n">recon_df</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">grader</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="s2">&quot;q1.4.2&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><br><br></p>
+</section>
+<section id="id7">
+<h4>1.4.3<a class="headerlink" href="#id7" title="Permalink to this heading">#</a></h4>
+<p>rubric={accuracy}</p>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>The last 3 rows (rows from indices 100 to 102) in <code class="docutils literal notranslate"><span class="pre">X_noise_scaled</span></code> are outliers. Calculate the average reconstruction error for outliers vs. average reconstruction error for other data points (i.e., non-outliers).</p></li>
+</ol>
+<div class="alert alert-warning">
+<p>Solution_1_4_3</p>
+</div>
+<p><em>Points:</em> 2</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">outliers_avg_recon_error</span> <span class="o">=</span> <span class="o">...</span>
+<span class="n">non_outliers_avg_recon_error</span> <span class="o">=</span> <span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">outliers_avg_recon_error</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">non_outliers_avg_recon_error</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">grader</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="s2">&quot;q1.4.3&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><br><br><br><br></p>
+</section>
+</section>
+</section>
+<section id="exercise-2-implementing-pca-using-svd">
+<h2>Exercise 2: Implementing PCA using SVD<a class="headerlink" href="#exercise-2-implementing-pca-using-svd" title="Permalink to this heading">#</a></h2>
+<hr>
+rubric={accuracy}
+<p>In this exercise, you’ll implement your own version of PCA using SVD. The class <code class="docutils literal notranslate"><span class="pre">MyPCA</span></code> below implements <code class="docutils literal notranslate"><span class="pre">init</span></code> and <code class="docutils literal notranslate"><span class="pre">fit</span></code> methods.</p>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>Complete the <code class="docutils literal notranslate"><span class="pre">get_components</span></code> method of the class which returns the learned components.</p></li>
+<li><p>Complete the <code class="docutils literal notranslate"><span class="pre">transform</span></code> method of the class which returns transformed <code class="docutils literal notranslate"><span class="pre">Z</span></code> given <code class="docutils literal notranslate"><span class="pre">X</span></code>.</p></li>
+</ol>
+<blockquote>
+<div><p><em>Before applying transformation, center the data by subtracting the mean.</em></p>
+</div></blockquote>
+<ol class="arabic simple" start="3">
+<li><p>Complete <code class="docutils literal notranslate"><span class="pre">reconstruct</span></code> method of the class which returns reconstructed <code class="docutils literal notranslate"><span class="pre">X_hat</span></code> given transformed <code class="docutils literal notranslate"><span class="pre">Z</span></code>.</p></li>
+</ol>
+<blockquote>
+<div><p><em>Do not forget to add the mean back after reconstruction.</em></p>
+</div></blockquote>
+<ol class="arabic simple" start="4">
+<li><p>Run your code and compare results of your PCA and <code class="docutils literal notranslate"><span class="pre">sklearn</span></code> PCA using the code below.</p></li>
+</ol>
+<div class="alert alert-warning">
+<p>Solution_2</p>
+</div>
+<p><em>Points:</em> 8</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyPCA</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Solves the PCA problem min_Z,W (Z*W-X)^2 using SVD</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the MyPCA instance with the specified number of components.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        k : int</span>
+<span class="sd">            The number of principal components to retain.</span>
+<span class="sd">        &quot;&quot;&quot;</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="n">k</span>
+        
+
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Computes the principal components from the dataset X using SVD.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : np.ndarray</span>
+<span class="sd">            The input dataset from which to compute principal components.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">X</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean</span>  <span class="c1"># Center the data</span>
+        <span class="n">U</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">Vt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span>
+            <span class="n">X</span>
+        <span class="p">)</span>  <span class="c1"># SVD to get singular values and principal components</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">W</span> <span class="o">=</span> <span class="n">Vt</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">,</span> <span class="p">:]</span>  <span class="c1"># store only first k components in self.W</span>
+
+        
+    <span class="k">def</span> <span class="nf">get_components</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the principal components obtained after fitting the model.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.ndarray</span>
+<span class="sd">            An array containing the top k principal components.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">### Solution_2_1</span>
+        <span class="o">...</span>
+
+        
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Transforms the dataset X into the principal component space (Z) and returns it.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : np.ndarray</span>
+<span class="sd">            The dataset to be transformed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.ndarray</span>
+<span class="sd">            The dataset transformed into the principal component space.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">### Solution_2_2</span>
+
+        <span class="o">...</span>
+
+        
+    <span class="k">def</span> <span class="nf">reconstruct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Z</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reconstructs the original dataset from the PCA transformed data Z.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        Z : np.ndarray</span>
+<span class="sd">            The PCA transformed data.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.ndarray</span>
+<span class="sd">            The reconstructed dataset, approximating the original dataset before transformation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">### Solution_2_3</span>
+
+        <span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">make_blobs</span>
+
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">make_blobs</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">centers</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">n_features</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>  <span class="c1">## Generating toy data</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;PCA implementation with </span><span class="si">{}</span><span class="s2"> components: OK&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">((</span><span class="n">i</span><span class="p">)))</span>
+    <span class="n">pca</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
+    <span class="n">pca</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+    <span class="n">mypca</span> <span class="o">=</span> <span class="n">MyPCA</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
+    <span class="n">mypca</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">pca</span><span class="o">.</span><span class="n">components_</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">mypca</span><span class="o">.</span><span class="n">get_components</span><span class="p">())</span>
+    <span class="p">),</span> <span class="s2">&quot;W values do not match&quot;</span>
+
+    <span class="n">Z</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">Z_prime</span> <span class="o">=</span> <span class="n">mypca</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">Z</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">Z_prime</span><span class="p">)),</span> <span class="s2">&quot;Z values do not match&quot;</span>
+
+    <span class="n">X_hat</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span>
+    <span class="n">X_hat_prime</span> <span class="o">=</span> <span class="n">mypca</span><span class="o">.</span><span class="n">reconstruct</span><span class="p">(</span><span class="n">Z_prime</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">X_hat</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">X_hat_prime</span><span class="p">)</span>
+    <span class="p">),</span> <span class="s2">&quot;reconstructed X_hat values do not match&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">grader</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="s2">&quot;q2&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><br><br><br><br></p>
+</section>
+<section id="dimensionality-reduction-on-animal-faces">
+<h2>Dimensionality reduction on animal faces<a class="headerlink" href="#dimensionality-reduction-on-animal-faces" title="Permalink to this heading">#</a></h2>
+<hr>
+<p>In the next few exercises, you’ll explore dimensionality reduction on a subset of <a class="reference external" href="https://www.kaggle.com/andrewmvd/animal-faces">Animal Faces dataset</a> from Kaggle. I have created a subset of this dataset and preprocessed it a bit.</p>
+<p><strong>Your tasks:</strong></p>
+<ul class="simple">
+<li><p>Download animal_faces.pkl from <a class="reference external" href="https://github.ubc.ca/mds-2021-22/datasets/blob/master/data/animal_faces.pkl">here</a> and save it locally under the data folder in this lab’s directory.</p></li>
+<li><p>Run the code below to unpickle the data and to display the first few images.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pickle</span>
+
+<span class="n">animals</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s2">&quot;data/animal_faces.pkl&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
+
+<span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">mpl</span><span class="o">.</span><span class="n">rcParamsDefault</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;image.cmap&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;gray&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">animals</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">subplot_kw</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;xticks&quot;</span><span class="p">:</span> <span class="p">(),</span> <span class="s2">&quot;yticks&quot;</span><span class="p">:</span> <span class="p">()})</span>
+<span class="k">for</span> <span class="n">image</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">animals</span><span class="p">,</span> <span class="n">axes</span><span class="o">.</span><span class="n">ravel</span><span class="p">()):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s flatten the images.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_anims</span> <span class="o">=</span> <span class="n">animals</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">animals</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">X_anims</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The flattened representation of the data is of shape <span class="math notranslate nohighlight">\(1500 \times 10000\)</span>; Each image is represented with 10,000 features, each feature representing a pixel from the image. Let’s define <code class="docutils literal notranslate"><span class="pre">image_shape</span></code> variable which will be handy later when we want to display images.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">image_shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Use this flattened representation <code class="docutils literal notranslate"><span class="pre">X_anims</span></code> in the rest of the lab.</p>
+<p><br><br></p>
+</section>
+<section id="exercise-3-dimensionality-reduction-with-pca">
+<h2>Exercise 3: Dimensionality reduction with PCA<a class="headerlink" href="#exercise-3-dimensionality-reduction-with-pca" title="Permalink to this heading">#</a></h2>
+<hr>
+<p>In this exercise, you will explore dimensionality reduction on the animal faces dataset using PCA.</p>
+<!-- BEGIN QUESTION -->
+<section id="varying-the-number-of-components">
+<h3>3.1 Varying the number of components<a class="headerlink" href="#varying-the-number-of-components" title="Permalink to this heading">#</a></h3>
+<p>rubric={accuracy,reasoning}</p>
+<p>In this exercise, you will experiment with how varying the number of components changes reconstructions and the explained variance ratio.</p>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>Recall that PCA finds principal components such that the first principal component has the highest variance, the second component has the next highest variance and so on. Using <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html">scikit-learn’s <code class="docutils literal notranslate"><span class="pre">PCA</span></code></a> implementation and the following hyperparameter values, fit a PCA model with <code class="docutils literal notranslate"><span class="pre">random_state=42</span></code>, and plot <span class="math notranslate nohighlight">\(k\)</span> (for <span class="math notranslate nohighlight">\(k=1, \ldots, 1000\)</span>) vs. the proportion of total variance explained by the first <span class="math notranslate nohighlight">\(k\)</span> components.</p></li>
+<li><p>Examine the reconstructions for different number of components using the <code class="docutils literal notranslate"><span class="pre">plot_pca_animals</span></code> function below.</p></li>
+<li><p>Briefly discuss your observations.</p></li>
+</ol>
+<div class="alert alert-info">
+<p><em>Note that scikit-learn’s PCA does the data centering for you. <strong>Do not scale the data in this exercise and the next exercises</strong>.</em></p>
+<p><em>Feel free to use code from lecture notes with appropriate attributions. Also, feel free to modify the provided code if necessary.</em></p>
+</div><div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="k">def</span> <span class="nf">pca_faces</span><span class="p">(</span><span class="n">X_faces</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">300</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Applies PCA to a dataset of faces to reduce dimensionality and reconstructs the images.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X_faces : np.ndarray</span>
+<span class="sd">        The input dataset of face images, where each row represents an image.</span>
+<span class="sd">    n_components : list of int, default=[10, 50, 100, 200, 300]</span>
+<span class="sd">        The number of principal components to retain for the reconstruction.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list of np.ndarray</span>
+<span class="sd">        A list of numpy arrays, each representing the dataset reconstructed</span>
+<span class="sd">        from a different number of principal components.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">reduced_images</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">n_components</span><span class="p">:</span>
+        <span class="n">pca</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+        <span class="n">pca</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_faces</span><span class="p">)</span>
+        <span class="n">X_hat</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">pca</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_faces</span><span class="p">))</span>
+        <span class="n">reduced_images</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">X_hat</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">reduced_images</span>        
+
+<span class="k">def</span> <span class="nf">plot_pca_animals</span><span class="p">(</span><span class="n">X_faces</span><span class="p">,</span> <span class="n">image_shape</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">300</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="mi">30</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plots the original and PCA-reconstructed images from a dataset of animal faces.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X_faces : np.ndarray</span>
+<span class="sd">        The input dataset of face images.</span>
+<span class="sd">    image_shape : tuple</span>
+<span class="sd">        The shape of a single image (height, width).</span>
+<span class="sd">    n_components : list of int, default=[10, 50, 100, 200, 300]</span>
+<span class="sd">        The number of principal components used for the reconstructions.</span>
+<span class="sd">    index : int, default=30</span>
+<span class="sd">        The starting index from which to plot the original and reconstructed images.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">reduced_images</span> <span class="o">=</span> <span class="n">pca_faces</span><span class="p">(</span><span class="n">X_faces</span><span class="p">,</span> <span class="n">n_components</span><span class="p">)</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">n_components</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+                             <span class="n">subplot_kw</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;xticks&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;yticks&#39;</span><span class="p">:</span> <span class="p">[]})</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ax_row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">axes</span><span class="p">):</span>
+        <span class="n">ax_row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">X_faces</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">image_shape</span><span class="p">),</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">X_hat</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">ax_row</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">reduced_images</span><span class="p">):</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">X_hat</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">image_shape</span><span class="p">),</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Original image&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">:],</span> <span class="n">n_components</span><span class="p">):</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2"> components&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example usage of the function plot_pca_animals</span>
+<span class="n">n_components</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+<span class="n">plot_pca_animals</span><span class="p">(</span><span class="n">X_anims</span><span class="p">,</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="mi">100</span><span class="p">),</span> <span class="n">n_components</span><span class="o">=</span><span class="n">n_components</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="alert alert-warning">
+<p>Solution_3_1</p>
+</div>
+<p><em>Points:</em> 5</p>
+<p><em>Type your answer here, replacing this text.</em></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_components</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">500</span><span class="p">]</span>
+<span class="n">plot_pca_animals</span><span class="p">(</span><span class="n">X_anims</span><span class="p">,</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="mi">100</span><span class="p">),</span> <span class="n">n_components</span><span class="o">=</span><span class="n">n_components</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<!-- END QUESTION -->
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+</section>
+<section id="applying-pca">
+<h3>3.2 Applying PCA<a class="headerlink" href="#applying-pca" title="Permalink to this heading">#</a></h3>
+<p>rubric={accuracy}</p>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>Train a pca model with <code class="docutils literal notranslate"><span class="pre">n_components=300</span></code> and <code class="docutils literal notranslate"><span class="pre">random_state=42</span></code>.</p></li>
+<li><p>Get <span class="math notranslate nohighlight">\(Z\)</span> (the transformed data), <span class="math notranslate nohighlight">\(W\)</span> (principal components), and <span class="math notranslate nohighlight">\(X_{hat}\)</span> (reconstructions).</p></li>
+</ol>
+<div class="alert alert-warning">
+<p>Solution_3_2</p>
+</div>
+<p><em>Points:</em> 2</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_components</span> <span class="o">=</span> <span class="mi">300</span> 
+<span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Z</span> <span class="o">=</span> <span class="o">...</span>
+<span class="n">W</span> <span class="o">=</span> <span class="o">...</span>
+<span class="n">X_hat</span> <span class="o">=</span> <span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<!-- END QUESTION -->
+<p><br><br><br><br></p>
+</section>
+</section>
+<section id="exercise-4-interpreting-the-components-learned-by-pca">
+<h2>Exercise 4: Interpreting the components learned by PCA<a class="headerlink" href="#exercise-4-interpreting-the-components-learned-by-pca" title="Permalink to this heading">#</a></h2>
+<hr>
+<p>PCA is a linear transformation and we can visualize and interpret the principal components learned by PCA. In this exercise, you will attempt to manually inspect and interpret these components.</p>
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+<section id="plotting-strong-component-images">
+<h3>4.1 Plotting strong component images<a class="headerlink" href="#plotting-strong-component-images" title="Permalink to this heading">#</a></h3>
+<p>rubric={accuracy,reasoning}</p>
+<p>Principal component matrix returned by PCA (<span class="math notranslate nohighlight">\(W\)</span> matrix) is of shape: number of components by number of features. So you can reshape each component and visualize it as an image (in our case <span class="math notranslate nohighlight">\(100 \times 100\)</span> image).</p>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>Visualize the first 15 components as <span class="math notranslate nohighlight">\(100 \times 100\)</span> images in a grid of 3 rows and 5 columns.</p></li>
+<li><p>Pick at least four principal components where you observe some clear semantic themes. For these principal components, extract and display a few example images where the component values are strong for these particular components. The <code class="docutils literal notranslate"><span class="pre">plot_storng_comp_images</span></code> function will help you with this.</p></li>
+<li><p>Observe the components and their representative images and identify some possible semantic themes captured by these components.</p></li>
+</ol>
+<div class="alert alert-info">
+<p><em>Feel free to use code from lecture notes with appropriate attributions. The function to extract and show strong component images is provided below. Feel free to modify the provided code if necessary.</em></p>
+</div>    <div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_strong_comp_images</span><span class="p">(</span><span class="n">X_anims</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">compn</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">image_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="mi">100</span><span class="p">)):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given transformed data Z, components W, and the component index compn, the function </span>
+<span class="sd">    extracts and shows the images from X_anims where the component compn is strongest.   </span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----</span>
+<span class="sd">    X_anims : numpy array </span>
+<span class="sd">        Input data</span>
+<span class="sd">        </span>
+<span class="sd">    Z : numpy array</span>
+<span class="sd">        Transformed data</span>
+<span class="sd">    </span>
+<span class="sd">    W : numpy array</span>
+<span class="sd">        Components found by dimensionality reduction</span>
+
+<span class="sd">    compn : int</span>
+<span class="sd">        component to examine</span>
+
+<span class="sd">    image_shape : tuple</span>
+<span class="sd">        shape of the input image</span>
+<span class="sd">    Returns</span>
+<span class="sd">    ----</span>
+<span class="sd">    None. Shows the images with strong value for the given component</span>
+<span class="sd">    &quot;&quot;&quot;</span>    
+    <span class="n">inds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">Z</span><span class="p">[:,</span> <span class="n">compn</span><span class="p">])[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>    
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span>
+        <span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span> <span class="n">subplot_kw</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;xticks&quot;</span><span class="p">:</span> <span class="p">(),</span> <span class="s2">&quot;yticks&quot;</span><span class="p">:</span> <span class="p">()}</span>
+    <span class="p">)</span>    
+    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Component </span><span class="si">{</span><span class="n">compn</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">W</span><span class="p">[</span><span class="n">compn</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">image_shape</span><span class="p">))</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">image</span> <span class="ow">in</span> <span class="n">inds</span><span class="p">[:</span><span class="mi">6</span><span class="p">]:</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">X_anims</span><span class="p">[</span><span class="n">image</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">image_shape</span><span class="p">))</span>
+        <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>  
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="alert alert-warning">
+<p>Solution_4_1</p>
+</div>
+<p><em>Points:</em> 6</p>
+<p><em>Type your answer here, replacing this text.</em></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<!-- END QUESTION -->
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+</section>
+<section id="visualization-of-first-two-dimensions">
+<h3>4.2 Visualization of first two dimensions<a class="headerlink" href="#visualization-of-first-two-dimensions" title="Permalink to this heading">#</a></h3>
+<p>rubric={viz}</p>
+<p>One of the use cases of PCA is visualization. It’s not possible to visualize high dimensional data. That said, since the first couple of components of PCA usually capture a lot of information from the data, we can plot the first two dimensions to get an intuition about the patterns in the data.</p>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>Make a scatterplot of the first two dimensions in the transformed data <span class="math notranslate nohighlight">\(Z\)</span> (from 3.2).</p></li>
+</ol>
+<div class="alert alert-warning">
+<p>Solution_4_2</p>
+</div>
+<p><em>Points:</em> 2</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">Z</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">Z</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Z0&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Z1&quot;</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<!-- END QUESTION -->
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+</section>
+<section id="image-tiling">
+<h3>4.3 Image tiling<a class="headerlink" href="#image-tiling" title="Permalink to this heading">#</a></h3>
+<p>rubric={accuracy,quality,reasoning}</p>
+<p>In this exercise you will attempt to interpret the first two dimensions of the transformed data. One way to interpret these dimensions is as follows:</p>
+<ul class="simple">
+<li><p>Create an <span class="math notranslate nohighlight">\(m \times m\)</span> grid which roughly spans scatterplot region from the previous exercise. For example, if <code class="docutils literal notranslate"><span class="pre">Z</span></code> is your transformed data, the following range of values will get you five points spanning the first dimension.</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">Z</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">Z</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]),</span> <span class="mi">5</span><span class="p">))</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Once you have representative points which span the first dimension, get the indices of the data points closest to these points.</p></li>
+<li><p>Plot the images corresponding to these indices as a grid and observe whether you see any pattern as the first dimension increases (left to right of the grid) and as the second dimension increases (bottom to top of the grid).</p></li>
+</ul>
+<p>Let’s try this out with <span class="math notranslate nohighlight">\(m=5\)</span>, i.e., a <span class="math notranslate nohighlight">\(5 \times 5\)</span> grid.</p>
+<p><strong>Your tasks:</strong></p>
+<ol class="arabic simple">
+<li><p>Make a <span class="math notranslate nohighlight">\(5 \times 5\)</span> grid that roughly spans the scatterplot region from the previous exercise (but stays within it). For each point on that grid, select the animal face whose first two dimensions are closest to the grid point. Plot a <span class="math notranslate nohighlight">\(5 \times 5\)</span> tiling of these animal faces, corresponding to the <span class="math notranslate nohighlight">\(5 \times 5\)</span> grid using the <code class="docutils literal notranslate"><span class="pre">img_tiling</span></code> function below.</p></li>
+<li><p>What happens to the images as the first dimension increases (i.e., go from left to right of the grid)? What about the second dimension? Briefly discuss your observations and try to label your axes based on your interpretation.</p></li>
+</ol>
+<div class="alert alert-info">
+<p>Hint: The function to make the <span class="math notranslate nohighlight">\(5 \times 5\)</span> tiling plot is provided below</p>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">img_tiling</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">image_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plots a 5x5 tiling of faces from bottom to top and left to right. </span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">    -----------</span>
+<span class="sd">    idx: the indexes of the faces to be plotted. This should be a 5x5 matrix, where each</span>
+<span class="sd">         elements is an index corresponding to the closest animal face of that grid point.</span>
+<span class="sd">         position 0,0 of idx corresponds to the bottom left position in the grid </span>
+<span class="sd">         position 0,4 of idx corresponds to the top left position</span>
+<span class="sd">         position 4,0 of idx corresponds to the bottom right position</span>
+<span class="sd">         position 4,4 of idx corresponds to the top right position</span>
+
+<span class="sd">    size: the desired size of the plot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;int32&quot;</span><span class="p">)</span>  <span class="c1"># Just making sure the indexes are int</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">size</span><span class="p">))</span>  <span class="c1"># Creating the image with the desired size</span>
+
+    <span class="n">tile_size</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="c1"># Ploting the 5x5 tiling</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">tile_size</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">tile_size</span><span class="p">):</span>
+            <span class="n">face</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                <span class="n">animals</span><span class="p">[</span><span class="n">idx</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]],</span> <span class="p">(</span><span class="n">image_shape</span><span class="p">)</span>
+            <span class="p">)</span>  <span class="c1"># Obtain the closest face</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span>
+                <span class="n">face</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="mi">32</span><span class="p">,</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">32</span><span class="p">,</span> <span class="n">j</span> <span class="o">*</span> <span class="mi">32</span><span class="p">,</span> <span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">32</span><span class="p">)</span>
+            <span class="p">)</span>  <span class="c1"># Plot the closest animal face</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">160</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">160</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">([])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">([])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="alert alert-warning">
+<p>Solution_4_3</p>
+</div>
+<p><em>Points:</em> 10</p>
+<p><em>Type your answer here, replacing this text.</em></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<!-- END QUESTION -->
+<p><br><br><br><br></p>
+<!-- BEGIN QUESTION -->
+</section>
+</section>
+<section id="exercise-5-pca-vs-nmf-vs-lsa">
+<h2>Exercise 5: PCA vs. NMF vs. LSA<a class="headerlink" href="#exercise-5-pca-vs-nmf-vs-lsa" title="Permalink to this heading">#</a></h2>
+<hr>
+Write the differences between PCA (Principal Component Analysis), NMF (Non-negative Matrix Factorization), and LSA (Latent Semantic Analysis) by completing the table provided below. <div class="alert alert-warning">
+<p>Solution_5</p>
+</div><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Differenciating feature</p></th>
+<th class="head"><p>PCA</p></th>
+<th class="head"><p>NMF</p></th>
+<th class="head"><p>LSA</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Primary use</strong></p></td>
+<td><p></p></td>
+<td><p></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Data types/constraints</strong></p></td>
+<td><p></p></td>
+<td><p></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Output components</strong></p></td>
+<td><p></p></td>
+<td><p></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Interpretability</strong></p></td>
+<td><p></p></td>
+<td><p></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p><em>Points:</em> 6</p>
+<p><em>Type your answer here, replacing this text.</em></p>
+<!-- END QUESTION -->
+<p><br><br><br><br></p>
+</section>
+<section id="exercise-6-food-for-thought">
+<h2>Exercise 6: Food for thought<a class="headerlink" href="#exercise-6-food-for-thought" title="Permalink to this heading">#</a></h2>
+<hr>
+<p>As you know, each lab has a few challenging questions. These are usually low-risk questions and will contribute to maximum 5% of the lab grade. The main purpose here is to challenge yourself, dig deeper in a particular area, and going beyond what we explicitly discussed in the class. When you start working on labs, attempt all other questions before moving to these challenging questions. If you are running out of time, please skip the challenging questions.</p>
+<p>We will be more strict with the marking of these questions. There might not be model answers. If you want to get full points in these questions, your answers need to</p>
+<ul class="simple">
+<li><p>be thorough, thoughtful, and well-written</p></li>
+<li><p>provide convincing justification and appropriate evidence for the claims you make</p></li>
+<li><p>impress the reader of your lab with your understanding of the material, your analytical and critical reasoning skills, and your ability to think on your own</p></li>
+</ul>
+<p><img alt="" src="../../../_images/eva-game-on1.png" /></p>
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+<section id="challenging-6-1-cnn-autoencoder-on-the-mnist-dataset">
+<h3>(Challenging) 6.1 CNN Autoencoder on the MNIST dataset<a class="headerlink" href="#challenging-6-1-cnn-autoencoder-on-the-mnist-dataset" title="Permalink to this heading">#</a></h3>
+<p>rubric={reasoning}</p>
+<p>The code provided below downloads the MNIST dataset and sets up training and validation loaders.</p>
+<p><strong>Your tasks:</strong></p>
+<ul class="simple">
+<li><p>Develop a CNN-based autoencoder for this dataset. Specifically, you should:</p>
+<ul>
+<li><p>Define a <code class="docutils literal notranslate"><span class="pre">CNNAutoencoder</span></code> class.</p></li>
+<li><p>Create an object of this class.</p></li>
+<li><p>Specify the appropriate loss function (criterion) and optimizer.</p></li>
+<li><p>Write the training loop and train your model.</p></li>
+</ul>
+</li>
+<li><p>After training your model, showcase some of the original images alongside their reconstructed counterparts.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span><span class="p">,</span> <span class="n">optim</span>
+<span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">transforms</span><span class="p">,</span> <span class="n">utils</span>
+<span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
+    <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">()</span>
+<span class="p">])</span>
+
+<span class="n">BATCH_SIZE</span> <span class="o">=</span> <span class="mi">64</span>
+
+<span class="n">trainset</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">MNIST</span><span class="p">(</span><span class="s1">&#39;data/&#39;</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">)</span>
+<span class="n">validset</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">MNIST</span><span class="p">(</span><span class="s1">&#39;data/&#39;</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">)</span>
+<span class="n">trainloader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">trainset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">validloader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">validset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Sample plot</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">trainloader</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number: </span><span class="si">{</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="alert alert-warning">
+<p>Solution_6_1</p>
+</div>
+<p><em>Points:</em> 2</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<!-- END QUESTION -->
+<p><br><br></p>
+<!-- BEGIN QUESTION -->
+</section>
+<section id="challenging-6-2-latent-semantic-analysis-lsa">
+<h3>(Challenging) 6.2 Latent Semantic Analysis (LSA)<a class="headerlink" href="#challenging-6-2-latent-semantic-analysis-lsa" title="Permalink to this heading">#</a></h3>
+<hr>
+<p>rubric={reasoning}</p>
+<p><strong>Your tasks:</strong></p>
+<ul class="simple">
+<li><p>Extract topics from a text dataset of your choice (e.g., the recipe titles dataset we used in lecture 2 class demo) using LSA (<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.TruncatedSVD.html">TruncatedSVD</a>). Show the topics and discuss your results.</p></li>
+</ul>
+<div class="alert alert-warning">
+<p>Solution_6_2</p>
+</div>
+<p><em>Points:</em> 1</p>
+<p><em>Type your answer here, replacing this text.</em></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+<!-- END QUESTION -->
+<p><br><br><br><br></p>
+<p>Before submitting your assignment, please make sure you have followed all the instructions in the Submission Instructions section at the top.</p>
+<p>Well done!! Have a wonderful weekend!</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">Image</span>
+
+<span class="n">Image</span><span class="p">(</span><span class="s2">&quot;img/eva-happy-caturday.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "conda-env-563-py"
+        },
+        kernelOptions: {
+            name: "conda-env-563-py",
+            path: "./labs/lab2/student"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'conda-env-563-py'</script>
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../../lab1/student/lab1.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Lab 1: Clustering</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../../lab3/student/lab3.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Lab 3: Word embeddings, T-SNE, and product similarity using Word2Vec</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imports-a-name-im-a">Imports <a name="im"></a></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submission-instructions-a-name-si-a">Submission instructions <a name="si"></a></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-warm-up">Exercise 1: Warm-up</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dimensionality-reduction-notation">1.1 Dimensionality reduction notation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#picking-the-number-of-components-k">1.2 Picking the number of components <span class="math notranslate nohighlight">\(k\)</span></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pca-by-hand">1.3 PCA by hand</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">1.3.1</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">1.3.2</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">1.3.3</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">1.3.4</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reconstruction-error">1.4 Reconstruction error</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">1.4.1</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">1.4.2</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">1.4.3</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-implementing-pca-using-svd">Exercise 2: Implementing PCA using SVD</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dimensionality-reduction-on-animal-faces">Dimensionality reduction on animal faces</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-dimensionality-reduction-with-pca">Exercise 3: Dimensionality reduction with PCA</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#varying-the-number-of-components">3.1 Varying the number of components</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#applying-pca">3.2 Applying PCA</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-interpreting-the-components-learned-by-pca">Exercise 4: Interpreting the components learned by PCA</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#plotting-strong-component-images">4.1 Plotting strong component images</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#visualization-of-first-two-dimensions">4.2 Visualization of first two dimensions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#image-tiling">4.3 Image tiling</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-5-pca-vs-nmf-vs-lsa">Exercise 5: PCA vs. NMF vs. LSA</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-6-food-for-thought">Exercise 6: Food for thought</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#challenging-6-1-cnn-autoencoder-on-the-mnist-dataset">(Challenging) 6.1 CNN Autoencoder on the MNIST dataset</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#challenging-6-2-latent-semantic-analysis-lsa">(Challenging) 6.2 Latent Semantic Analysis (LSA)</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Varada Kolhatkar
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2022.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
